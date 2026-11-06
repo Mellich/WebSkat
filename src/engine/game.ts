@@ -20,15 +20,15 @@ import {
 
 /** Information for the acting role. Absent fields mean "not allowed". */
 export interface Legal {
-  bidValues?: number[];
-  canPassBid?: boolean;
-  canHold?: boolean;
-  canClaim?: boolean;
-  canPickUp?: boolean;
-  canPlayHand?: boolean;
-  discardFrom?: CardId[];
-  declarations?: Declaration[];
-  playableCards?: CardId[];
+  bidValues?: number[] | undefined;
+  canPassBid?: boolean | undefined;
+  canHold?: boolean | undefined;
+  canClaim?: boolean | undefined;
+  canPickUp?: boolean | undefined;
+  canPlayHand?: boolean | undefined;
+  discardFrom?: CardId[] | undefined;
+  declarations?: Declaration[] | undefined;
+  playableCards?: CardId[] | undefined;
 }
 
 export function newGame(seed: number): GameState {

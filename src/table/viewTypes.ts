@@ -50,7 +50,7 @@ export type ViewResult =
 export interface ViewBidEvent {
   readonly playerId: PlayerId;
   readonly type: 'bid' | 'hold' | 'pass' | 'claim';
-  readonly value?: number;
+  readonly value?: number | undefined;
 }
 
 export interface GameView {

@@ -90,20 +90,20 @@ sequence) is part of the tests as living documentation.
 
 ## Phase 4 — Networking  (*05*, *02 §3–4*)
 
-- [ ] `constants.ts`, `keys.ts` (+ tests: format/normalize/validate, alphabet, length).
-- [ ] `protocol.ts`: zod schemas typed against the TS types; tests: valid samples parse, malformed
+- [x] `constants.ts`, `keys.ts` (+ tests: format/normalize/validate, alphabet, length).
+- [x] `protocol.ts`: zod schemas typed against the TS types; tests: valid samples parse, malformed
       (unknown card id, extra type, missing fields, oversize name) rejected.
-- [ ] `transport.ts` interface + `fake.ts` in-memory network (synchronous or microtask delivery,
+- [x] `transport.ts` interface + `fake.ts` in-memory network (synchronous or microtask delivery,
       supports multiple rooms, targets, join/leave events).
-- [ ] `host.ts` + `client.ts` + `connection.ts` against the fake network. Tests:
+- [x] `host.ts` + `client.ts` + `connection.ts` against the fake network. Tests:
       3 clients + host play a scripted game to the end through `GameConnection`s; clients never
       receive a `view` containing foreign cards; unknown peer commands ignored; reconnect with
       token reclaims the seat; table full → `rejected`; version mismatch → `rejected`;
       host `stop` → clients `closed`; join timeout → `rejected TIMEOUT` (use fake timers).
-- [ ] `directory.ts` + test with fake network (ads appear, expire after TTL, stop leaves room).
-- [ ] `createTrysteroTransport` for `nostr` and `ws-relay` (dynamic imports). Read the `.d.ts` files
+- [x] `directory.ts` + test with fake network (ads appear, expire after TTL, stop leaves room).
+- [x] `createTrysteroTransport` for `nostr` and `ws-relay` (dynamic imports). Read the `.d.ts` files
       in `node_modules` first. This part is not unit-tested (manual in Phase 10).
-- [ ] `scripts/relay.mjs` and `npm run relay`.
+- [x] `scripts/relay.mjs` and `npm run relay`.
 
 **Acceptance**: `npm run check` green. Two terminal-free checks: `npm run relay` starts; the fake
 network integration test passes.
