@@ -41,3 +41,14 @@ decide something while implementing** (date, decision, reason). Format: `ID — 
 | Q4 | Optional turn timer / auto-play for AFK players? | No |
 | Q5 | Sound effects? | None |
 | Q6 | Strong AI opponents? | No, random bots only |
+
+## Decided during implementation
+
+| ID | Topic | Decision | Why / alternative |
+|---|---|---|---|
+| I1 | TypeScript project layout (Phase 0) | `tsconfig.base.json` (shared strict options); `tsconfig.core.json` for `src/engine` + `src/table` with `lib: ["ES2022"]`, `types: []` (no DOM); `tsconfig.app.json` for `src` (DOM, `vite/client`); `tsconfig.node.json` for `vite.config.ts`; root `tsconfig.json` references all three; `npm run typecheck` = `tsc -b` | Makes accidental `window`/`console` use in the pure layers a compile error (verified). Same pattern as the Vite React template |
+| I2 | Type-aware ESLint (Phase 0) | `tseslint.configs.strictTypeChecked` for `**/*.{ts,tsx}` with `parserOptions.project` = the three tsconfigs; `*.js/*.mjs` use `disableTypeChecked`; `eslint-plugin-react-hooks` flat recommended for `src/**` | Type info is needed for the strict rules; JS config files are not part of a TS project |
+| I3 | Extra dev dependencies (Phase 0) | Added `eslint-plugin-react-hooks@^7.1.1`, `jsdom@^31`, `@testing-library/react@^16`, `@testing-library/dom@^10` (peer of RTL), `@testing-library/user-event@^14`, `fast-check@^4`, `@types/react@^19`, `@types/react-dom@^19`, `@types/node@^22` | Listed in 01 as "latest compatible" / "matching". `@types/node` pinned to 22 to match the minimum runtime (Node 22.12), not the latest (26) |
+| I4 | Purity lint rules (Phase 0) | `src/engine` and `src/table`: no `react`/`zustand`/`trystero`, no `window`/`document`/storage/`fetch`/`crypto`/timers, no `Date` (any use), no `Math.random`, no `console`. `src/engine` additionally forbids `zod` and importing `table`/`net`/`ui`; `src/table` forbids `net`/`ui`; `src/net` forbids `ui` | Literal reading of 01 ("zod (engine only)"). `table` may therefore use `zod` if it needs to; revisit if that is undesired |
+| I5 | Vitest scope (Phase 0) | `vite.config.ts` test block: `environment: 'node'`, excludes `e2e/**` (Playwright) | Keeps Vitest and Playwright apart; jsdom only for component tests |
+| I6 | Node runtime (Phase 0) | Node v26.13.0 (via nvm) is used locally; `engines.node` is `>=22.12` | Requirement is the minimum; the project is tested only on the installed version so far |

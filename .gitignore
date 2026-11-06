@@ -1,0 +1,7 @@
+node_modules
+dist
+public/cards
+public/backs
+test-results
+playwright-report
+.env.local

@@ -10,16 +10,16 @@ Reference docs per phase are in *italics*. Rules/numbers always from `03-skat-ru
 
 ## Phase 0 — Scaffolding  (*01-tech-stack.md*)
 
-- [ ] `node -v` is ≥ 22.12 (if Node is missing: stop and tell the user).
-- [ ] `npm init`, install the dependencies from `01-tech-stack.md` (exact ranges listed there).
-- [ ] Create `package.json` scripts, `tsconfig.json` (+ no-DOM config for `src/engine`/`src/table`),
+- [x] `node -v` is ≥ 22.12 (if Node is missing: stop and tell the user).
+- [x] `npm init`, install the dependencies from `01-tech-stack.md` (exact ranges listed there).
+- [x] Create `package.json` scripts, `tsconfig.json` (+ no-DOM config for `src/engine`/`src/table`),
       `vite.config.ts`, `eslint.config.js` (with layering and purity rules), `.gitignore`,
       `.env.example`, `index.html`.
-- [ ] `src/main.tsx` + `src/App.tsx` rendering "WebSkat" (placeholder).
-- [ ] Add a trivial test `src/engine/smoke.test.ts` so Vitest has something to run.
-- [ ] Verify the lint rules work: temporarily `import React` inside `src/engine/x.ts` and confirm
+- [x] `src/main.tsx` + `src/App.tsx` rendering "WebSkat" (placeholder).
+- [x] Add a trivial test `src/engine/smoke.test.ts` so Vitest has something to run.
+- [x] Verify the lint rules work: temporarily `import React` inside `src/engine/x.ts` and confirm
       ESLint fails; remove it.
-- [ ] Create `docs/12-open-questions.md` entries are already seeded; keep appending.
+- [x] Create `docs/12-open-questions.md` entries are already seeded; keep appending.
 
 **Acceptance**: `npm run check` green; `npm run dev` serves the placeholder; `npm run build` works.
 
