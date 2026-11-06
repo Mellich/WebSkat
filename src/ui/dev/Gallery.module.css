@@ -1,0 +1,25 @@
+.gallery {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.gallery section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gallery h2 {
+  font-size: 1rem;
+  color: var(--accent);
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  align-items: flex-end;
+}

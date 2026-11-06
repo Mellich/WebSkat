@@ -112,13 +112,13 @@ network integration test passes.
 
 ## Phase 5 — Assets and base components  (*10-assets.md*, *06 §2,5*)
 
-- [ ] `scripts/make-assets.mjs` using `sharp`: 32 card WebP files and 4 backs (see `10-assets.md`);
+- [x] `scripts/make-assets.mjs` using `sharp`: 32 card WebP files and 4 backs (see `10-assets.md`);
       idempotent; `npm run assets`; `predev`/`prebuild` run it if `public/cards` is missing.
-- [ ] `ui/styles/tokens.css`, `global.css`.
-- [ ] `Card`, `Hand`, `OpponentSeat`, `TrickArea`, `SkatPile` components (pure presentational) with
+- [x] `ui/styles/tokens.css`, `global.css`.
+- [x] `Card`, `Hand`, `OpponentSeat`, `TrickArea`, `SkatPile` components (pure presentational) with
       a dev-only **Gallery** page (`#/dev/gallery`, only when `import.meta.env.DEV`) showing: all 32
       cards, 4 backs, a hand with some disabled cards, a trick with 3 cards.
-- [ ] Component tests for `Hand` (only legal cards enabled).
+- [x] Component tests for `Hand` (only legal cards enabled).
 
 **Acceptance**: gallery looks right on a 360 px wide viewport and on desktop; `npm run check` green.
 

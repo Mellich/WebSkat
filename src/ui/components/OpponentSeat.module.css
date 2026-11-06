@@ -1,0 +1,55 @@
+.seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  min-width: 0;
+}
+
+.turn {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 18px rgb(242 193 78 / 55%);
+}
+
+.declarer .name::after {
+  content: ' ♦';
+  color: var(--accent);
+}
+
+.header {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.name {
+  font-weight: 600;
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.count {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.cards {
+  display: flex;
+  align-items: flex-start;
+}
+
+.stacked + .stacked {
+  margin-left: calc(var(--card-w-opponent) * -0.7);
+}

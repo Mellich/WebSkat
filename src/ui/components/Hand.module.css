@@ -1,0 +1,16 @@
+.hand {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px 8px 8px;
+  min-height: calc(var(--card-h) + 24px);
+  max-width: 100%;
+}
+
+.hand > * {
+  flex: 0 0 auto;
+}
+
+.hand > * + * {
+  margin-left: calc(var(--card-w) * -0.55);
+}

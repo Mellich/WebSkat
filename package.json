@@ -8,7 +8,9 @@
     "node": ">=22.12"
   },
   "scripts": {
+    "predev": "node scripts/make-assets.mjs --if-missing",
     "dev": "vite",
+    "prebuild": "node scripts/make-assets.mjs --if-missing",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",

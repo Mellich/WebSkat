@@ -1,0 +1,40 @@
+.trick {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: calc(var(--gap) * 2);
+  min-height: calc(var(--card-w-trick) * 178 / 128 + 28px);
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.card {
+  border-radius: 8px;
+  transition: transform 300ms ease-out, box-shadow 300ms ease-out;
+}
+
+.winner {
+  box-shadow: 0 0 0 3px var(--accent);
+}
+
+.name {
+  font-size: 0.8rem;
+  color: var(--muted);
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  display: block;
+  width: var(--card-w-trick);
+  height: calc(var(--card-w-trick) * 178 / 128);
+  border-radius: 8px;
+  border: 2px dashed rgb(255 255 255 / 18%);
+}

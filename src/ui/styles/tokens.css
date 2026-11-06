@@ -1,0 +1,21 @@
+/* Design tokens (docs/06-ui-ux.md §5). Dark theme only in v1. */
+:root {
+  --felt: #1d5c2e;
+  --felt-dark: #123d1e;
+  --ink: #f4f1e8;
+  --muted: #b9c7b5;
+  --panel: rgb(10 30 16 / 72%);
+  --accent: #f2c14e;
+  --danger: #e5484d;
+  --suit-red: #d12f2f;
+  --suit-black: #111;
+
+  --card-w: clamp(52px, 11vw, 96px);
+  --card-h: calc(var(--card-w) * 178 / 128);
+  --card-w-opponent: calc(var(--card-w) * 0.5);
+  --card-w-trick: calc(var(--card-w) * 1.1);
+
+  --radius: 10px;
+  --gap: 8px;
+  --tap: 44px;
+}
