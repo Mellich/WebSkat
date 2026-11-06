@@ -68,19 +68,19 @@ sequence) is part of the tests as living documentation.
 
 ## Phase 3 — Table layer  (*04 Part B*, *07*, *02 §3*)
 
-- [ ] `types.ts` (Part B), `rotation.ts` (`rolesForDealer`, `pickFirstDealer`) with tests for N=3..6
+- [x] `types.ts` (Part B), `rotation.ts` (`rolesForDealer`, `pickFirstDealer`) with tests for N=3..6
       (who sits out, forehand/middle/hind per dealer).
-- [ ] `table.ts`: `createTable`, `addPlayer`, `setConnected`, `uniqueName`, `applyCommand` with all
+- [x] `table.ts`: `createTable`, `addPlayer`, `setConnected`, `uniqueName`, `applyCommand` with all
       commands of 04 B2; `removePlayer` index maths with tests (kick before/at/after dealer pointer).
-- [ ] `records.ts`: `makeRecord` incl. Seeger bonus by `seatsAtDeal`; tests with 03 §10.7 vectors and
+- [x] `records.ts`: `makeRecord` incl. Seeger bonus by `seatsAtDeal`; tests with 03 §10.7 vectors and
       a 4-player table (+30 to the sitting-out player).
-- [ ] `stats.ts`: `computeStats` + tests from 07 §5.
-- [ ] `view.ts`: `viewFor` with allow-list redaction (04 B4) + `spitzen` for declarer.
-- [ ] **Redaction property test** (09 §3): for random games × every viewer × after every action.
-- [ ] `bot.ts`: `botAction`, `runBots`; test: bot-only tables of 3, 4, 5, 6 players play 50 games
+- [x] `stats.ts`: `computeStats` + tests from 07 §5.
+- [x] `view.ts`: `viewFor` with allow-list redaction (04 B4) + `spitzen` for declarer.
+- [x] **Redaction property test** (09 §3): for random games × every viewer × after every action.
+- [x] `bot.ts`: `botAction`, `runBots`; test: bot-only tables of 3, 4, 5, 6 players play 50 games
       each → records consistent, no exceptions, dealer rotation correct, scores sum rules
       (standard: sum of deltas per game = declarerScore).
-- [ ] Table-level tests: `ready` flow, abort, pending players seated after game, host cannot be
+- [x] Table-level tests: `ready` flow, abort, pending players seated after game, host cannot be
       kicked, `start` requires ≥ 3.
 
 **Acceptance**: `npm run check` green. A Node script/test can play whole 4-player tables using only
