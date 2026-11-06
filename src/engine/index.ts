@@ -5,3 +5,8 @@ export * from './deck';
 export * from './trump';
 export * from './spitzen';
 export * from './values';
+export * from './declaration';
+export * from './bidding';
+export * from './scoring';
+export * from './play';
+export * from './game';

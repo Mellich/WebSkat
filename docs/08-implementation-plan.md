@@ -45,21 +45,21 @@ Reference docs per phase are in *italics*. Rules/numbers always from `03-skat-ru
 
 ## Phase 2 — Engine game flow  (*04 A2*, *03 §4,5,8,10,11*)
 
-- [ ] `declaration.ts`: `validateDeclaration` (all invalid combos rejected), `declarationOptions`
+- [x] `declaration.ts`: `validateDeclaration` (all invalid combos rejected), `declarationOptions`
       (exactly 7 / 22 entries, all valid, all unique).
-- [ ] `bidding.ts`: state machine per transition table. Tests: every example row in 03 §4.2,
+- [x] `bidding.ts`: state machine per transition table. Tests: every example row in 03 §4.2,
       wrong-turn rejection, bids must increase, `hold` without bid rejected, claim stage.
-- [ ] `scoring.ts`: `computeScore` + `scoreGame`; **all 20 vectors** from 03 §10.7 as a
+- [x] `scoring.ts`: `computeScore` + `scoreGame`; **all 20 vectors** from 03 §10.7 as a
       table-driven test (`it.each`). Test overbid rounding and Null overbid.
-- [ ] `play.ts`: `playCard`, trick resolution, Null early end, 10-trick end.
-- [ ] `game.ts`: `newGame`, `applyAction`, `getLegal`, `enumerateActions`, `isFinished`.
+- [x] `play.ts`: `playCard`, trick resolution, Null early end, 10-trick end.
+- [x] `game.ts`: `newGame`, `applyAction`, `getLegal`, `enumerateActions`, `isFinished`.
       Test: `newGame` starts with `turn = 'middlehand'`; passed-in flow; hand game flow; pickup +
       discard flow (declarer holds 12 then 10); ouvert flow; illegal card rejected and state
       unchanged (use `toBe` identity on the returned state in error cases is not needed, but
       verify deep equality with the old state).
-- [ ] Fuzz test `game.fuzz.test.ts`: 2000 seeds, random legal actions via `enumerateActions`;
+- [x] Fuzz test `game.fuzz.test.ts`: 2000 seeds, random legal actions via `enumerateActions`;
       invariants listed in 04 A3. Use `fast-check` or a plain seeded loop.
-- [ ] Purity check: grep test or ESLint ensures no `Math.random`/`Date` in `src/engine`.
+- [x] Purity check: grep test or ESLint ensures no `Math.random`/`Date` in `src/engine`.
 
 **Acceptance**: `npm run check` green; fuzz test passes; a scripted full game (hand-written
 sequence) is part of the tests as living documentation.
