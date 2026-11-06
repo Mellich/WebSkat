@@ -95,3 +95,7 @@ Environment note: the planning machine had **no Node.js installed**. Verify `nod
 
 State briefly: what you built, which files, which tests pass. Do not claim "done" without running
 `npm run check`.
+
+## 7. Extending the Project
+
+The user may ask to change or add functionality to this app. In that case, update the documentation accordingly to always keep it in sync.
