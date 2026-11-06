@@ -27,17 +27,17 @@ Reference docs per phase are in *italics*. Rules/numbers always from `03-skat-ru
 
 ## Phase 1 — Engine core  (*04 Part A*, *03 §1,3,6,7,10.1*)
 
-- [ ] `types.ts` exactly as in 04 A1 (+ `assertNever`, `ok()/err()` helpers for `Result`).
-- [ ] `cards.ts`: `ALL_CARDS` (32 unique), `suitOf/rankOf/cardPoints/sumPoints/isCardId`, `sortHand`.
-- [ ] `rng.ts`: `mulberry32`, `shuffle`; test determinism (same seed → same order) and that
+- [x] `types.ts` exactly as in 04 A1 (+ `assertNever`, `ok()/err()` helpers for `Result`).
+- [x] `cards.ts`: `ALL_CARDS` (32 unique), `suitOf/rankOf/cardPoints/sumPoints/isCardId`, `sortHand`.
+- [x] `rng.ts`: `mulberry32`, `shuffle`; test determinism (same seed → same order) and that
       the result is a permutation.
-- [ ] `deck.ts`: `deal(seed)`; test: 10/10/10/2, all 32 unique, deterministic, deal order by index.
-- [ ] `trump.ts`: `modeOf/isTrump/effectiveSuit/cardStrength/trickWinner/legalCards`.
+- [x] `deck.ts`: `deal(seed)`; test: 10/10/10/2, all 32 unique, deterministic, deal order by index.
+- [x] `trump.ts`: `modeOf/isTrump/effectiveSuit/cardStrength/trickWinner/legalCards`.
       Tests: **every row** of the tables in 03 §6.4 and §6.5; plus Null ordering, jacks in Grand.
-- [ ] `spitzen.ts`: tests for the examples in 03 §7 (mit 2, ohne 2, mit 6, ohne 3, mit 11, grand max 4).
-- [ ] `values.ts`: `BID_VALUES` (test first 20 values + length + sorted + unique), `baseValue`,
+- [x] `spitzen.ts`: tests for the examples in 03 §7 (mit 2, ohne 2, mit 6, ohne 3, mit 11, grand max 4).
+- [x] `values.ts`: `BID_VALUES` (test first 20 values + length + sorted + unique), `baseValue`,
       `nullValue`, `gameMultiplier`, `declarationFloorValue`.
-- [ ] `index.ts` re-exports the public API.
+- [x] `index.ts` re-exports the public API.
 
 **Acceptance**: `npm run check` green; all table-driven tests above exist and pass.
 
