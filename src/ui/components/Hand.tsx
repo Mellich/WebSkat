@@ -14,6 +14,7 @@ export interface HandProps {
   readonly legal: readonly CardId[];
   /** Show the hand at full brightness when card legality is not relevant (e.g. bidding). */
   readonly showAll?: boolean;
+  readonly paused?: boolean;
   readonly mode?: 'play' | 'discard';
   readonly selected?: readonly CardId[];
   readonly highlight?: readonly CardId[];
@@ -32,10 +33,15 @@ function stateOf(card: CardId, props: HandProps): CardState {
 export function Hand(props: HandProps) {
   const { cards, declaration, legal, mode = 'play', onPlay, onToggle, label = cardLabel } = props;
   return (
-    <div className={styles.hand} role="group" aria-label="Your hand">
+    <div
+      className={styles.hand}
+      role="group"
+      aria-label="Your hand"
+      style={{ '--hand-n': Math.max(2, cards.length) } as React.CSSProperties & Record<'--hand-n', number>}
+    >
       {sortHand(cards, declaration).map((card) => {
         const enabled = legal.includes(card);
-        const handler = enabled ? (mode === 'discard' ? onToggle : onPlay) : undefined;
+        const handler = enabled && props.paused !== true ? (mode === 'discard' ? onToggle : onPlay) : undefined;
         const state = stateOf(card, props);
         const testId = `hand-card-${card}`;
         return handler === undefined ? (

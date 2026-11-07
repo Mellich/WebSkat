@@ -30,8 +30,8 @@ export function initialBidding(): BiddingState {
   };
 }
 
-function isRaise(value: number, currentBid: number | null): boolean {
-  return BID_VALUES.includes(value) && value > (currentBid ?? 0);
+export function nextBidValue(currentBid: number | null): number | null {
+  return BID_VALUES.find((value) => value > (currentBid ?? 0)) ?? null;
 }
 
 function toEvent(role: Role, action: BidAction): BidEvent {
@@ -75,8 +75,11 @@ function applyStage(
       if (b.awaiting !== 'caller') {
         return err('ILLEGAL_BID', 'The listener must hold or pass.');
       }
-      if (!isRaise(action.value, b.currentBid)) {
-        return err('ILLEGAL_BID', `A bid of ${String(action.value)} is not allowed here.`);
+      if (action.value !== nextBidValue(b.currentBid)) {
+        const next = nextBidValue(b.currentBid);
+        return err('ILLEGAL_BID', next === null
+          ? 'No higher bid value is allowed.'
+          : `Only the next bid value ${String(next)} is allowed.`);
       }
       return ok({ ...b, currentBid: action.value, awaiting: 'listener', history });
     case 'hold':
@@ -142,7 +145,8 @@ export function legalBidValues(b: BiddingState): number[] {
   if ((b.stage !== 1 && b.stage !== 2) || b.awaiting !== 'caller') {
     return [];
   }
-  return BID_VALUES.filter((value) => isRaise(value, b.currentBid));
+  const next = nextBidValue(b.currentBid);
+  return next === null ? [] : [next];
 }
 
 export function biddingOutcome(b: BiddingState): BiddingOutcome {

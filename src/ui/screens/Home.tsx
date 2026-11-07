@@ -30,6 +30,7 @@ export function Home() {
   const update = useSettings((s) => s.update);
   const [tableName, setTableName] = useState('');
   const [maxSeats, setMaxSeats] = useState<number>(3);
+  const lastBotLevel = useSettings((s) => s.lastBotLevel);
   const [isPublic, setIsPublic] = useState(false);
   const [joinKey, setJoinKey] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -82,6 +83,7 @@ export function Home() {
       tableName: tableName.trim() === '' ? t('home.defaultTableName', { name: hostName }) : tableName.trim(),
       maxSeats,
       isPublic,
+      botLevel: lastBotLevel,
     });
     navigate(tableHash(key));
   };
@@ -159,6 +161,18 @@ export function Home() {
             {MAX_SEATS_OPTIONS.map((n) => (
               <option key={n} value={n}>{n}</option>
             ))}
+          </select>
+        </label>
+        <label className={styles.field}>
+          <span>{t('home.botLevel')}</span>
+          <select
+            data-testid="create-bot-level"
+            value={lastBotLevel}
+            onChange={(e) => { update({ lastBotLevel: e.target.value as 'easy' | 'normal' | 'strong' }); }}
+          >
+            <option value="easy">{t('botLevel.easy')}</option>
+            <option value="normal">{t('botLevel.normal')}</option>
+            <option value="strong">{t('botLevel.strong')}</option>
           </select>
         </label>
         <label className={styles.check}>

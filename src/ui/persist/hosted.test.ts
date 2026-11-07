@@ -50,6 +50,14 @@ describe('host snapshots in localStorage', () => {
     expect(loadHostSnapshot(storage, 'TESTKEY')).toBeNull();
   });
 
+  it('loads older snapshots with the default bot level', () => {
+    const storage = memoryStorage();
+    const old = JSON.parse(JSON.stringify(snapshotOf(tableWith(3)))) as { table: Record<string, unknown>; tokens: Record<string, string> };
+    delete old.table.botLevel;
+    storage.setItem('webskat.host.TESTKEY', JSON.stringify(old));
+    expect(loadHostSnapshot(storage, 'TESTKEY')?.table.botLevel).toBe('normal');
+  });
+
   it('lists only the keys of readable snapshots', () => {
     const storage = memoryStorage();
     saveHostSnapshot(storage, snapshotOf(tableWith(3)));

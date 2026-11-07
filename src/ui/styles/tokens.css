@@ -10,10 +10,10 @@
   --suit-red: #d12f2f;
   --suit-black: #111;
 
-  --card-w: clamp(52px, 11vw, 96px);
+  --card-w: clamp(44px, min((100vw - 24px) / 5.2, 17dvh), 100px);
   --card-h: calc(var(--card-w) * 178 / 128);
-  --card-w-opponent: calc(var(--card-w) * 0.5);
-  --card-w-trick: calc(var(--card-w) * 1.1);
+  --card-w-opponent: calc(var(--card-w) * 0.42);
+  --card-w-trick: calc(var(--card-w) * 0.95);
 
   --radius: 10px;
   --gap: 8px;

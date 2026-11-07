@@ -28,6 +28,13 @@ describe('settings persistence', () => {
     expect(loadSettings(memoryStorage(), 'en-GB')).toEqual(defaultSettings('en-GB'));
   });
 
+  it('migrates the old bot delay setting to trick display time', () => {
+    const old = { ...defaultSettings('en'), trickDisplayMs: undefined, botDelayMs: 1000 };
+    expect(loadSettings(memoryStorage({ 'webskat.settings': JSON.stringify(old) }), 'en').trickDisplayMs).toBe(1000);
+    const withoutValue = { ...defaultSettings('en'), trickDisplayMs: undefined };
+    expect(loadSettings(memoryStorage({ 'webskat.settings': JSON.stringify(withoutValue) }), 'en').trickDisplayMs).toBe(600);
+  });
+
   it('round-trips valid settings', () => {
     const storage = memoryStorage();
     const settings = { ...defaultSettings('en'), name: 'Anna', cardBack: 3 as const, scoring: 'standard' as const };

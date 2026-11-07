@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { applyAction, enumerateActions, getLegal, newGame } from './game';
 import { PASS, PLAY_HAND, afterBidding, afterDiscard, afterPickup, apply, bid, playingState, run } from './testing';
-import { BID_VALUES } from './values';
+
 
 describe('getLegal', () => {
-  it('lets the caller bid every value and pass, and the listener hold after a bid', () => {
+  it('lets the caller bid only 18 and pass, and the listener hold after a bid', () => {
     const start = newGame(1);
-    expect(getLegal(start, 'middlehand')).toEqual({ bidValues: [...BID_VALUES], canPassBid: true });
+    expect(getLegal(start, 'middlehand')).toEqual({ bidValues: [18], canPassBid: true });
     expect(getLegal(start, 'forehand')).toEqual({});
     const afterBid = apply(start, 'middlehand', bid(18));
     expect(getLegal(afterBid, 'forehand')).toEqual({ canPassBid: true, canHold: true });
@@ -44,9 +44,9 @@ describe('enumerateActions', () => {
     expect(enumerateActions(newGame(1), 'forehand')).toEqual([]);
   });
 
-  it('lists 63 bids and a pass for the caller at the start', () => {
+  it('lists one bid and a pass for the caller at the start', () => {
     const actions = enumerateActions(newGame(1), 'middlehand');
-    expect(actions).toHaveLength(BID_VALUES.length + 1);
+    expect(actions).toHaveLength(2);
     expect(actions).toContainEqual({ type: 'pass' });
   });
 

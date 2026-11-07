@@ -42,7 +42,7 @@ export function TableScreen({ tableKey }: { readonly tableKey: string }) {
         <TableLobby view={view} connection={connection} tableKey={tableKey} />
       ) : (
         <GameScreen
-          key={`${String(view.game.number)}-${view.game.phase}`}
+          key={String(view.game.number)}
           view={view}
           game={view.game}
           connection={connection}

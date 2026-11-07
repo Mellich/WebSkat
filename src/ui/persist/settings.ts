@@ -8,9 +8,10 @@ export const SettingsSchema = z.object({
   language: z.enum(['en', 'de']),
   cardBack: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
   confirmPlay: z.enum(['auto', 'always', 'never']),
-  botDelayMs: z.union([z.literal(0), z.literal(300), z.literal(600), z.literal(1000)]).default(600),
+  trickDisplayMs: z.union([z.literal(0), z.literal(300), z.literal(600), z.literal(1000), z.literal(2000)]).default(600),
   scoring: z.enum(['seeger', 'standard']),
   reducedMotion: z.enum(['system', 'on', 'off']),
+  lastBotLevel: z.enum(['easy', 'normal', 'strong']).default('normal'),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -23,9 +24,10 @@ export function defaultSettings(browserLanguage: string): Settings {
     language: browserLanguage.toLowerCase().startsWith('de') ? 'de' : 'en',
     cardBack: 2,
     confirmPlay: 'auto',
-    botDelayMs: 600,
+    trickDisplayMs: 600,
     scoring: 'seeger',
     reducedMotion: 'system',
+    lastBotLevel: 'normal',
   };
 }
 
@@ -40,7 +42,15 @@ export function loadSettings(storage: Storage, browserLanguage: string): Setting
   const raw = storage.getItem(STORAGE_KEY);
   if (raw === null) return fallback;
   try {
-    const parsed = SettingsSchema.safeParse(JSON.parse(raw));
+    const stored: unknown = JSON.parse(raw);
+    if (typeof stored === 'object' && stored !== null && !Array.isArray(stored)) {
+      const legacy = stored as Record<string, unknown>;
+      if (legacy.trickDisplayMs === undefined && [0, 300, 600, 1000].includes(legacy.botDelayMs as number)) {
+        legacy.trickDisplayMs = legacy.botDelayMs;
+      }
+      delete legacy.botDelayMs;
+    }
+    const parsed = SettingsSchema.safeParse(stored);
     return parsed.success ? parsed.data : fallback;
   } catch {
     return fallback;

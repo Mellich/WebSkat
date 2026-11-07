@@ -23,18 +23,17 @@ function bidding(overrides: Partial<GameView['bidding']> = {}): GameView['biddin
 }
 
 describe('BiddingPanel', () => {
-  it('offers only the bid values that the engine lists as legal', () => {
-    const legal: Legal = { bidValues: [18, 20, 22], canPassBid: true };
+  it('offers one button for the single bid value the engine lists as legal', () => {
+    const legal: Legal = { bidValues: [18], canPassBid: true };
     render(<BiddingPanel bidding={bidding()} legal={legal} nameOf={names} send={() => undefined} />);
-    const options = screen.getAllByRole('option').map((o) => o.textContent);
-    expect(options).toEqual(['18', '20', '22']);
+    expect(screen.getByRole('button', { name: 'Bid 18' })).toBeTruthy();
+    expect(screen.queryByRole('combobox')).toBeNull();
   });
 
-  it('sends the chosen value as a bid', () => {
+  it('sends the only legal next value', () => {
     const send = vi.fn<(action: GameAction) => void>();
-    render(<BiddingPanel bidding={bidding()} legal={{ bidValues: [18, 20], canPassBid: true }} nameOf={names} send={send} />);
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: '20' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Bid' }));
+    render(<BiddingPanel bidding={bidding()} legal={{ bidValues: [20], canPassBid: true }} nameOf={names} send={send} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Bid 20' }));
     expect(send).toHaveBeenCalledWith({ type: 'bid', value: 20 });
   });
 

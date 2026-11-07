@@ -1,10 +1,11 @@
 // The end of a game: result, breakdown, revealed Skat, and "Continue" (docs/06-ui-ux.md §1).
 
 import type { ReactNode } from 'react';
-import type { CardId } from '../../engine';
+
 import type { TableView, ViewResult } from '../../table';
+import { CardChips } from '../components/CardChip';
 import { useT, type Translator } from '../i18n';
-import { cardName, declarationLabel } from './labels';
+import { declarationLabel } from './labels';
 import { namesById } from './seats';
 import styles from './ResultDialog.module.css';
 
@@ -40,7 +41,7 @@ export function ResultDialog({ view, result, onContinue }: ResultDialogProps) {
     ? t('result.won', { name: declarer, game: gameText })
     : t('result.lost', { name: declarer, game: gameText });
   const game = view.game;
-  const cardText = (cards: readonly CardId[]): string => cards.map((c) => cardName(c, t)).join(', ');
+
   return (
     <Shell {...shell}>
       <p className={styles.headline}>{headline}</p>
@@ -53,10 +54,10 @@ export function ResultDialog({ view, result, onContinue }: ResultDialogProps) {
       <p>{t('result.points', { declarer: result.declarerPoints, defender: result.defenderPoints })}</p>
       <p>{t('result.tricks', { declarer: result.declarerTricks, defender: result.defenderTricks })}</p>
       {game?.skat === null || game?.skat === undefined ? null : (
-        <p>{t('result.skat')}: {cardText(game.skat)}</p>
+        <p>{t('result.skat')}: <CardChips cards={game.skat} /></p>
       )}
       {game?.discarded === null || game?.discarded === undefined || game.discarded.length === 0 ? null : (
-        <p>{t('result.discarded')}: {cardText(game.discarded)}</p>
+        <p>{t('result.discarded')}: <CardChips cards={game.discarded} /></p>
       )}
       <table className={styles.table}>
         <caption>{t('result.change')}</caption>

@@ -14,6 +14,7 @@ import { useSettings } from '../store/settings';
 import { BiddingPanel } from './BiddingPanel';
 import { DeclarationPicker } from './DeclarationPicker';
 import { cardName, declarationLabel } from './labels';
+import { CardChip } from '../components/CardChip';
 import { ResultDialog } from './ResultDialog';
 import { SkatDecision, DiscardPanel } from './SkatPanels';
 import { namesById, opponentsOf, type SeatedView } from './seats';
@@ -56,7 +57,8 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
   const viewer = view.you.id;
   const myRole = activeRoleOf(game, viewer);
   const myTurn = game.turnId === viewer && game.phase !== 'finished';
-  const shown = useShownTrick(game);
+  const trickDisplayMs = useSettings((s) => s.trickDisplayMs);
+  const shown = useShownTrick(game, trickDisplayMs);
   const opponents = opponentsOf(view);
   const label = (c: CardId): string => cardName(c, t);
   const send = (action: GameAction): void => {
@@ -90,6 +92,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
   };
 
   const statusLine = ((): string => {
+    if (shown.holding && shown.winnerId !== null) return t('trick.takesNow', { name: nameOf(shown.winnerId) });
     if (game.phase === 'finished') return '';
     if (myTurn) return t('status.yourTurn');
     if (game.turnId === null) return '';
@@ -99,9 +102,14 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
 
   const declarer = game.declarerId === null ? '' : nameOf(game.declarerId);
   const declared = game.declaration === null ? null : declarationLabel(game.declaration, t);
+  useEffect(() => {
+    if (!shown.holding) return;
+    const timer = window.setTimeout(() => { setPending(null); }, 0);
+    return () => { window.clearTimeout(timer); };
+  }, [shown.holding]);
   const amSittingOut = view.you.role === 'sitting-out';
   const dealerName = nameOf(game.dealerId);
-  const trickSlots = shown.map((p) => ({ card: p.card, name: nameOf(p.playerId), winner: p.winner }));
+  const trickSlots = shown.plays.map((p) => ({ card: p.card, name: nameOf(p.playerId), winner: p.winner }));
   const showSkat = game.phase === 'bidding' || game.phase === 'skat-decision';
 
   return (
@@ -131,7 +139,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
 
       <div className={styles.table}>
         <SkatPile visible={showSkat} back={cardBack} label={t('skat.onTable')} />
-        <TrickArea slots={trickSlots} labelOf={label} />
+        <TrickArea slots={trickSlots} labelOf={label} {...(shown.holding ? { onDismiss: shown.dismiss, dismissLabel: t('trick.continue') } : {})} />
       </div>
 
       <div className={styles.status} aria-live="polite" data-testid="status-line">
@@ -141,10 +149,14 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
         )}
       </div>
       {showLast && game.lastTrick !== null ? (
-        <p className={styles.lastTrick}>
-          {game.lastTrick.plays.map((p) => `${nameOf(p.playerId)}: ${label(p.card)}`).join(' · ')}
-          {' → '}{t('trick.takes', { name: nameOf(game.lastTrick.winnerId) })}
-        </p>
+        <ul className={styles.lastTrick} data-testid="last-trick">
+          {game.lastTrick.plays.map((p) => (
+            <li key={p.playerId} className={p.playerId === game.lastTrick?.winnerId ? styles.trickWinner : undefined}>
+              {nameOf(p.playerId)} <CardChip card={p.card} />
+              {p.playerId === game.lastTrick?.winnerId ? ` — ${t('trick.takes', { name: nameOf(p.playerId) })}` : null}
+            </li>
+          ))}
+        </ul>
       ) : null}
       {declared === null ? null : (
         <p className={styles.declared}>{t('status.declared', { game: declared, name: declarer })}</p>
@@ -198,8 +210,9 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
             declaration={game.declaration}
             legal={isDiscarding ? discardable : playable}
             showAll={game.phase === 'bidding'}
+            paused={shown.holding}
             mode={isDiscarding ? 'discard' : 'play'}
-            selected={isDiscarding ? discardPick : pending === null ? [] : [pending]}
+            selected={isDiscarding ? discardPick : shown.holding || pending === null ? [] : [pending]}
             highlight={isDiscarding && game.skat !== null ? game.skat : []}
             {...(isDiscarding ? { onToggle: toggleDiscard } : {})}
             {...(isPlaying ? { onPlay: playCard } : {})}
@@ -209,7 +222,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
         )}
       </div>
 
-      {game.phase === 'finished' && game.result !== null ? (
+      {game.phase === 'finished' && game.result !== null && !shown.holding ? (
         <ResultDialog
           view={view}
           result={game.result}

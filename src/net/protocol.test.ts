@@ -45,7 +45,7 @@ describe('client messages', () => {
 
 describe('host messages', () => {
   it.each([
-    ['a welcome', { t: 'welcome', v: 1, playerId: 'p1', token: TOKEN }],
+    ['a welcome', { t: 'welcome', v: 2, playerId: 'p1', token: TOKEN }],
     ['a rejection', { t: 'rejected', reason: 'TABLE_FULL' }],
     ['a kick notice', { t: 'kicked' }],
     ['a close notice', { t: 'closed' }],
@@ -66,7 +66,7 @@ describe('host messages', () => {
 describe('advertisements', () => {
   const ad = {
     t: 'ad',
-    v: 1,
+    v: 2,
     key: 'ABCD-EFGH',
     name: 'Friday game',
     hostName: 'Anna',

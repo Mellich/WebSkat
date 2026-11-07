@@ -29,6 +29,7 @@ import type {
   PlayerId,
   TableCommand,
   TableErrorCode,
+  BotLevel,
   TableState,
 } from './types';
 
@@ -46,6 +47,7 @@ export function createTable(args: {
   readonly hostId: PlayerId;
   readonly hostName: string;
   readonly maxSeats: number;
+  readonly botLevel?: BotLevel;
 }): TableState {
   const host: Player = {
     id: args.hostId,
@@ -59,6 +61,7 @@ export function createTable(args: {
     isPublic: args.isPublic,
     hostId: args.hostId,
     maxSeats: Math.min(MAX_SEATS, Math.max(MIN_SEATS, args.maxSeats)),
+    botLevel: args.botLevel ?? 'normal',
     status: 'lobby',
     players: [host],
     pending: [],

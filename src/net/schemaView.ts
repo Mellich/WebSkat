@@ -115,6 +115,7 @@ export const TableViewSchema: z.ZodType<TableView> = z.object({
     name: z.string().min(1).max(40),
     hostId: id,
     maxSeats: z.number().int().min(3).max(6),
+    botLevel: z.enum(['easy', 'normal', 'strong']),
     status: z.enum(['lobby', 'in-game']),
     players: z.array(PlayerPublicSchema),
     pending: z.array(PlayerPublicSchema),

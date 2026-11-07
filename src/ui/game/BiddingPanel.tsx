@@ -1,7 +1,7 @@
 // Bidding (Reizen): the caller bids or passes, the listener holds or passes, the forehand may
 // claim 18 (docs/06-ui-ux.md §1). Only the options from `legal` are offered.
 
-import { useState } from 'react';
+
 import type { GameAction, Legal } from '../../engine';
 import type { GameView, ViewBidEvent } from '../../table';
 import { useT, type Translator } from '../i18n';
@@ -33,8 +33,7 @@ function historyText(ev: ViewBidEvent, name: string, t: Translator): string {
 export function BiddingPanel({ bidding, legal, nameOf, send }: BiddingPanelProps) {
   const t = useT();
   const values = legal.bidValues ?? [];
-  const [chosen, setChosen] = useState<number | null>(null);
-  const selected = chosen !== null && values.includes(chosen) ? chosen : (values[0] ?? null);
+  const selected = values[0] ?? null;
 
   return (
     <section className="bidding" aria-label={t('bid.title')}>
@@ -51,32 +50,16 @@ export function BiddingPanel({ bidding, legal, nameOf, send }: BiddingPanelProps
       )}
       <div className="bidding-actions">
         {values.length > 0 ? (
-          <>
-            <label>
-              {t('bid.select')}{' '}
-              <select
-                value={selected ?? ''}
-                data-testid="bid-value"
-                onChange={(e) => {
-                  setChosen(Number(e.target.value));
-                }}
-              >
-                {values.map((v) => (
-                  <option key={v} value={v}>{v}</option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="button"
-              disabled={selected === null}
-              data-testid="bid-submit"
-              onClick={() => {
-                if (selected !== null) send({ type: 'bid', value: selected });
-              }}
-            >
-              {t('bid.bid')}
-            </button>
-          </>
+          <button
+            type="button"
+            disabled={selected === null}
+            data-testid="bid-submit"
+            onClick={() => {
+              if (selected !== null) send({ type: 'bid', value: selected });
+            }}
+          >
+            {t('bid.bidValue', { value: selected ?? '' })}
+          </button>
         ) : null}
         {legal.canHold === true && bidding.currentBid !== null ? (
           <button type="button" data-testid="bid-hold" onClick={() => { send({ type: 'hold' }); }}>

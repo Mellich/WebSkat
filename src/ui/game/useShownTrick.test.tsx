@@ -2,58 +2,47 @@
 import { act, renderHook, cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GameView, ViewLastTrick } from '../../table';
-import { LAST_TRICK_MS, useShownTrick } from './useShownTrick';
+import { useShownTrick } from './useShownTrick';
 
 function game(overrides: Partial<GameView>): GameView {
-  return {
-    trick: { leaderId: 'a', plays: [] },
-    lastTrick: null,
-    ...overrides,
-  } as GameView;
+  return { trick: { leaderId: 'a', plays: [] }, lastTrick: null, ...overrides } as GameView;
 }
-
 const LAST: ViewLastTrick = {
-  leaderId: 'a',
-  winnerId: 'b',
-  plays: [
-    { playerId: 'a', card: 'CA' },
-    { playerId: 'b', card: 'C10' },
-    { playerId: 'c', card: 'C7' },
-  ],
+  leaderId: 'a', winnerId: 'b',
+  plays: [{ playerId: 'a', card: 'CA' }, { playerId: 'b', card: 'C10' }, { playerId: 'c', card: 'C7' }],
 };
-
-beforeEach(() => {
-  vi.useFakeTimers();
-});
-
-afterEach(() => {
-  cleanup();
-  vi.useRealTimers();
-});
+beforeEach(() => vi.useFakeTimers());
+afterEach(() => { cleanup(); vi.useRealTimers(); });
 
 describe('useShownTrick', () => {
-  it('shows a completed trick for a moment, with the winner marked', () => {
-    const { result, rerender } = renderHook(({ g }) => useShownTrick(g), {
-      initialProps: { g: game({}) },
+  it('holds a new completed trick for the configured duration, even as the next trick starts', () => {
+    const { result, rerender } = renderHook(({ g, ms }) => useShownTrick(g, ms), {
+      initialProps: { g: game({}), ms: 600 },
     });
-    expect(result.current).toEqual([]);
-
-    rerender({ g: game({ lastTrick: LAST }) });
-    expect(result.current.map((p) => p.winner)).toEqual([false, true, false]);
-
-    act(() => {
-      vi.advanceTimersByTime(LAST_TRICK_MS);
-    });
-    expect(result.current).toEqual([]);
+    expect(result.current.plays).toEqual([]);
+    act(() => { rerender({ g: game({ lastTrick: LAST }), ms: 600 }); });
+    expect(result.current.plays.map((p) => p.winner)).toEqual([false, true, false]);
+    expect(result.current.holding).toBe(true);
+    act(() => { rerender({ g: game({ lastTrick: LAST, trick: { leaderId: 'b', plays: [{ playerId: 'b', card: 'HA' }] } }), ms: 600 }); });
+    expect(result.current.plays[0]?.card).toBe('CA');
+    act(() => { vi.advanceTimersByTime(599); });
+    expect(result.current.holding).toBe(true);
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(result.current.plays).toEqual([{ playerId: 'b', card: 'HA', winner: false }]);
   });
 
-  it('replaces the display as soon as the next trick is played', () => {
-    const { result, rerender } = renderHook(({ g }) => useShownTrick(g), {
-      initialProps: { g: game({}) },
+  it('does not hold the initial trick and supports dismiss and zero duration', () => {
+    const { result, rerender } = renderHook(({ g, ms }) => useShownTrick(g, ms), {
+      initialProps: { g: game({ lastTrick: LAST }), ms: 600 },
     });
-    rerender({ g: game({ lastTrick: LAST }) });
-    expect(result.current).toHaveLength(3);
-    rerender({ g: game({ lastTrick: LAST, trick: { leaderId: 'b', plays: [{ playerId: 'b', card: 'HA' }] } }) });
-    expect(result.current).toEqual([{ playerId: 'b', card: 'HA', winner: false }]);
+    expect(result.current.holding).toBe(false);
+    act(() => { rerender({ g: game({}), ms: 600 }); });
+    act(() => { rerender({ g: game({ lastTrick: LAST }), ms: 600 }); });
+    act(() => { result.current.dismiss(); });
+    expect(result.current.holding).toBe(false);
+    act(() => { rerender({ g: game({}), ms: 0 }); });
+    act(() => { rerender({ g: game({ lastTrick: LAST }), ms: 0 }); });
+    expect(result.current.holding).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

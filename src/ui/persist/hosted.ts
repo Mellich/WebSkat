@@ -22,6 +22,7 @@ export function isTableState(value: unknown): value is TableState {
     typeof v.key === 'string' &&
     typeof v.name === 'string' &&
     typeof v.hostId === 'string' &&
+    (v.botLevel === undefined || v.botLevel === 'easy' || v.botLevel === 'normal' || v.botLevel === 'strong') &&
     Array.isArray(v.players) &&
     Array.isArray(v.pending) &&
     Array.isArray(v.records) &&
@@ -59,6 +60,11 @@ export function loadHostSnapshot(storage: KeyValueStorage, key: string): HostSna
   if (raw === null) return null;
   try {
     const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed === 'object' && parsed !== null && 'table' in parsed &&
+      typeof parsed.table === 'object' && parsed.table !== null) {
+      const table = parsed.table as Record<string, unknown>;
+      if (!('botLevel' in table)) table.botLevel = 'normal';
+    }
     return isSnapshot(parsed) ? parsed : null;
   } catch {
     return null;

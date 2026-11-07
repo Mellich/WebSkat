@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CardId } from '../../engine';
 import { translate } from '../i18n';
-import { cardName, declarationLabel } from './labels';
+import { cardName, cardShort, declarationLabel } from './labels';
 
 const en = (key: Parameters<typeof translate>[1], params?: Parameters<typeof translate>[2]) =>
   translate('en', key, params);
@@ -16,6 +16,14 @@ describe('cardName', () => {
   ] as [CardId, string, string][])('%s', (card, english, german) => {
     expect(cardName(card, en)).toBe(english);
     expect(cardName(card, de)).toBe(german);
+  });
+});
+
+describe('cardShort', () => {
+  it('formats localized short rank and suit color', () => {
+    expect(cardShort('HJ', en)).toEqual({ suit: '♥', rank: 'J', red: true });
+    expect(cardShort('HJ', de)).toEqual({ suit: '♥', rank: 'B', red: true });
+    expect(cardShort('C10', en)).toEqual({ suit: '♣', rank: '10', red: false });
   });
 });
 

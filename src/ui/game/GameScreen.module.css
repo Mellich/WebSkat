@@ -57,6 +57,10 @@
   font-size: 0.95rem;
 }
 
+.lastTrick { list-style: none; padding: 0; }
+.lastTrick li { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.trickWinner { font-weight: 700; color: var(--ink); }
+
 .phase {
   display: flex;
   flex-direction: column;

@@ -35,6 +35,7 @@ export function viewFor(s: TableState, viewer: PlayerId): TableView {
       name: s.name,
       hostId: s.hostId,
       maxSeats: s.maxSeats,
+      botLevel: s.botLevel,
       status: s.status,
       players: s.players.map((p, seat) => publicPlayer(p, seat)),
       pending: s.pending.map((p) => publicPlayer(p, null)),

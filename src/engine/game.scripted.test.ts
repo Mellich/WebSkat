@@ -16,6 +16,12 @@ describe('scripted game: Null won without a trick', () => {
   const SKAT = hand('D9 D10');
 
   const BIDDING: readonly Step[] = [
+    ['middlehand', bid(18)],
+    ['forehand', HOLD],
+    ['middlehand', bid(20)],
+    ['forehand', HOLD],
+    ['middlehand', bid(22)],
+    ['forehand', HOLD],
     ['middlehand', bid(23)],
     ['forehand', HOLD],
     ['middlehand', PASS],

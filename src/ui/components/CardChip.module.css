@@ -1,0 +1,4 @@
+.chips { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: middle; }
+.chip { display: inline-block; padding: 1px 4px; border-radius: 4px; background: #fff; white-space: nowrap; font-size: .95rem; font-variant-numeric: tabular-nums; }
+.red { color: var(--suit-red); }
+.black { color: var(--suit-black); }

@@ -16,13 +16,15 @@ export interface TrickAreaProps {
   /** Up to three slots, in play order. */
   readonly slots: readonly TrickSlot[];
   readonly labelOf?: (card: CardId) => string;
+  readonly onDismiss?: () => void;
+  readonly dismissLabel?: string;
 }
 
 const SLOTS = 3;
 
-export function TrickArea({ slots, labelOf = cardLabel }: TrickAreaProps) {
-  return (
-    <div className={styles.trick} role="group" aria-label="Current trick">
+export function TrickArea({ slots, labelOf = cardLabel, onDismiss, dismissLabel = 'Continue' }: TrickAreaProps) {
+  const content = (
+    <div className={styles.trick} role="group" aria-label="Current trick" data-testid="trick-area">
       {Array.from({ length: SLOTS }, (_, i) => {
         const slot = slots[i];
         return (
@@ -41,5 +43,10 @@ export function TrickArea({ slots, labelOf = cardLabel }: TrickAreaProps) {
         );
       })}
     </div>
+  );
+  return onDismiss === undefined ? content : (
+    <button type="button" className={styles.dismiss} aria-label={dismissLabel} data-testid="trick-dismiss" onClick={onDismiss}>
+      {content}
+    </button>
   );
 }

@@ -66,7 +66,7 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
             <span className={styles.name}>
               {p.name}
               {p.id === table.hostId ? <span className={styles.badge}> ♛ {t('lobby.host')}</span> : null}
-              {p.isBot ? <span className={styles.badge}> {t('lobby.bot')}</span> : null}
+              {p.isBot ? <span className={styles.badge}> {t('lobby.bot')} · {t(`botLevel.${table.botLevel}`)}</span> : null}
             </span>
             <span
               className={p.connected ? styles.online : styles.offline}
@@ -127,7 +127,7 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
         </p>
       )}
 
-      <p className={styles.info}>{t('lobby.info')}</p>
+      <p className={styles.info}>{t('lobby.info')} {t('lobby.botsLevel', { level: t(`botLevel.${table.botLevel}`) })}</p>
       {kicking === null ? null : (
         <ConfirmDialog
           message={t('lobby.kickConfirm', { name: kicking.name })}

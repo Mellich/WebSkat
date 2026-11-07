@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyBid, biddingOutcome, initialBidding, legalBidValues, type BiddingOutcome } from './bidding';
+import { applyBid, biddingOutcome, initialBidding, legalBidValues, nextBidValue, type BiddingOutcome } from './bidding';
 import { snapshot } from './testing';
 import { BID_VALUES } from './values';
 import type { BidAction, BiddingState, GameErrorCode, Role } from './types';
@@ -115,11 +115,11 @@ describe('turn order and stage transitions', () => {
 });
 
 describe('bidding rules', () => {
-  it('requires bids to increase', () => {
-    const state = run([['middlehand', bid(20)], ['forehand', HOLD]]);
-    expect(errorOf(state, 'middlehand', bid(18))).toBe('ILLEGAL_BID');
-    expect(errorOf(state, 'middlehand', bid(20))).toBe('ILLEGAL_BID');
-    expect(applyBid(state, 'middlehand', bid(22)).ok).toBe(true);
+  it('requires the next bid value and rejects jumps', () => {
+    expect(errorOf(initialBidding(), 'middlehand', bid(20))).toBe('ILLEGAL_BID');
+    const state = run([['middlehand', bid(18)], ['forehand', HOLD]]);
+    expect(errorOf(state, 'middlehand', bid(22))).toBe('ILLEGAL_BID');
+    expect(applyBid(state, 'middlehand', bid(20)).ok).toBe(true);
   });
 
   it('rejects values that are not in BID_VALUES', () => {
@@ -176,14 +176,17 @@ describe('bidding rules', () => {
 });
 
 describe('legalBidValues', () => {
-  it('offers all bid values to the caller at the start', () => {
-    expect(legalBidValues(initialBidding())).toEqual([...BID_VALUES]);
+  it('offers only the next bid value to the caller', () => {
+    expect(legalBidValues(initialBidding())).toEqual([18]);
+    expect(nextBidValue(null)).toBe(18);
+    expect(nextBidValue(18)).toBe(20);
+    expect(nextBidValue(264)).toBeNull();
+    expect(BID_VALUES.at(-1)).toBe(264);
   });
 
   it('offers only higher values after a bid', () => {
-    const values = legalBidValues(run([['middlehand', bid(20)], ['forehand', HOLD]]));
-    expect(values[0]).toBe(22);
-    expect(values).not.toContain(20);
+    const values = legalBidValues(run([['middlehand', bid(18)], ['forehand', HOLD]]));
+    expect(values).toEqual([20]);
     expect(values).not.toContain(18);
   });
 

@@ -11,7 +11,7 @@ import type {
   Role,
   Suit,
 } from '../engine';
-import type { PlayerId, TableStatus } from './types';
+import type { BotLevel, PlayerId, TableStatus } from './types';
 
 export interface PlayerPublic {
   readonly id: PlayerId;
@@ -92,6 +92,7 @@ export interface TableView {
     readonly name: string;
     readonly hostId: PlayerId;
     readonly maxSeats: number;
+    readonly botLevel: BotLevel;
     readonly status: TableStatus;
     readonly players: readonly PlayerPublic[];
     readonly pending: readonly PlayerPublic[];

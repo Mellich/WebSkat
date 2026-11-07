@@ -4,6 +4,7 @@
   justify-content: center;
   padding: 16px 8px 8px;
   min-height: calc(var(--card-h) + 24px);
+  width: 100%;
   max-width: 100%;
 }
 
@@ -12,5 +13,5 @@
 }
 
 .hand > * + * {
-  margin-left: calc(var(--card-w) * -0.55);
+  margin-left: clamp(calc(var(--card-w) * -0.7), calc((100% - var(--hand-n) * var(--card-w)) / (var(--hand-n) - 1)), calc(var(--card-w) * -0.15));
 }

@@ -29,6 +29,16 @@ const SUIT_NAME_KEYS: Readonly<Record<Suit, TranslationKey>> = {
   D: 'suit.D',
 };
 
+const SHORT_RANK_KEYS: Readonly<Record<Rank, TranslationKey>> = {
+  '7': 'rankShort.7', '8': 'rankShort.8', '9': 'rankShort.9', '10': 'rankShort.10',
+  J: 'rankShort.J', Q: 'rankShort.Q', K: 'rankShort.K', A: 'rankShort.A',
+};
+
+export function cardShort(card: CardId, t: Translator): { suit: string; rank: string; red: boolean } {
+  const suit = suitOf(card);
+  return { suit: suitSymbol(suit), rank: t(SHORT_RANK_KEYS[rankOf(card)]), red: suit === 'H' || suit === 'D' };
+}
+
 /** "Queen of hearts", or "Dame Herz" in German. */
 export function cardName(card: CardId, t: Translator): string {
   return t('card.label', { rank: t(RANK_KEYS[rankOf(card)]), suit: t(SUIT_NAME_KEYS[suitOf(card)]) });

@@ -86,15 +86,17 @@ export function SettingsDialog({ onClose }: SettingsDialogProps) {
         </fieldset>
 
         <label className={styles.field}>
-          <span>{t('settings.botDelay')}</span>
+          <span>{t('settings.trickDisplay')}</span>
           <select
-            value={settings.botDelayMs}
-            onChange={(e) => { update({ botDelayMs: Number(e.target.value) as 0 | 300 | 600 | 1000 }); }}
+            data-testid="setting-trick-display"
+            value={settings.trickDisplayMs}
+            onChange={(e) => { update({ trickDisplayMs: Number(e.target.value) as 0 | 300 | 600 | 1000 | 2000 }); }}
           >
-            <option value={0}>{t('settings.botDelayOff')}</option>
-            <option value={300}>{t('settings.botDelayShort')}</option>
-            <option value={600}>{t('settings.botDelayDefault')}</option>
-            <option value={1000}>{t('settings.botDelayLong')}</option>
+            <option value={0}>{t('settings.trickDisplayOff')}</option>
+            <option value={300}>{t('settings.trickDisplayShort')}</option>
+            <option value={600}>{t('settings.trickDisplayDefault')}</option>
+            <option value={1000}>{t('settings.trickDisplayLong')}</option>
+            <option value={2000}>{t('settings.trickDisplayVeryLong')}</option>
           </select>
         </label>
 

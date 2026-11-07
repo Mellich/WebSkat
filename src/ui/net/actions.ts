@@ -18,7 +18,8 @@ import { loadHostSnapshot, removeHostSnapshot, resumableSnapshot, saveHostSnapsh
 import { clearSession, loadSession, saveSession } from '../persist/session';
 import { browserStorage } from '../persist/storage';
 import { useSession } from '../store/session';
-import { useSettings } from '../store/settings';
+import type { BotLevel } from '../../table';
+
 import { getTransport } from './transport';
 
 const SAVE_DELAY_MS = 300;
@@ -58,7 +59,7 @@ function startHost(transport: Transport, table: TableState, tokens: HostSnapshot
     tokens,
     now: () => Date.now(),
     randomSeed: randomUint32,
-    botDelayMs: () => useSettings.getState().botDelayMs,
+
     lobby: transport,
     persist: saveSoon,
   });
@@ -69,6 +70,7 @@ export interface HostInput {
   readonly tableName: string;
   readonly maxSeats: number;
   readonly isPublic: boolean;
+  readonly botLevel?: BotLevel;
 }
 
 /** Creates a table with this browser as host and attaches to it. Returns the table key. */
@@ -82,6 +84,7 @@ export async function hostTable(input: HostInput): Promise<string> {
     hostId: `h${randomHex(8)}`,
     hostName: input.hostName,
     maxSeats: input.maxSeats,
+    ...(input.botLevel === undefined ? {} : { botLevel: input.botLevel }),
   });
   const host = startHost(transport, table, {});
   useSession.getState().attach({ key, connection: host.connection, host });

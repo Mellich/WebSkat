@@ -74,7 +74,7 @@ describe('what one viewer sees of the cards', () => {
     const view = viewFor(s, idOf(s, 'middlehand'));
     expect(view.you.role).toBe('middlehand');
     expect(view.game?.myHand).toEqual(game(s).engine.hands.middlehand);
-    expect(view.game?.legal.bidValues).toHaveLength(63);
+    expect(view.game?.legal.bidValues).toEqual([18]);
     expect(view.game?.legal.canPassBid).toBe(true);
   });
 
@@ -134,6 +134,12 @@ describe('Skat and Spitzen', () => {
 describe('open hands of an ouvert declarer', () => {
   it('shows the declarer hand to everybody during an ouvert Null Hand game', () => {
     let s = started(3);
+    s = step(s, 'p2', { type: 'game', action: { type: 'bid', value: 18 } });
+    s = step(s, 'p1', { type: 'game', action: { type: 'hold' } });
+    s = step(s, 'p2', { type: 'game', action: { type: 'bid', value: 20 } });
+    s = step(s, 'p1', { type: 'game', action: { type: 'hold' } });
+    s = step(s, 'p2', { type: 'game', action: { type: 'bid', value: 22 } });
+    s = step(s, 'p1', { type: 'game', action: { type: 'hold' } });
     s = step(s, 'p2', { type: 'game', action: { type: 'bid', value: 23 } });
     s = step(s, 'p1', { type: 'game', action: { type: 'pass' } });
     s = step(s, 'p0', { type: 'game', action: { type: 'pass' } });

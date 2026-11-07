@@ -1,11 +1,9 @@
-// Shows a completed trick for a moment after it is finished (docs/06-ui-ux.md §4). The hand stays
-// interactive meanwhile; a new trick that starts replaces the display at once.
+// Locally holds each newly completed trick while bots and opponents continue.
 
 import { useEffect, useState } from 'react';
 import type { CardId } from '../../engine';
 import type { GameView, ViewLastTrick } from '../../table';
 
-export const LAST_TRICK_MS = 1200;
 
 export interface ShownPlay {
   readonly playerId: string;
@@ -13,7 +11,14 @@ export interface ShownPlay {
   readonly winner: boolean;
 }
 
-export function useShownTrick(game: GameView): readonly ShownPlay[] {
+export interface ShownTrick {
+  readonly plays: readonly ShownPlay[];
+  readonly holding: boolean;
+  readonly winnerId: string | null;
+  readonly dismiss: () => void;
+}
+
+export function useShownTrick(game: GameView, displayMs: number): ShownTrick {
   const last = game.lastTrick;
   const lastKey = last === null ? null : JSON.stringify(last);
   const [seenKey, setSeenKey] = useState<string | null>(lastKey);
@@ -23,27 +28,30 @@ export function useShownTrick(game: GameView): readonly ShownPlay[] {
   // second render pass.
   if (lastKey !== seenKey) {
     setSeenKey(lastKey);
-    setShownKey(lastKey);
+    setShownKey(displayMs > 0 ? lastKey : null);
   }
 
   useEffect(() => {
-    if (shownKey === null) return;
-    const timer = setTimeout(() => {
-      setShownKey(null);
-    }, LAST_TRICK_MS);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [shownKey]);
+    if (shownKey === null || displayMs <= 0) return;
+    const timer = setTimeout(() => { setShownKey(null); }, displayMs);
+    return () => { clearTimeout(timer); };
+  }, [shownKey, displayMs]);
 
-  if (game.trick.plays.length > 0) {
-    return game.trick.plays.map((p) => ({ playerId: p.playerId, card: p.card, winner: false }));
+  const dismiss = (): void => { setShownKey(null); };
+  const holding = shownKey !== null;
+  if (holding) {
+    const shown = JSON.parse(shownKey) as ViewLastTrick;
+    return {
+      plays: shown.plays.map((p) => ({ playerId: p.playerId, card: p.card, winner: p.playerId === shown.winnerId })),
+      holding: true,
+      winnerId: shown.winnerId,
+      dismiss,
+    };
   }
-  if (shownKey === null) return [];
-  const shown = JSON.parse(shownKey) as ViewLastTrick;
-  return shown.plays.map((p) => ({
-    playerId: p.playerId,
-    card: p.card,
-    winner: p.playerId === shown.winnerId,
-  }));
+  return {
+    plays: game.trick.plays.map((p) => ({ playerId: p.playerId, card: p.card, winner: false })),
+    holding: false,
+    winnerId: null,
+    dismiss,
+  };
 }

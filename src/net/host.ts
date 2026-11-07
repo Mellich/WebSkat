@@ -35,7 +35,7 @@ export interface HostOptions {
   readonly tokens?: Readonly<Record<string, PlayerId>>;
   readonly now: () => number;
   readonly randomSeed: () => number;
-  readonly botDelayMs?: () => number;
+
   readonly randomId?: () => string;
   readonly randomToken?: () => string;
   readonly persist?: (snapshot: HostSnapshot) => void;
@@ -54,7 +54,7 @@ export function createHost(opts: HostOptions): Host {
   const hostId = opts.table.hostId;
   let state = opts.table;
   let stopped = false;
-  let botTimer: ReturnType<typeof setTimeout> | null = null;
+
   const tokens = new Map<string, PlayerId>(Object.entries(opts.tokens ?? {}));
   const tokenOf = new Map<PlayerId, string>([...tokens].map(([token, id]) => [id, token]));
   const peerOf = new Map<PlayerId, string>();
@@ -112,8 +112,7 @@ export function createHost(opts: HostOptions): Host {
     if (peer !== undefined) sendTo(peer, { t: 'error', code, message });
   }
 
-  async function runBotTurns(recordsBefore: number): Promise<void> {
-    const delay = opts.botDelayMs?.() ?? 0;
+  function runBotTurns(recordsBefore: number): void {
     const rand = mulberry32(opts.randomSeed());
     for (let step = 0; step < 100_000 && !stopped; step++) {
       const next = botStep(state, ctx, rand);
@@ -123,14 +122,7 @@ export function createHost(opts: HostOptions): Host {
       if (created.length > 0) broadcastRecords(created);
       broadcastViews();
       persist();
-      if (delay > 0) {
-        await new Promise<void>((resolve) => {
-          botTimer = setTimeout(() => {
-            botTimer = null;
-            resolve();
-          }, delay);
-        });
-      }
+
     }
   }
 
@@ -151,7 +143,7 @@ export function createHost(opts: HostOptions): Host {
     if (created.length > 0) broadcastRecords(created);
     broadcastViews();
     persist();
-    void runBotTurns(state.records.length);
+    runBotTurns(state.records.length);
   }
 
   function onJoin(peer: string, msg: JoinMessage): void {
@@ -261,8 +253,7 @@ export function createHost(opts: HostOptions): Host {
   function stop(): void {
     if (stopped) return;
     stopped = true;
-    if (botTimer !== null) clearTimeout(botTimer);
-    botTimer = null;
+
     room.send('msg', { t: 'closed' });
     if (adTimer !== null) clearInterval(adTimer);
     lobby?.leave();

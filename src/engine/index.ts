@@ -6,6 +6,7 @@ export * from './trump';
 export * from './spitzen';
 export * from './values';
 export * from './declaration';
+export { nextBidValue } from './bidding';
 export * from './bidding';
 export * from './scoring';
 export * from './play';
