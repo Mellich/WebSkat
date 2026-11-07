@@ -20,7 +20,6 @@ export const en = {
   'home.tableName': 'Table name',
   'home.defaultTableName': "{name}'s table",
   'home.localInfo': 'Practice offline: you and two bots, no network needed.',
-  'home.maxSeats': 'Seats',
   'home.public': 'List publicly',
   'home.create': 'Create table',
   'home.joinTitle': 'Join with a key',
@@ -73,9 +72,9 @@ export const en = {
   'lobby.bot': 'bot',
   'lobby.connected': 'connected',
   'lobby.offline': 'offline',
-  'lobby.needPlayers': 'At least 3 players are needed to start.',
+  'lobby.needPlayers': 'At least 3 players or bots are needed to start.',
   'lobby.waitingHost': 'Waiting for the host to start the game…',
-  'lobby.info': '3 players: classic Skat. 4–6 players: Geberskat, the dealer and any extra players sit out and the seat rotates after each game.',
+  'lobby.info': 'Start with 3 to 6 players or bots. 3 players: classic Skat. 4–6 players: Geberskat, the dealer and any extra players sit out and the seat rotates after each game. As host you choose each bot\'s strength.',
   'lobby.pending': "You'll be seated when the current game ends.",
   'lobby.kickConfirm': 'Remove {name} from the table?',
 
@@ -97,6 +96,7 @@ export const en = {
   'error.INVALID_NAME': 'Names need 1 to 20 characters.',
   'error.CANNOT_KICK_HOST': 'The host cannot be removed.',
   'error.HOST_CANNOT_LEAVE': 'The host cannot leave the table.',
+  'error.NOT_A_BOT': 'Only bots have a strength.',
   'error.ILLEGAL_BID': 'That bid is not allowed.',
   'error.CANNOT_HOLD': 'There is nothing to hold.',
   'error.INVALID_DISCARD': 'Choose two different cards from your hand.',
@@ -262,11 +262,10 @@ export const en = {
   'settings.trickDisplayDefault': '0.6 s',
   'settings.trickDisplayLong': '1 s',
   'settings.trickDisplayVeryLong': '2 s',
-  'home.botLevel': 'Bot strength',
   'botLevel.easy': 'Easy',
   'botLevel.normal': 'Normal',
   'botLevel.strong': 'Strong',
-  'lobby.botsLevel': 'Bots: {level}',
+  'lobby.botLevel': 'Strength of {name}',
 } as const;
 
 export type TranslationKey = keyof typeof en;

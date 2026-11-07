@@ -18,6 +18,7 @@ export interface PlayerPublic {
   readonly name: string;
   readonly connected: boolean;
   readonly isBot: boolean;
+  readonly botLevel: BotLevel | null; // null for humans
   readonly seat: number | null; // null while pending
 }
 
@@ -92,7 +93,6 @@ export interface TableView {
     readonly name: string;
     readonly hostId: PlayerId;
     readonly maxSeats: number;
-    readonly botLevel: BotLevel;
     readonly status: TableStatus;
     readonly players: readonly PlayerPublic[];
     readonly pending: readonly PlayerPublic[];

@@ -11,8 +11,9 @@ export function botStep(s: TableState, ctx: () => Ctx, rand: () => number): Tabl
   if (game === null || game.engine.phase === 'finished' || game.engine.turn === null) return null;
   const role = game.engine.turn;
   const playerId = game.roles[role];
-  if (!s.players.some((p) => p.id === playerId && p.isBot)) return null;
-  const action = botAction(game.engine, role, s.botLevel, rand);
+  const bot = s.players.find((p) => p.id === playerId && p.isBot);
+  if (bot === undefined) return null;
+  const action = botAction(game.engine, role, bot.botLevel ?? 'normal', rand);
   const result = applyCommand(s, playerId, { type: 'game', action }, ctx());
   if (!result.ok) throw new Error(`bot action rejected: ${result.error.code} ${result.error.message}`);
   return result.value.state;

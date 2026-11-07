@@ -1,3 +1,4 @@
+import { PROTOCOL_VERSION } from './constants';
 import { describe, expect, it } from 'vitest';
 import { addPlayer, applyCommand, createTable, viewFor, type TableState } from '../table';
 import { AdSchema, ClientMessageSchema, HostMessageSchema } from './protocol';
@@ -45,7 +46,7 @@ describe('client messages', () => {
 
 describe('host messages', () => {
   it.each([
-    ['a welcome', { t: 'welcome', v: 2, playerId: 'p1', token: TOKEN }],
+    ['a welcome', { t: 'welcome', v: PROTOCOL_VERSION, playerId: 'p1', token: TOKEN }],
     ['a rejection', { t: 'rejected', reason: 'TABLE_FULL' }],
     ['a kick notice', { t: 'kicked' }],
     ['a close notice', { t: 'closed' }],
@@ -66,7 +67,7 @@ describe('host messages', () => {
 describe('advertisements', () => {
   const ad = {
     t: 'ad',
-    v: 2,
+    v: PROTOCOL_VERSION,
     key: 'ABCD-EFGH',
     name: 'Friday game',
     hostName: 'Anna',

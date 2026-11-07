@@ -70,5 +70,5 @@ docs/
   11-deployment.md          build, static hosting, TURN, relay fallback
   12-open-questions.md      decisions taken where the spec was ambiguous (append here!)
   13-playtest-fixes.md      Phase 12 spec: strict bidding, trick display time, mobile layout
-  14-bots.md                Phase 13 spec: bot strength levels (easy/normal/strong), bidding + card play
+  14-bots.md                Phase 13/14 spec: bot strength per bot (easy/normal/strong), bidding + card play
 ```

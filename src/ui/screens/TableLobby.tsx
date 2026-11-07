@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { formatKey, joinLink, type GameConnection } from '../../net';
-import type { TableView } from '../../table';
+import type { BotLevel, TableView } from '../../table';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useT } from '../i18n';
 import styles from './TableLobby.module.css';
@@ -14,6 +14,8 @@ export interface TableLobbyProps {
 }
 
 const MIN_PLAYERS = 3;
+const LEVELS: readonly BotLevel[] = ['easy', 'normal', 'strong'];
+const LEVEL_KEYS = { easy: 'botLevel.easy', normal: 'botLevel.normal', strong: 'botLevel.strong' } as const;
 
 /** Not available in insecure contexts, so the value may be undefined at runtime. */
 function clipboardOf(): Clipboard | undefined {
@@ -66,8 +68,26 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
             <span className={styles.name}>
               {p.name}
               {p.id === table.hostId ? <span className={styles.badge}> ♛ {t('lobby.host')}</span> : null}
-              {p.isBot ? <span className={styles.badge}> {t('lobby.bot')} · {t(`botLevel.${table.botLevel}`)}</span> : null}
+              {p.isBot ? <span className={styles.badge}> {t('lobby.bot')}</span> : null}
             </span>
+            {p.isBot && isHost ? (
+              <select
+                className={styles.level}
+                aria-label={t('lobby.botLevel', { name: p.name })}
+                data-testid={`bot-level-${String(seat)}`}
+                value={p.botLevel ?? 'normal'}
+                onChange={(e) => {
+                  const level = LEVELS.find((l) => l === e.target.value);
+                  if (level !== undefined) connection.send({ type: 'set-bot-level', playerId: p.id, level });
+                }}
+              >
+                {LEVELS.map((l) => (
+                  <option key={l} value={l}>{t(LEVEL_KEYS[l])}</option>
+                ))}
+              </select>
+            ) : (
+              <span className={styles.badge}>{p.isBot ? t(LEVEL_KEYS[p.botLevel ?? 'normal']) : ''}</span>
+            )}
             <span
               className={p.connected ? styles.online : styles.offline}
               title={p.connected ? t('lobby.connected') : t('lobby.offline')}
@@ -127,7 +147,7 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
         </p>
       )}
 
-      <p className={styles.info}>{t('lobby.info')} {t('lobby.botsLevel', { level: t(`botLevel.${table.botLevel}`) })}</p>
+      <p className={styles.info}>{t('lobby.info')}</p>
       {kicking === null ? null : (
         <ConfirmDialog
           message={t('lobby.kickConfirm', { name: kicking.name })}

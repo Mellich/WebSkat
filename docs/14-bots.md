@@ -7,7 +7,8 @@ bidding of `03` §4.1 is assumed). Everything in this file is **pure TypeScript 
 
 ## 1. Goals and levels
 
-The host picks the bot strength **when creating the table**. It applies to every bot at that table.
+The host sets the strength **for every bot individually in the lobby** (Phase 14). A new bot starts
+at *Normal*. The strength can be changed at any time; it applies from the bot's next action.
 
 | Level | id | Bidding / Skat / declaring | Card play |
 |---|---|---|---|
@@ -75,8 +76,8 @@ export function botViewOf(game: GameState, role: Role): BotView;
 | `tuning.ts` | all numeric constants (weights, thresholds, sample counts) in one place |
 | `arena.ts` | test support (not exported): engine-only games between levels (`playGame`, `match`), `envFlag`, `nowMs` |
 
-`src/table/bot.ts` keeps `botStep` and `runBots`. They read
-`s.botLevel` and call `botAction` from `bot/index.ts`. Engine helpers to reuse: `legalCards`,
+`src/table/bot.ts` keeps `botStep` and `runBots`. They read the
+acting bot's `botLevel` (default `normal`) and call `botAction` from `bot/index.ts`. Engine helpers to reuse: `legalCards`,
 `trickWinner`, `cardStrength`, `effectiveSuit`, `isTrump`, `modeOf` (`trump.ts`), `cardPoints`,
 `sumPoints`, `suitOf`, `rankOf` (`cards.ts`), `countSpitzen` (`spitzen.ts`),
 `declarationFloorValue`, `baseValue`, `nullValue` (`values.ts`), `nextBidValue` (`bidding.ts`).
@@ -218,27 +219,30 @@ therefore takes no `rand`. Skat decision, discard and declare as in §4.4. Card 
 
 ## 7. Table, protocol and UI changes
 
+*(Phase 13 first stored one strength per table, chosen in the create form. Phase 14 replaced that
+with one strength per bot, as described here.)*
+
 - `src/table/types.ts`: `export type BotLevel = 'easy' | 'normal' | 'strong'`;
-  `TableState.botLevel: BotLevel`. `createTable({ …, botLevel })` (optional argument, default
-  `'normal'`).
-- `src/table/bot.ts`: `botStep(s, ctx, rand)` calls `botAction(game.engine, role, s.botLevel, rand)`.
-  `runBots` is unchanged. The host runs bots synchronously (Phase 12), so a strong decision
-  (≈ 50 ms) briefly blocks the host tab; acceptable, see §9 for the Web Worker option.
-- View: `TableView.table.botLevel` (`viewTypes.ts`, `view.ts`), zod in `src/net/schemaView.ts`
-  (`z.enum(['easy','normal','strong'])`). Bump `PROTOCOL_VERSION` to 2 (`src/net/constants.ts`,
-  `05` §1). Old clients get `rejected PROTOCOL_MISMATCH` instead of failing to parse views.
-- Host snapshots (`src/ui/persist/hosted.ts`, resume): a snapshot without `botLevel` loads as
-  `'normal'` (fill it in when loading; add a test).
-- `src/ui/net/actions.ts`: `HostInput.botLevel` → `createTable`.
-  `src/ui/dev/localTable.ts`: read `?bots=easy|normal|strong` (default normal) for practice.
-- `Home.tsx` create form: a `<select>` "Bot strength" with Easy / Normal / Strong, default Normal,
-  `data-testid="create-bot-level"`. It is remembered in settings as `lastBotLevel` (zod
-  `.default('normal')`), so the next table uses the same choice.
-- `TableLobby.tsx`: shows "Bots: Normal" in the info line, and the bot badge reads
-  "Bot · Normal". The level cannot be changed after creation (`12` I100).
-- i18n `en`/`de`: `home.botLevel` ("Bot strength" / "Bot-Stärke"), `botLevel.easy` ("Easy" /
-  "Leicht"), `botLevel.normal` ("Normal" / "Normal"), `botLevel.strong` ("Strong" / "Stark"),
-  `lobby.botsLevel` ("Bots: {level}" / "Bots: {level}").
+  `Player.botLevel?: BotLevel` (bots only; absent is read as `'normal'`). `add-bot` creates bots
+  with `'normal'`. New command `{ type: 'set-bot-level', playerId, level }`: host only, any time,
+  for seated or pending bots; errors `UNKNOWN_PLAYER`, `NOT_A_BOT`, `NOT_HOST`.
+- `src/table/bot.ts`: `botStep(s, ctx, rand)` calls `botAction(game.engine, role, bot.botLevel ??
+  'normal', rand)`. `runBots` is unchanged. The host runs bots synchronously (Phase 12), so a strong
+  decision (≈ 50 ms) briefly blocks the host tab; acceptable, see §9 for the Web Worker option.
+- View: `PlayerPublic.botLevel: BotLevel | null` (`null` for humans; `viewTypes.ts`, `view.ts`),
+  zod in `src/net/schemaView.ts`; `TableCommandSchema` gets `set-bot-level`. `PROTOCOL_VERSION` is
+  3 (`src/net/constants.ts`, `05` §1).
+- Host snapshots (`src/ui/persist/hosted.ts`): a snapshot from version 2 had `table.botLevel`; on
+  load every bot without its own level gets that value (or `'normal'`) and the table field is
+  dropped (tests in `hosted.test.ts`).
+- `src/ui/dev/localTable.ts`: `?bots=easy|normal|strong` (default normal) sets every practice bot
+  to that level via `set-bot-level`.
+- `Home.tsx` create form: no bot strength and no seat count (06 §1).
+- `TableLobby.tsx`: the host gets a `<select>` per bot (`data-testid="bot-level-<seat>"`, label
+  `lobby.botLevel` "Strength of {name}" / "Stärke von {name}"); other players see the level as text
+  (`TableLobby.test.tsx`).
+- i18n `en`/`de`: `botLevel.easy` ("Easy" / "Leicht"), `botLevel.normal` ("Normal"),
+  `botLevel.strong` ("Strong" / "Stark"), `lobby.botLevel`, `error.NOT_A_BOT`.
 - Statistics: no change. Records already mark bots via the player list. Showing the level in records
   is out of scope.
 
@@ -276,11 +280,11 @@ therefore takes no `rand`. Skat decision, discard and declare as in §4.4. Card 
 9. Performance (`strong.test.ts`, only with `BOT_BENCH=1` because wall-clock limits are flaky while
    the whole suite runs in parallel): one `strong` card decision < 100 ms (median of 20); one full
    game with three strong bots < 5 s.
-10. UI: `Home.test.tsx` checks the create form passes the selected level and remembers it. The e2e
-    scenarios play with humans only, so the bot level does not affect them.
+10. UI: `TableLobby.test.tsx` (host select per bot sends `set-bot-level`; others see the level;
+    Start with 3 players or bots), `Home.test.tsx` (no seat count, no strength in the create form).
+    The e2e scenarios play with humans only.
 
 ## 9. Not in scope
-- Per-bot levels, or changing the level after creation.
 - Bots learning across games, or opening-book tables.
 - Running bots in a Web Worker. Revisit only if the perf budget in §6.2 cannot be met with
   `SAMPLES ≥ 16`.

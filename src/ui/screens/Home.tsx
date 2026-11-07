@@ -14,7 +14,6 @@ import { navigate, tableHash } from '../router';
 import { useSettings } from '../store/settings';
 import styles from './Home.module.css';
 
-const MAX_SEATS_OPTIONS = [3, 4, 5, 6] as const;
 
 /** A reload of the app at its start page rejoins the seat from the last session, once per page load. */
 let autoRejoinChecked = false;
@@ -29,8 +28,6 @@ export function Home() {
   const name = useSettings((s) => s.name);
   const update = useSettings((s) => s.update);
   const [tableName, setTableName] = useState('');
-  const [maxSeats, setMaxSeats] = useState<number>(3);
-  const lastBotLevel = useSettings((s) => s.lastBotLevel);
   const [isPublic, setIsPublic] = useState(false);
   const [joinKey, setJoinKey] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -81,9 +78,7 @@ export function Home() {
     const key = await hostTable({
       hostName,
       tableName: tableName.trim() === '' ? t('home.defaultTableName', { name: hostName }) : tableName.trim(),
-      maxSeats,
       isPublic,
-      botLevel: lastBotLevel,
     });
     navigate(tableHash(key));
   };
@@ -154,26 +149,6 @@ export function Home() {
         <label className={styles.field}>
           <span>{t('home.tableName')}</span>
           <input type="text" maxLength={40} value={tableName} onChange={(e) => { setTableName(e.target.value); }} />
-        </label>
-        <label className={styles.field}>
-          <span>{t('home.maxSeats')}</span>
-          <select value={maxSeats} onChange={(e) => { setMaxSeats(Number(e.target.value)); }}>
-            {MAX_SEATS_OPTIONS.map((n) => (
-              <option key={n} value={n}>{n}</option>
-            ))}
-          </select>
-        </label>
-        <label className={styles.field}>
-          <span>{t('home.botLevel')}</span>
-          <select
-            data-testid="create-bot-level"
-            value={lastBotLevel}
-            onChange={(e) => { update({ lastBotLevel: e.target.value as 'easy' | 'normal' | 'strong' }); }}
-          >
-            <option value="easy">{t('botLevel.easy')}</option>
-            <option value="normal">{t('botLevel.normal')}</option>
-            <option value="strong">{t('botLevel.strong')}</option>
-          </select>
         </label>
         <label className={styles.check}>
           <input type="checkbox" checked={isPublic} onChange={(e) => { setIsPublic(e.target.checked); }} />

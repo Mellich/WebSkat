@@ -45,7 +45,7 @@ test('a public table of four: the dealer sits out, and the next game another pla
     const dora = await newPlayer(browser, 'Dora');
     players.push(host, ben, carl, dora);
 
-    const key = await createTable(host.page, { tableName: 'Friday game', maxSeats: 4, isPublic: true });
+    const key = await createTable(host.page, { tableName: 'Friday game', isPublic: true });
     await joinTable(ben.page, key);
     await joinTable(carl.page, key);
 

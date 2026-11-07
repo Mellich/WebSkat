@@ -26,6 +26,7 @@ const ERROR_CODES: Record<TableErrorCode | GameErrorCode | 'NOT_CONNECTED', true
   INVALID_NAME: true,
   CANNOT_KICK_HOST: true,
   HOST_CANNOT_LEAVE: true,
+  NOT_A_BOT: true,
   NOT_CONNECTED: true,
 };
 

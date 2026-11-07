@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { mulberry32 } from '../engine';
-import { botStep, runBots } from './bot';
+import { botAction, botStep, runBots } from './bot';
 import { seegerBonus } from './records';
 import { ctxFor, tableWith } from './testing';
 import { applyCommand } from './table';
@@ -107,3 +107,20 @@ function checkScores(r: GameRecord, n: number): void {
   const expected = r.won ? (r.gameValue ?? 0) + 50 : declarerScore - 50 + seegerBonus(n) * (n - 1);
   expect(seeger).toBe(expected);
 }
+
+describe('per-bot strength', () => {
+  it('lets the bot on turn act with its own strength', () => {
+    const base = tableWith(3, { bots: true });
+    const players = base.players.map((p, i) => ({ ...p, isBot: true, botLevel: i === 0 ? ('easy' as const) : ('strong' as const) }));
+    const started = applyCommand({ ...base, players }, 'p0', { type: 'start' }, ctxFor(3, 0));
+    if (!started.ok) throw new Error(started.error.message);
+    const state = started.value.state;
+    const game = state.game;
+    const role = game?.engine.turn ?? null;
+    if (game === null || role === null) throw new Error('test data: a game on turn expected');
+    const level = players.find((p) => p.id === game.roles[role])?.botLevel ?? 'normal';
+    const expected = botAction(game.engine, role, level, mulberry32(9));
+    const last = botStep(state, () => ctxFor(4, 0), mulberry32(9))?.game?.engine.bidding.history.at(-1);
+    expect(last).toEqual({ role, ...expected });
+  });
+});

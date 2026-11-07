@@ -263,13 +263,32 @@ Detailed algorithms, constants and tests: `14-bots.md`. All bot code is pure (`s
 - [x] `bot/heuristics.ts` (normal card play for declarer/defenders, suit/grand/null) + scenario tests.
 - [x] `bot/sample.ts`, `bot/simulate.ts`, `bot/strong.ts` (PIMC card play, Skat-sampling auction) + tests, perf budget.
 - [x] `levels.test.ts`: legality at all levels + strength (normal beats easy; strong vs normal behind `BOT_BENCH=1`); measured results in `12` I101.
-- [x] UI: create-form bot strength select (`create-bot-level`, remembered as `lastBotLevel`), lobby shows the level, i18n, `Home.test.tsx`; `#/dev/local?bots=…` (e2e scenarios have no bots, unchanged).
+- [x] UI: create-form bot strength select (`create-bot-level`, remembered as `lastBotLevel`), lobby shows the level, i18n, `Home.test.tsx`; `#/dev/local?bots=…` (e2e scenarios have no bots, unchanged). *Replaced in Phase 14 by a per-bot strength in the lobby.*
 
 **Acceptance**: `npm run check` and `npm run e2e` green. Creating a table offers Easy/Normal/Strong.
 In `#/dev/local?bots=normal` the bots pass with weak hands, bid up to sensible values with strong
 ones, never discard Jacks in suit/Grand games, and as defenders give points to a partner who is
 winning the trick. `strong` decisions feel instant (< 100 ms each). The fairness test proves no bot
 uses hidden cards.
+
+---
+
+## Phase 14 — Lobby: per-bot strength, no table size  (*14-bots.md §7*, *06 §1*, *04 B1–B3*)
+
+User change after Phase 13: the strength is not chosen when creating a table, and neither is the
+number of seats.
+
+- [x] `Player.botLevel` (bots only, new bots `normal`); `TableState.botLevel` removed; `createTable` `maxSeats` optional (default 6).
+- [x] Command `set-bot-level` (host, any time; `UNKNOWN_PLAYER` / `NOT_A_BOT`); zod schema; `PlayerPublic.botLevel`; `PROTOCOL_VERSION = 3`.
+- [x] `botStep` uses the acting bot's level; old host snapshots: table level copied to each bot.
+- [x] Create form: only table name and public flag; settings `lastBotLevel` removed.
+- [x] Lobby: strength select per bot for the host (`bot-level-<seat>`), level text for others; Start with ≥ 3 players or bots; info text updated (en/de).
+- [x] `#/dev/local?bots=…` sets each bot via `set-bot-level`; e2e helper `createTable` no longer picks seats.
+- [x] Tests: table (`set-bot-level`, default level, 6 seats + start with bots), view, bot (own level), snapshots, `TableLobby.test.tsx`, `Home.test.tsx`.
+
+**Acceptance**: `npm run check` and `npm run e2e` green. Creating a table asks only for a name and
+the public flag; the host can add bots, set each bot's strength and start once 3 players or bots
+are seated.
 
 ---
 

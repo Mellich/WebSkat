@@ -1,7 +1,7 @@
 // Seats and names: joining, leaving, dealer-pointer maintenance (docs/04 Part B2).
 
 import { err, ok, type Result } from '../engine';
-import type { Player, PlayerId, TableState } from './types';
+import type { BotLevel, Player, PlayerId, TableState } from './types';
 
 export const MIN_SEATS = 3;
 export const MAX_SEATS = 6;
@@ -33,7 +33,7 @@ export function uniqueName(existing: readonly string[], wanted: string): string 
  */
 export function addPlayer(
   s: TableState,
-  p: { readonly id: PlayerId; readonly name: string; readonly isBot?: boolean },
+  p: { readonly id: PlayerId; readonly name: string; readonly isBot?: boolean; readonly botLevel?: BotLevel },
 ): Result<TableState, 'TABLE_FULL' | 'INVALID_NAME'> {
   if (allPlayers(s).some((x) => x.id === p.id)) {
     return ok(setConnected(s, p.id, true));
@@ -54,6 +54,7 @@ export function addPlayer(
     ),
     connected: true,
     isBot: p.isBot ?? false,
+    ...(p.isBot === true ? { botLevel: p.botLevel ?? 'normal' } : {}),
   };
   const next = s.game === null
     ? { ...s, players: [...s.players, player] }

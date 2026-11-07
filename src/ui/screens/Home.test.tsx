@@ -9,9 +9,9 @@ vi.mock('../net/transport', () => ({
   getTransport: () => new Promise<never>(() => undefined),
 }));
 
-const hostTable = vi.fn((input: { readonly botLevel?: string }) => Promise.resolve(input.botLevel === undefined ? 'X' : 'ABCDEFGH'));
+const hostTable = vi.fn<(input: Record<string, unknown>) => Promise<string>>(() => Promise.resolve('ABCDEFGH'));
 vi.mock('../net/actions', () => ({
-  hostTable: (input: { readonly botLevel?: string }) => hostTable(input),
+  hostTable: (input: Record<string, unknown>) => hostTable(input),
   resumeHostedTable: () => Promise.resolve(),
 }));
 
@@ -49,15 +49,15 @@ describe('Home form validation', () => {
 });
 
 describe('Create table', () => {
-  it('passes the chosen bot strength and remembers it', async () => {
+  it('asks only for a name and the public flag: no seat count, no bot strength', async () => {
     useNameForTest('Anna');
     render(<Home />);
-    fireEvent.change(screen.getByTestId('create-bot-level'), { target: { value: 'strong' } });
+    expect(screen.queryByLabelText('Seats')).toBeNull();
+    expect(screen.queryByTestId('create-bot-level')).toBeNull();
     fireEvent.click(screen.getByTestId('create-table'));
     await waitFor(() => {
-      expect(hostTable).toHaveBeenCalledWith(expect.objectContaining({ botLevel: 'strong' }));
+      expect(hostTable).toHaveBeenCalledWith({ hostName: 'Anna', tableName: "Anna's table", isPublic: false });
     });
-    expect(useSettings.getState().lastBotLevel).toBe('strong');
   });
 });
 

@@ -103,7 +103,7 @@ C (reload a client mid-game), D (`layout.spec.ts`: offline `#/dev/local?seed=123
 of `13-playtest-fixes.md` F3; asserts no page scroll, all game areas inside the viewport, hand card
 width ≥ 60 px on phones and ≤ 104 px everywhere; saves screenshots). Additional test ids for D:
 `opponent-seat`, `trick-area`, `phase-panel`, `trick-dismiss`, `setting-trick-display`, `last-trick`, and
-`create-bot-level` (Phase 13; the e2e scenarios play without bots). The
+`bot-level-<seat>` (Phase 14: the host's strength select per bot in the lobby). The
 `bid-value` select no longer exists; bidding uses `bid-submit` (single "Bid N" button).
 
 ## 6. Component tests (jsdom)

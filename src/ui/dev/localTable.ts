@@ -15,8 +15,6 @@ export function startLocalTable(hostName: string, seed: number | null, players: 
     isPublic: false,
     hostId: 'local-host',
     hostName,
-    maxSeats: players,
-    botLevel: bots,
   });
   const host = createHost({
     transport: createFakeNetwork().transportFor('local'),
@@ -27,6 +25,9 @@ export function startLocalTable(hostName: string, seed: number | null, players: 
   useSession.getState().attach({ key, connection: host.connection, host });
   for (let i = 1; i < players; i++) {
     host.connection.send({ type: 'add-bot' });
+  }
+  for (const bot of host.getState().players.filter((p) => p.isBot)) {
+    host.connection.send({ type: 'set-bot-level', playerId: bot.id, level: bots });
   }
   return key;
 }

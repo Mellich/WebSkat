@@ -22,10 +22,10 @@ connection status dot, buttons **Stats**, **Settings**, **Leave**.
 ### Home
 - Show the supplied raster Skatastischer Hirsch logo centered at three times its original display size above a centered page title. The title is “Skatastisches Onlineturniersystem” in German and “Skatastic Online Tournament System” in English; use the public copy described in `10-assets.md` and provide empty alternative text because the adjacent title names the app.
 - Name input (stored in `localStorage`).
-- **Create table**: name (default "<Player>'s table"), max seats (3–6, default 3), **bot strength**
-  (`create-bot-level`: Easy / Normal / Strong, default Normal, last choice remembered in settings as
-  `lastBotLevel`), public toggle → generates key, starts a host, navigates to `#/t/KEY`. The
-  strength applies to all bots of the table and cannot be changed later (`14-bots.md`).
+- **Create table**: name (default "<Player>'s table") and public toggle only → generates key, starts
+  a host, navigates to `#/t/KEY`. There is no seat count and no bot strength: every table has 6
+  seats, the game can start as soon as 3 players or bots are in the lobby, and the host sets each
+  bot's strength in the lobby.
 - **Join with key**: input accepting `ABCD-EFGH` (any case/spaces) + Join button (validate with
   `isValidKey`).
 - **Public tables**: live list (`createDirectory`), each row: table name, host, seats `2/3`,
@@ -38,9 +38,10 @@ connection status dot, buttons **Stats**, **Settings**, **Leave**.
 
 ### TableLobby
 - Big key `ABCD-EFGH` with **Copy key** and **Copy link** buttons.
-- Seat list in order (seat numbers), each with name, connection dot, host crown, bot icon + level
-  ("Bot · Normal"). The info line shows "Bots: Normal".
-- Host only: **Start game** (enabled with ≥ 3 players), **Add bot**, per-player **Kick**.
+- Seat list in order (seat numbers), each with name, connection dot, host crown, bot icon + level.
+- Host only: **Start game** (enabled with ≥ 3 players or bots), **Add bot** (new bots are
+  *Normal*), per-player **Kick**, and for every bot a strength `<select>` Easy / Normal / Strong
+  (`bot-level-<seat>`, sends `set-bot-level`). Other players see the bot's strength as text.
 - Non-host: "Waiting for host to start…".
 - Info text: "3 players: classic Skat. 4–6 players: Geberskat — the dealer (and extra players) sit
   out, rotating each game."
@@ -201,7 +202,7 @@ Error codes map to messages under `error.<CODE>`.
 ## 7. Settings (persisted, zod-validated, `ui/persist/settings.ts`)
 
 `{ name, language, cardBack: 0|1|2|3, confirmPlay: 'auto'|'always'|'never', scoring: 'seeger'|'standard',
-`reducedMotion: 'system'|'on'|'off', trickDisplayMs: 0|300|600|1000|2000, lastBotLevel: 'easy'|'normal'|'strong' }`. `lastBotLevel` (zod `.default('normal')`) preselects the bot strength in the create-table form. `trickDisplayMs` (label "Show finished trick", options Off / 0.3 / 0.6 / 1 / 2 s, default 600 ms) is how long a finished trick stays on the table on this device (§4); 0 = no hold. It replaced the old `botDelayMs` (stored values are migrated on load). It has no effect on bots, which are never delayed.
+`reducedMotion: 'system'|'on'|'off', trickDisplayMs: 0|300|600|1000|2000}`. (A `lastBotLevel` setting existed briefly in Phase 13; stored values are ignored.) `trickDisplayMs` (label "Show finished trick", options Off / 0.3 / 0.6 / 1 / 2 s, default 600 ms) is how long a finished trick stays on the table on this device (§4); 0 = no hold. It replaced the old `botDelayMs` (stored values are migrated on load). It has no effect on bots, which are never delayed.
 
 ## 8. Accessibility
 

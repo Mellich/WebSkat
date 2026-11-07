@@ -46,8 +46,8 @@ export function createTable(args: {
   readonly isPublic: boolean;
   readonly hostId: PlayerId;
   readonly hostName: string;
-  readonly maxSeats: number;
-  readonly botLevel?: BotLevel;
+  /** Seat limit; defaults to the maximum (6). Players decide the table size by joining. */
+  readonly maxSeats?: number;
 }): TableState {
   const host: Player = {
     id: args.hostId,
@@ -60,8 +60,7 @@ export function createTable(args: {
     name: args.name,
     isPublic: args.isPublic,
     hostId: args.hostId,
-    maxSeats: Math.min(MAX_SEATS, Math.max(MIN_SEATS, args.maxSeats)),
-    botLevel: args.botLevel ?? 'normal',
+    maxSeats: Math.min(MAX_SEATS, Math.max(MIN_SEATS, args.maxSeats ?? MAX_SEATS)),
     status: 'lobby',
     players: [host],
     pending: [],
@@ -197,8 +196,17 @@ function addBot(s: TableState): Outcome {
     allPlayers(s).map((p) => p.name),
     'Bot',
   );
-  const added = addPlayer(s, { id: `bot-${String(s.seq)}`, name: botName, isBot: true });
+  const added = addPlayer(s, { id: `bot-${String(s.seq)}`, name: botName, isBot: true, botLevel: 'normal' });
   return added.ok ? plain(added.value) : err(added.error.code, added.error.message);
+}
+
+/** The host sets a bot's strength; allowed at any time, it applies from the bot's next action. */
+function setBotLevel(s: TableState, target: PlayerId, level: BotLevel): Outcome {
+  const player = allPlayers(s).find((p) => p.id === target);
+  if (player === undefined) return err('UNKNOWN_PLAYER', 'No such player at this table.');
+  if (!player.isBot) return err('NOT_A_BOT', 'Only bots have a strength.');
+  const update = (p: Player): Player => (p.id === target ? { ...p, botLevel: level } : p);
+  return plain({ ...s, players: s.players.map(update), pending: s.pending.map(update), seq: s.seq + 1 });
 }
 
 function leave(s: TableState, actor: PlayerId, ctx: Ctx): Outcome {
@@ -232,6 +240,8 @@ export function applyCommand(
       return kick(s, actor, c.playerId, ctx);
     case 'add-bot':
       return actor === s.hostId ? addBot(s) : notHost();
+    case 'set-bot-level':
+      return actor === s.hostId ? setBotLevel(s, c.playerId, c.level) : notHost();
     case 'leave':
       return leave(s, actor, ctx);
     default:

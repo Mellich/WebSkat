@@ -12,6 +12,8 @@ export interface Player {
   readonly name: string; // 1..20 chars, trimmed, unique at the table
   readonly connected: boolean;
   readonly isBot: boolean;
+  /** Strength of a bot (docs/14-bots.md); absent for humans and read as 'normal' for bots. */
+  readonly botLevel?: BotLevel;
 }
 
 /** 'in-game' while a game is dealt, including a finished game that waits for "ready". */
@@ -33,8 +35,7 @@ export interface TableState {
   readonly name: string;
   readonly isPublic: boolean;
   readonly hostId: PlayerId;
-  readonly maxSeats: number; // 3..6
-  readonly botLevel: BotLevel;
+  readonly maxSeats: number; // 6 for tables created in the UI; tests may use fewer
   readonly status: TableStatus;
   readonly players: readonly Player[]; // index = seat (clockwise)
   readonly pending: readonly Player[]; // joined while a game runs; seated after it
@@ -53,6 +54,7 @@ export type TableCommand =
   | { readonly type: 'abort-game' }
   | { readonly type: 'kick'; readonly playerId: PlayerId }
   | { readonly type: 'add-bot' }
+  | { readonly type: 'set-bot-level'; readonly playerId: PlayerId; readonly level: BotLevel }
   | { readonly type: 'leave' };
 
 /** Values supplied by the caller: wall clock (record timestamps) and the deal seed. */
@@ -73,6 +75,7 @@ export type TableErrorCode =
   | 'GAME_RUNNING'
   | 'INVALID_NAME'
   | 'CANNOT_KICK_HOST'
+  | 'NOT_A_BOT'
   | 'HOST_CANNOT_LEAVE';
 
 export type GameKindLabel = 'clubs' | 'spades' | 'hearts' | 'diamonds' | 'grand' | 'null';

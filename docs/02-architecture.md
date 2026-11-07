@@ -64,7 +64,7 @@ WebSkat/
       records.ts              build GameRecord from a finished game (+ both scoring systems)
       stats.ts                computeStats(records, players) — pure aggregations
       view.ts                 viewFor(state, playerId) — redaction lives here
-      bot.ts                  botStep/runBots: lets the bot whose turn it is act (level = table.botLevel)
+      bot.ts                  botStep/runBots: lets the bot whose turn it is act (with that bot's own botLevel)
       bot/                    bot strategies easy/normal/strong (14-bots.md); see only a BotView,
                               never the full GameState (bots must not use hidden cards)
       index.ts

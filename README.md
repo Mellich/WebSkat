@@ -10,11 +10,12 @@ reading order and the hard rules.
 ## How to play
 
 1. Open the page and enter your name.
-2. **Create table** (choose 3 to 6 seats, optionally list it publicly). You are the host.
+2. **Create table** (give it a name, optionally list it publicly). You are the host. A table has
+   up to 6 seats.
 3. Share the key (`ABCD-EFGH`), the copied link, or the public list with the others. They enter
    the key on the start page, or open the link.
-4. When at least three players are seated, the host presses **Start game**. Bots can fill seats
-   with **Add bot**.
+4. When at least three players or bots are seated, the host presses **Start game**. Bots can fill
+   seats with **Add bot**; the host sets each bot's strength (Easy, Normal or Strong) in the lobby.
 5. After each game, every player presses **Continue**; the next game is dealt when all connected
    players are ready.
 
@@ -31,7 +32,8 @@ npm run build        # production build into dist/
 npm run preview      # serve dist/ locally
 ```
 
-Offline practice against two bots (development builds only): `#/dev/local`.
+Offline practice against two bots (development builds only): `#/dev/local`
+(`?bots=easy|normal|strong`, `?players=3..6`, `?seed=N`).
 
 ## Checks
 

@@ -25,10 +25,9 @@ export async function closeAll(players: readonly Player[]): Promise<void> {
 /** Creates a table as the host and returns its key as shown in the lobby (ABCD-EFGH). */
 export async function createTable(
   page: Page,
-  options: { tableName?: string; maxSeats?: number; isPublic?: boolean } = {},
+  options: { tableName?: string; isPublic?: boolean } = {},
 ): Promise<string> {
   if (options.tableName !== undefined) await page.getByLabel('Table name').fill(options.tableName);
-  if (options.maxSeats !== undefined) await page.getByLabel('Seats').selectOption(String(options.maxSeats));
   if (options.isPublic === true) await page.getByLabel('List publicly').check();
   await page.getByTestId('create-table').click();
   const key = page.getByTestId('table-key');

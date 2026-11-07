@@ -50,12 +50,29 @@ describe('host snapshots in localStorage', () => {
     expect(loadHostSnapshot(storage, 'TESTKEY')).toBeNull();
   });
 
-  it('loads older snapshots with the default bot level', () => {
+  it('gives each bot of an older snapshot the table-wide strength it had', () => {
     const storage = memoryStorage();
-    const old = JSON.parse(JSON.stringify(snapshotOf(tableWith(3)))) as { table: Record<string, unknown>; tokens: Record<string, string> };
-    delete old.table.botLevel;
+    const old = JSON.parse(JSON.stringify(snapshotOf(tableWith(3, { bots: true })))) as {
+      table: { botLevel?: string; players: { isBot: boolean; botLevel?: string }[] };
+      tokens: Record<string, string>;
+    };
+    for (const p of old.table.players) delete p.botLevel;
+    old.table.botLevel = 'strong';
     storage.setItem('webskat.host.TESTKEY', JSON.stringify(old));
-    expect(loadHostSnapshot(storage, 'TESTKEY')?.table.botLevel).toBe('normal');
+    const loaded = loadHostSnapshot(storage, 'TESTKEY')?.table;
+    expect(loaded?.players.filter((p) => p.isBot).map((p) => p.botLevel)).toEqual(['strong', 'strong']);
+    expect(loaded !== undefined && 'botLevel' in loaded).toBe(false);
+  });
+
+  it('gives bots of an older snapshot without a table strength the normal strength', () => {
+    const storage = memoryStorage();
+    const old = JSON.parse(JSON.stringify(snapshotOf(tableWith(3, { bots: true })))) as {
+      table: { players: { botLevel?: string }[] };
+      tokens: Record<string, string>;
+    };
+    for (const p of old.table.players) delete p.botLevel;
+    storage.setItem('webskat.host.TESTKEY', JSON.stringify(old));
+    expect(loadHostSnapshot(storage, 'TESTKEY')?.table.players.map((p) => p.botLevel)).toEqual([undefined, 'normal', 'normal']);
   });
 
   it('lists only the keys of readable snapshots', () => {

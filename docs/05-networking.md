@@ -16,7 +16,7 @@ public *lobby room* for the table list. The host is the authority (`02-architect
 
 ```ts
 export const APP_ID = 'webskat-v1-7c2f9a';        // must be unique to this app
-export const PROTOCOL_VERSION = 2;            // 2 since Phase 13 (TableView.table.botLevel)
+export const PROTOCOL_VERSION = 3;            // 3 since Phase 14 (per-bot botLevel, set-bot-level command)
 export const LOBBY_ROOM = 'webskat-lobby-v1';
 export const tableRoom = (key: string) => `webskat-t-${normalizeKey(key)}`;
 export const AD_INTERVAL_MS = 5000;

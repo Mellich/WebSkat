@@ -190,3 +190,12 @@ describe('finished games', () => {
   });
 });
 
+
+describe('bot strength in the view', () => {
+  it('shows each bot its strength and humans none', () => {
+    const s = applyCommand(tableWith(2), 'p0', { type: 'add-bot' }, ctxFor(1));
+    if (!s.ok) throw new Error(s.error.message);
+    const players = viewFor(s.value.state, 'p1').table.players;
+    expect(players.map((p) => p.botLevel)).toEqual([null, null, 'normal']);
+  });
+});

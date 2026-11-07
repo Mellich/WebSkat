@@ -22,7 +22,6 @@ export function isTableState(value: unknown): value is TableState {
     typeof v.key === 'string' &&
     typeof v.name === 'string' &&
     typeof v.hostId === 'string' &&
-    (v.botLevel === undefined || v.botLevel === 'easy' || v.botLevel === 'normal' || v.botLevel === 'strong') &&
     Array.isArray(v.players) &&
     Array.isArray(v.pending) &&
     Array.isArray(v.records) &&
@@ -60,14 +59,33 @@ export function loadHostSnapshot(storage: KeyValueStorage, key: string): HostSna
   if (raw === null) return null;
   try {
     const parsed: unknown = JSON.parse(raw);
-    if (typeof parsed === 'object' && parsed !== null && 'table' in parsed &&
-      typeof parsed.table === 'object' && parsed.table !== null) {
-      const table = parsed.table as Record<string, unknown>;
-      if (!('botLevel' in table)) table.botLevel = 'normal';
-    }
+    migrateBotLevel(parsed);
     return isSnapshot(parsed) ? parsed : null;
   } catch {
     return null;
+  }
+}
+
+const LEVELS: readonly unknown[] = ['easy', 'normal', 'strong'];
+
+/**
+ * Snapshots from protocol version 2 kept one bot strength for the whole table. Each bot gets that
+ * strength (or 'normal') as its own; the table field is dropped.
+ */
+function migrateBotLevel(parsed: unknown): void {
+  if (typeof parsed !== 'object' || parsed === null || !('table' in parsed)) return;
+  const table = parsed.table;
+  if (typeof table !== 'object' || table === null) return;
+  const t = table as Record<string, unknown>;
+  const level = LEVELS.includes(t.botLevel) ? t.botLevel : 'normal';
+  delete t.botLevel;
+  for (const list of [t.players, t.pending]) {
+    if (!Array.isArray(list)) continue;
+    for (const p of list as unknown[]) {
+      if (typeof p !== 'object' || p === null) continue;
+      const player = p as Record<string, unknown>;
+      if (player.isBot === true && !LEVELS.includes(player.botLevel)) player.botLevel = level;
+    }
   }
 }
 

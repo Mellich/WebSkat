@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { addPlayer, setConnected } from './seating';
 import { ctxFor, tableWith } from './testing';
-import { applyCommand } from './table';
+import { applyCommand, createTable } from './table';
 import type { Ctx, PlayerId, TableCommand, TableErrorCode, TableState } from './types';
 
 const CTX: Ctx = ctxFor(42, 1000);
@@ -168,6 +168,52 @@ describe('add-bot', () => {
     expect(errorOf(tableWith(2), 'p1', { type: 'add-bot' })).toBe('NOT_HOST');
     expect(errorOf(startedWith(3), 'p0', { type: 'add-bot' })).toBe('GAME_RUNNING');
     expect(errorOf(tableWith(3, { maxSeats: 3 }), 'p0', { type: 'add-bot' })).toBe('TABLE_FULL');
+  });
+
+  it('gives a new bot the normal strength', () => {
+    const s = apply(tableWith(2), 'p0', { type: 'add-bot' });
+    expect(s.players.find((p) => p.isBot)?.botLevel).toBe('normal');
+  });
+});
+
+describe('set-bot-level', () => {
+  const withBots = (): TableState => apply(apply(tableWith(1), 'p0', { type: 'add-bot' }), 'p0', { type: 'add-bot' });
+
+  it('changes the strength of one bot only', () => {
+    const s = withBots();
+    const [first, second] = s.players.filter((p) => p.isBot);
+    if (first === undefined || second === undefined) throw new Error('test data: two bots expected');
+    const next = apply(s, 'p0', { type: 'set-bot-level', playerId: first.id, level: 'strong' });
+    expect(next.players.find((p) => p.id === first.id)?.botLevel).toBe('strong');
+    expect(next.players.find((p) => p.id === second.id)?.botLevel).toBe('normal');
+    expect(next.seq).toBeGreaterThan(s.seq);
+  });
+
+  it('is allowed during a running game', () => {
+    const s = withBots();
+    const started = apply(s, 'p0', { type: 'start' });
+    const bot = started.players.find((p) => p.isBot);
+    if (bot === undefined) throw new Error('test data: a bot expected');
+    expect(apply(started, 'p0', { type: 'set-bot-level', playerId: bot.id, level: 'easy' }).players.find((p) => p.id === bot.id)?.botLevel).toBe('easy');
+  });
+
+  it('is refused for non-hosts, humans and unknown players', () => {
+    const s = apply(tableWith(2), 'p0', { type: 'add-bot' });
+    const bot = s.players.find((p) => p.isBot);
+    if (bot === undefined) throw new Error('test data: a bot expected');
+    expect(errorOf(s, 'p1', { type: 'set-bot-level', playerId: bot.id, level: 'easy' })).toBe('NOT_HOST');
+    expect(errorOf(s, 'p0', { type: 'set-bot-level', playerId: 'p1', level: 'easy' })).toBe('NOT_A_BOT');
+    expect(errorOf(s, 'p0', { type: 'set-bot-level', playerId: 'nobody', level: 'easy' })).toBe('UNKNOWN_PLAYER');
+  });
+});
+
+describe('table size', () => {
+  it('offers six seats by default and starts with three players or bots', () => {
+    const s = createTable({ key: 'K', name: 'T', isPublic: false, hostId: 'p0', hostName: 'Host' });
+    expect(s.maxSeats).toBe(6);
+    const withBots = apply(apply(s, 'p0', { type: 'add-bot' }), 'p0', { type: 'add-bot' });
+    expect(apply(withBots, 'p0', { type: 'start' }).status).toBe('in-game');
+    expect(errorOf(apply(s, 'p0', { type: 'add-bot' }), 'p0', { type: 'start' })).toBe('TOO_FEW_PLAYERS');
   });
 });
 

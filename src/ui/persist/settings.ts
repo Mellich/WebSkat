@@ -11,7 +11,6 @@ export const SettingsSchema = z.object({
   trickDisplayMs: z.union([z.literal(0), z.literal(300), z.literal(600), z.literal(1000), z.literal(2000)]).default(600),
   scoring: z.enum(['seeger', 'standard']),
   reducedMotion: z.enum(['system', 'on', 'off']),
-  lastBotLevel: z.enum(['easy', 'normal', 'strong']).default('normal'),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -27,7 +26,6 @@ export function defaultSettings(browserLanguage: string): Settings {
     trickDisplayMs: 600,
     scoring: 'seeger',
     reducedMotion: 'system',
-    lastBotLevel: 'normal',
   };
 }
 

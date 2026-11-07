@@ -335,6 +335,7 @@ export interface Player {
   readonly name: string;             // 1..20 chars, trimmed, unique at the table
   readonly connected: boolean;
   readonly isBot: boolean;
+  readonly botLevel?: BotLevel;      // bots only: 'easy' | 'normal' | 'strong' (absent = 'normal'), 14-bots.md
 }
 
 export type TableStatus = 'lobby' | 'in-game';   // 'in-game' while `game !== null` (incl. finished, waiting for ready)
@@ -355,8 +356,7 @@ export interface TableState {
   readonly name: string;
   readonly isPublic: boolean;
   readonly hostId: PlayerId;
-  readonly maxSeats: number;                            // 3..6
-  readonly botLevel: BotLevel;                          // 'easy' | 'normal' | 'strong', set at creation (14-bots.md)
+  readonly maxSeats: number;                            // 6 (UI tables); tests may pass 3..6
   readonly status: TableStatus;
   readonly players: readonly Player[];                  // index = seat (clockwise)
   readonly pending: readonly Player[];                  // joined while a game runs; seated after it
@@ -374,14 +374,16 @@ export type TableCommand =
   | { readonly type: 'ready' }                          // after a finished game
   | { readonly type: 'abort-game' }                     // host: discard running game, no record
   | { readonly type: 'kick'; readonly playerId: PlayerId }  // host; lobby or finished/no game only
-  | { readonly type: 'add-bot' }                        // host; lobby or finished/no game only
+  | { readonly type: 'add-bot' }                        // host; lobby or finished/no game only; strength 'normal'
+  | { readonly type: 'set-bot-level'; readonly playerId: PlayerId; readonly level: BotLevel } // host; any time
   | { readonly type: 'leave' };
 
 export interface Ctx { readonly now: number; readonly seed: number }
 
 export type TableErrorCode = GameErrorCode
   | 'NOT_HOST' | 'NOT_SEATED' | 'NOT_ACTIVE_PLAYER' | 'WRONG_STATUS' | 'TOO_FEW_PLAYERS'
-  | 'TABLE_FULL' | 'UNKNOWN_PLAYER' | 'GAME_RUNNING';
+  | 'TABLE_FULL' | 'UNKNOWN_PLAYER' | 'GAME_RUNNING' | 'INVALID_NAME' | 'CANNOT_KICK_HOST'
+  | 'HOST_CANNOT_LEAVE' | 'NOT_A_BOT';
 ```
 
 ## B2. Functions
@@ -389,8 +391,9 @@ export type TableErrorCode = GameErrorCode
 ```ts
 // table.ts
 export function createTable(args: { key: string; name: string; isPublic: boolean;
-  hostId: PlayerId; hostName: string; maxSeats: number; botLevel?: BotLevel /* default 'normal' */ }): TableState;
-export function addPlayer(s: TableState, p: { id: PlayerId; name: string; isBot?: boolean }):
+  hostId: PlayerId; hostName: string; maxSeats?: number /* default 6 */ }): TableState;
+  // The UI never asks for a table size: every table has 6 seats and can start with 3 players/bots.
+export function addPlayer(s: TableState, p: { id: PlayerId; name: string; isBot?: boolean; botLevel?: BotLevel }):
   Result<TableState, 'TABLE_FULL'>;
   // lobby or no running game → seat immediately; game running → `pending`.
   // Full = players.length + pending.length >= maxSeats.
@@ -425,7 +428,8 @@ export function runBots(s: TableState, ctx: () => Ctx, rand: () => number): Tabl
 | `ready` | any seated player | `game !== null && phase === 'finished'` | add to `ready`; if every seated **connected** human is in `ready` → `dealNext` |
 | `abort-game` | host | `game !== null && phase !== 'finished'` | discard the running game (no record), then immediately `dealNext` (the dealer pointer already advanced when that game was dealt) |
 | `kick` | host | `game === null` or `phase==='finished'` | remove player (seat or pending) via `removePlayer`; if `players.length < 3` → `game = null`, `status = 'lobby'` |
-| `add-bot` | host | same as kick; seats free | `addPlayer({ isBot: true, name: 'Bot 1'… })` |
+| `add-bot` | host | same as kick; seats free | `addPlayer({ isBot: true, botLevel: 'normal', name: 'Bot', 'Bot (2)'… })` |
+| `set-bot-level` | host | any time (seated or pending bot) | sets that bot's `botLevel`; it applies from the bot's next action. Unknown id → `UNKNOWN_PLAYER`, a human → `NOT_A_BOT` |
 | `leave` | any | seated: only if `game === null` or finished → `removePlayer`; if a game is running → just `connected=false` (they may rejoin); pending → removed |
 
 `dealNext(state, ctx)`:
@@ -445,8 +449,8 @@ view `waitingFor`).
 
 ## B3. Bots (`bot.ts`, `bot/`)
 
-Three levels, chosen per table at creation (`TableState.botLevel`, default `normal`). The full spec
-is in `14-bots.md`:
+Three levels, set **per bot** by the host in the lobby (`Player.botLevel`, new bots start at
+`normal`). The full spec is in `14-bots.md`:
 - **easy**: `botAction` picks **uniformly at random** among `enumerateActions(game, role)`. In bidding
   it prefers `pass` with probability 0.6 and otherwise picks the legal bid (always the single next
   value, 03 §4.1), hold or claim.
@@ -458,12 +462,12 @@ is in `14-bots.md`:
 
 Bots only see a `BotView` (no hidden cards). Every chosen action is checked against
 `enumerateActions`. All randomness comes from the injected `rand`. Bots are also used for fuzz tests,
-demos, e2e tests and "Add bot". The UI labels bots with a robot icon and the level.
+demos, e2e tests and "Add bot". The UI labels bots with a robot icon and their level.
 
 ## B4. Views (`view.ts`) — redaction
 
 ```ts
-export interface PlayerPublic { id: PlayerId; name: string; connected: boolean; isBot: boolean; seat: number }
+export interface PlayerPublic { id: PlayerId; name: string; connected: boolean; isBot: boolean; botLevel: BotLevel | null; seat: number }
 
 export interface ViewLegal {            // for the viewer, only when it is the viewer's turn
   bidValues?: number[]; canPassBid?: boolean; canHold?: boolean; canClaim?: boolean;
@@ -506,7 +510,7 @@ export interface GameView {
 export interface TableView {
   seq: number;
   table: {
-    key: string; name: string; hostId: PlayerId; maxSeats: number; botLevel: BotLevel; status: TableStatus;
+    key: string; name: string; hostId: PlayerId; maxSeats: number; status: TableStatus;
     players: PlayerPublic[]; pending: PlayerPublic[];
     nextDealerId: PlayerId | null; readyIds: PlayerId[];
   };
