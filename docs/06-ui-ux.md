@@ -22,8 +22,10 @@ connection status dot, buttons **Stats**, **Settings**, **Leave**.
 ### Home
 - Show the supplied raster Skatastischer Hirsch logo centered at three times its original display size above a centered page title. The title is “Skatastisches Onlineturniersystem” in German and “Skatastic Online Tournament System” in English; use the public copy described in `10-assets.md` and provide empty alternative text because the adjacent title names the app.
 - Name input (stored in `localStorage`).
-- **Create table**: name (default "<Player>'s table"), max seats (3–6, default 3), public toggle →
-  generates key, starts a host, navigates to `#/t/KEY`.
+- **Create table**: name (default "<Player>'s table"), max seats (3–6, default 3), **bot strength**
+  (`create-bot-level`: Easy / Normal / Strong, default Normal, last choice remembered in settings as
+  `lastBotLevel`), public toggle → generates key, starts a host, navigates to `#/t/KEY`. The
+  strength applies to all bots of the table and cannot be changed later (`14-bots.md`).
 - **Join with key**: input accepting `ABCD-EFGH` (any case/spaces) + Join button (validate with
   `isValidKey`).
 - **Public tables**: live list (`createDirectory`), each row: table name, host, seats `2/3`,
@@ -36,7 +38,8 @@ connection status dot, buttons **Stats**, **Settings**, **Leave**.
 
 ### TableLobby
 - Big key `ABCD-EFGH` with **Copy key** and **Copy link** buttons.
-- Seat list in order (seat numbers), each with name, connection dot, host crown, bot icon.
+- Seat list in order (seat numbers), each with name, connection dot, host crown, bot icon + level
+  ("Bot · Normal"). The info line shows "Bots: Normal".
 - Host only: **Start game** (enabled with ≥ 3 players), **Add bot**, per-player **Kick**.
 - Non-host: "Waiting for host to start…".
 - Info text: "3 players: classic Skat. 4–6 players: Geberskat — the dealer (and extra players) sit
@@ -63,7 +66,9 @@ connection status dot, buttons **Stats**, **Settings**, **Leave**.
 ```
 Clockwise seating: viewer at the bottom; the next player in play order sits at the **left-top**,
 the one after at the **right-top** (triangle). On wide screens use the same arrangement with more
-space; the trick area is the center.
+space; the trick area is the center. In **compact landscape** (phones held sideways) the opponents
+move to a left and a right column beside the table, and the phase panel is overlaid on the (empty)
+trick area; see §5. The screen never scrolls during a game.
 
 If the viewer is **sitting out** or pending: no hand; the bottom area shows "You are sitting out
 this game" plus the dealer/role names; everything else is a spectator view (backs and trick).
@@ -72,7 +77,7 @@ this game" plus the dealer/role names; everything else is a spectator view (back
 
 | Phase | What the viewer sees |
 |---|---|
-| `bidding` | `BiddingPanel`. Header: who bids/holds now. When it is my turn: as **caller** a value `<select>`/stepper limited to `legal.bidValues` (default = the lowest) + **Bid** + **Pass**; as **listener** **Hold (“Ja”) at N** + **Pass**; claim stage: **Play (18)** / **Pass**. Others: compact **bid history** list ("Anna 18 · Ben ja · Anna 20 · Ben weg"). |
+| `bidding` | `BiddingPanel`. Header: who bids/holds now. When it is my turn: as **caller** one button **Bid N** (`bid-submit`, N = the single entry of `legal.bidValues`; no value picker, bids go up strictly step by step, 03 §4.1) + **Pass**; as **listener** **Hold (“Ja”) at N** + **Pass**; claim stage: **Play (18)** / **Pass**. Others: compact **bid history** list ("Anna 18 · Ben ja · Anna 20 · Ben weg"). |
 | `skat-decision` | Declarer: **Pick up Skat** / **Play Hand**. Others: "X won the bidding with N". |
 | `discarding` | Declarer: the two Skat cards are shown in the hand (highlighted *new*). Tap cards to select exactly 2 (checkmark), **Discard** button enabled when 2 selected (`legal.discardFrom`). |
 | `declaring` | Declarer: `DeclarationPicker` (see below). Others: waiting text. |
@@ -94,7 +99,7 @@ Passed in: "Everybody passed". Otherwise:
 - Headline: "Anna won Grand Hand" / "Anna lost (overbid)".
 - Table: declarer card points vs defenders (`83 – 37`), tricks, Schneider/Schwarz flags,
   "Mit 2, Spiel 3, Hand 4 × 24 = 96", bid, game value, score delta per player (both systems if toggle).
-- Revealed Skat/discarded cards, and (for passed-in nothing).
+- Revealed Skat/discarded cards as `CardChips` (small symbols, not written-out names); nothing for passed-in.
 - **Continue** button → sends `ready`; shows "Waiting for: Ben, Carl" with ready checkmarks.
 
 ## 2. Components (`src/ui/components`)
@@ -104,8 +109,9 @@ Passed in: "Everybody passed". Otherwise:
 | `Card` | `id: CardId \| 'back'`, `state?: 'normal'\|'disabled'\|'selected'\|'highlight'`, `onClick?`, `size` | `<button>` when clickable, else `<img>`. `alt`/`aria-label` from i18n ("Jack of clubs"). Image `src = ${BASE}cards/${id}.webp`. Illegal card = `disabled` (opaque card face with a translucent grey overlay + not focusable). During bidding, show every card at full brightness because the hand is needed for bidding; cards remain non-interactive. |
 | `Hand` | `cards`, `legal: CardId[]\|null`, `mode: 'play'\|'discard'`, `selected`, `onPlay`, `onToggle` | Overlapped fan (negative margin; overlap shrinks to fit width). Sorted via `sortHand(cards, declaration)`. Selected card raised by 12px. |
 | `OpponentSeat` | `player`, `role`, `count`, `isTurn`, `isDeclarer`, `openCards?` | Shows `Card back` stack (overlapped ×min(count,10)) + count badge; highlights when it is their turn; ouvert → real cards face up. |
-| `TrickArea` | `trick`, `lastTrick`, `players` | Three fixed slots mapped to seat positions; card appears with CSS transition; after a trick completes show it for ~1.2 s (UI timer) with a winner highlight, then clear — see §4. |
+| `TrickArea` | `trick`, `lastTrick`, `players` | Three fixed slots mapped to seat positions; card appears with CSS transition; after a trick completes, hold it for `trickDisplayMs` (Settings) with a winner highlight; tap to skip (`onDismiss`) — see §4. |
 | `SkatPile` | `visible: boolean` | Two small backs in the table center during bidding/skat-decision. |
+| `CardChip` / `CardChips` | `card` / `cards` | A card **in text**: small white rounded chip with coloured suit symbol + short rank (`♥10`, `♣B` in German, `♣J` in English; i18n `rankShort.*`). `role="img"`, `aria-label`/`title` = full name. Used for the last trick, Skat/discard in the result, and every other visible card mention. Never write card names out in visible text (13 F4). |
 | `SittingOutBar` | `players`, `dealerId` | chips |
 | `BiddingPanel`, `SkatDecision`, `DiscardPanel`, `DeclarationPicker`, `ResultDialog` | as above | one file each |
 | `TopBar`, `Toast`, `ConfirmDialog`, `SettingsDialog` | | |
@@ -131,20 +137,40 @@ Passed in: "Everybody passed". Otherwise:
 
 ## 4. Trick display timing (UI only)
 
-The engine clears the trick the moment the third card is played. The UI keeps a local
-`displayTrick` state: when `view.game.lastTrick` changes to a new completed trick, show its 3 cards
-in the trick area for 1200 ms (winner's card highlighted, then slide towards the winner's seat),
-**while the hand is already interactive** — if the viewer is the winner and plays immediately, the
-new card replaces the display. A "Last trick" button/long-press shows the previous trick
-(`lastTrick`) in a popover. Respect `prefers-reduced-motion` (no slide, only a fade).
+The engine clears the trick the moment the third card is played. The UI (`useShownTrick`) keeps a
+local hold: when `view.game.lastTrick` changes to a new completed trick, its 3 cards stay in the
+trick area for the full **`trickDisplayMs`** from Settings (default 600 ms, up to 2 s; `0` = no hold;
+winner's card highlighted), regardless of what happens next:
+- cards of the next trick that arrive during the hold are not drawn until the hold ends;
+- the viewer's hand is *paused* (not greyed, but not clickable) and a pending two-tap selection is
+  cleared; the status line shows "{name} takes the trick";
+- tapping the trick area (`trick-dismiss`) ends the hold early for this viewer only;
+- after the last trick, `ResultDialog` opens only when the hold ends;
+- no hold on the first render after a reload/reconnect.
+
+Bots are **not** delayed: the host runs bot actions without pauses. The client-side hold alone
+makes sure every finished trick is seen.
+A "Last trick" button shows the previous trick (`lastTrick`) in a bubble over the table area: one
+entry per play, `name` + `CardChip` (e.g. "Anna ♥10"), with the winner marked (`data-testid="last-trick"`).
+Respect `prefers-reduced-motion` (no slide, only a fade). Details: `13-playtest-fixes.md` F2.
 
 ## 5. Responsiveness and style
 
-- Card natural size 128×178 (aspect 0.719). CSS variable `--card-w`: clamp so that 10 cards fit:
-  `--card-w: clamp(52px, 11vw, 96px)` for the hand; opponents' backs `--card-w * 0.5`; trick cards
-  `--card-w * 1.1`.
-- Hand overlap: `margin-left: calc(-1 * (--card-w * 10 - available) / 9)` computed in a small
-  `useHandOverlap` hook using `ResizeObserver` (max overlap 60% of the card).
+- **The whole game screen fits the viewport without page scrolling**, in portrait and landscape,
+  from 360×640 / 640×360 up to large desktops (target list and acceptance test:
+  `13-playtest-fixes.md` F3). Only dialogs scroll internally (`max-height: calc(100dvh - 16px)`).
+- Card natural size 128×178 (aspect 0.719). Card size depends on width **and** height:
+  `--card-w: clamp(44px, min((100vw - 24px) / 5.2, 17dvh), 100px)` (≈ 64–70 px on phones, capped at
+  100 px on desktops); opponents' backs `--card-w * 0.42`; trick cards `--card-w * 0.95`
+  (`* 0.8` in compact landscape).
+- Hand overlap in pure CSS: `Hand` sets `--hand-n` (card count); each card after the first gets
+  `margin-left: clamp(-0.7 * card-w, (100% - n * card-w) / (n - 1), -0.15 * card-w)`, so 10 or 12
+  cards always fit the hand width. Hover raise only under `@media (hover: hover)`.
+- Layouts (CSS grid areas in `GameScreen.module.css`): **portrait/default** opponents top row, table,
+  status, phase panel, hand; **compact landscape** (`orientation: landscape` and `max-height: 520px`)
+  opponents in left/right columns, phase panel overlaid in the table area, hand bottom, compact
+  TopBar; **large screens** (`min-width: 900px` and `min-height: 600px`) the portrait arrangement
+  centered with `max-width: 1040px`.
 - Table background: dark green felt (flat color + subtle radial gradient). Cards get a soft
   `filter: drop-shadow`. Palette and spacing tokens in `tokens.css`; dark theme only in v1.
 - Safe areas: use `env(safe-area-inset-*)` paddings. Minimum tap target 44×44 px for buttons.
@@ -175,7 +201,7 @@ Error codes map to messages under `error.<CODE>`.
 ## 7. Settings (persisted, zod-validated, `ui/persist/settings.ts`)
 
 `{ name, language, cardBack: 0|1|2|3, confirmPlay: 'auto'|'always'|'never', scoring: 'seeger'|'standard',
-`reducedMotion: 'system'|'on'|'off', botDelayMs: 0|300|600|1000 }`. The bot-play delay defaults to 600 ms and controls the pause between successive bot actions; 0 disables it. It is read live by the host for bot turns (so changing the setting takes effect during a game) and persisted locally.
+`reducedMotion: 'system'|'on'|'off', trickDisplayMs: 0|300|600|1000|2000, lastBotLevel: 'easy'|'normal'|'strong' }`. `lastBotLevel` (zod `.default('normal')`) preselects the bot strength in the create-table form. `trickDisplayMs` (label "Show finished trick", options Off / 0.3 / 0.6 / 1 / 2 s, default 600 ms) is how long a finished trick stays on the table on this device (§4); 0 = no hold. It replaced the old `botDelayMs` (stored values are migrated on load). It has no effect on bots, which are never delayed.
 
 ## 8. Accessibility
 

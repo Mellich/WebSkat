@@ -56,6 +56,11 @@ sorted ascending, de-duplicated, max 264. Begins:
 (Compute it in code; add a unit test that the first 20 values equal
 `[18,20,22,23,24,27,30,33,35,36,40,44,45,46,48,50,54,55,59,60]`.)
 
+**House rule — strictly ascending bids (no jumps).** The caller can only bid the *next* value of
+`BID_VALUES`: `18` when `currentBid` is `null`, otherwise the smallest value `> currentBid`
+(`nextBidValue` in `04`). This applies to humans and bots equally. After `264` the caller can only
+pass. (Official Skat allows jump bids; WebSkat deliberately does not, see `12` I95.)
+
 ### 4.2 Procedure
 
 Two *stages*. In each stage there is a **caller** (Sager) and a **listener** (Hörer).
@@ -66,8 +71,8 @@ Two *stages*. In each stage there is a **caller** (Sager) and a **listener** (H�
 
 Within a stage, turn order is:
 
-1. Caller either **bids** a value (`> currentBid`, or any `≥ 18` if `currentBid` is `null`) or
-   **passes**.
+1. Caller either **bids** the next value (`nextBidValue(currentBid)`: `18` if `currentBid` is
+   `null`, else the smallest `BID_VALUES` entry `> currentBid`, see §4.1) or **passes**.
 2. After a bid, listener either **holds** (accepts the value; `currentBid` unchanged) or
    **passes**.
 3. After a hold, go to step 1 (caller must raise or pass).

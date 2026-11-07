@@ -210,7 +210,8 @@ Validation per the table in 03 §5.1, plus `d.hand === hand`.
 export function initialBidding(): BiddingState;
 //  stage 1, caller 'middlehand', listener 'forehand', awaiting 'caller', currentBid null, history []
 export function applyBid(b: BiddingState, role: Role, a: GameAction): Result<BiddingState, GameErrorCode>;
-export function legalBidValues(b: BiddingState): number[];       // [] when it is not a bid situation
+export function nextBidValue(currentBid: number | null): number | null; // 18, else next BID_VALUES entry > currentBid; null after 264
+export function legalBidValues(b: BiddingState): number[];       // [nextBidValue] or [] (not a bid situation / after 264)
 export function biddingOutcome(b: BiddingState):
   | { kind: 'running' } | { kind: 'declarer'; role: Role; bid: number } | { kind: 'passed-in' };
 ```
@@ -218,7 +219,7 @@ Transition table (implement as a `switch` on `stage`, `awaiting`, `action.type`)
 
 | stage | awaiting | action | effect |
 |---|---|---|---|
-| 1 or 2 | caller | `bid v` (v ∈ BID_VALUES, v > currentBid ?? 17) | `currentBid = v`; awaiting = listener |
+| 1 or 2 | caller | `bid v` (v === nextBidValue(currentBid); no jumps, 03 §4.1) | `currentBid = v`; awaiting = listener |
 | 1 or 2 | caller | `pass` | caller out → **end of stage** (see below) |
 | 1 or 2 | listener | `hold` (only if `currentBid !== null` and last event was a caller bid) | awaiting = caller |
 | 1 or 2 | listener | `pass` | listener out → **end of stage** |
@@ -355,6 +356,7 @@ export interface TableState {
   readonly isPublic: boolean;
   readonly hostId: PlayerId;
   readonly maxSeats: number;                            // 3..6
+  readonly botLevel: BotLevel;                          // 'easy' | 'normal' | 'strong', set at creation (14-bots.md)
   readonly status: TableStatus;
   readonly players: readonly Player[];                  // index = seat (clockwise)
   readonly pending: readonly Player[];                  // joined while a game runs; seated after it
@@ -387,7 +389,7 @@ export type TableErrorCode = GameErrorCode
 ```ts
 // table.ts
 export function createTable(args: { key: string; name: string; isPublic: boolean;
-  hostId: PlayerId; hostName: string; maxSeats: number }): TableState;
+  hostId: PlayerId; hostName: string; maxSeats: number; botLevel?: BotLevel /* default 'normal' */ }): TableState;
 export function addPlayer(s: TableState, p: { id: PlayerId; name: string; isBot?: boolean }):
   Result<TableState, 'TABLE_FULL'>;
   // lobby or no running game → seat immediately; game running → `pending`.
@@ -441,12 +443,22 @@ The host cannot be kicked.
 player does not block the next deal; the new game simply waits on their turn when it comes (see
 view `waitingFor`).
 
-## B3. Bots (`bot.ts`)
+## B3. Bots (`bot.ts`, `bot/`)
 
-`botAction` picks **uniformly at random** among `enumerateActions(game, role)`, except in bidding
-where it prefers `pass` with probability 0.6 and otherwise picks among the lowest three legal bids /
-hold. This is *not* an AI; its purposes are: fuzz tests, demos, e2e tests, solo experiments with
-"Add bot". The UI labels bots with a robot icon.
+Three levels, chosen per table at creation (`TableState.botLevel`, default `normal`). The full spec
+is in `14-bots.md`:
+- **easy**: `botAction` picks **uniformly at random** among `enumerateActions(game, role)`. In bidding
+  it prefers `pass` with probability 0.6 and otherwise picks the legal bid (always the single next
+  value, 03 §4.1), hold or claim.
+- **normal**: bids, holds or claims up to the value of its best playable game from a hand
+  evaluation. Rule-based Skat decision, discard and declaration. Heuristic card play that maximizes
+  its team's card points (Null: declarer avoids tricks, defenders force one).
+- **strong**: like normal, plus Monte-Carlo sampling of the hidden cards (Skat estimate for bidding;
+  for card play, rollouts with the normal heuristics).
+
+Bots only see a `BotView` (no hidden cards). Every chosen action is checked against
+`enumerateActions`. All randomness comes from the injected `rand`. Bots are also used for fuzz tests,
+demos, e2e tests and "Add bot". The UI labels bots with a robot icon and the level.
 
 ## B4. Views (`view.ts`) — redaction
 
@@ -494,7 +506,7 @@ export interface GameView {
 export interface TableView {
   seq: number;
   table: {
-    key: string; name: string; hostId: PlayerId; maxSeats: number; status: TableStatus;
+    key: string; name: string; hostId: PlayerId; maxSeats: number; botLevel: BotLevel; status: TableStatus;
     players: PlayerPublic[]; pending: PlayerPublic[];
     nextDealerId: PlayerId | null; readyIds: PlayerId[];
   };

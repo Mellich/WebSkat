@@ -60,7 +60,12 @@ Fuzz invariants (check after every action and at the end):
   (`/\b[CSHD](?:7|8|9|10|J|Q|K|A)\b/g`) and assert ⊆ `allowed`. Also assert the JSON contains neither
   `"seed"` nor `"initialHands"`.
 - Bots: bot-only tables for N=3,4,5,6, 50 games each, fixed seeds → terminates, record count
-  equals finished games, no exceptions.
+  equals finished games, no exceptions. Run them at every bot level.
+- Bot levels (Phase 13, `14-bots.md` §8): fairness property (`botViewOf` and the chosen action do not
+  change when cards the bot cannot see are swapped), evaluation/auction/heuristic scenario tests,
+  sampling constraints, determinism, "legal fallback never used". Strength check: `normal` beats
+  `easy` (in `npm run check`); `strong` ≥ `normal` only with `BOT_BENCH=1`. Perf: a strong card
+  decision takes < 100 ms.
 
 ## 4. Network (`src/net`)
 
@@ -94,11 +99,21 @@ option), if `pickup`/`play-hand` is shown click `play-hand`/`pickup`, discard th
 declare the first suggested option, else click the first enabled `hand-card-*`.
 
 Scenarios: A (3 players, one game, stats visible), B (public list + 4 players Geberskat rotation),
-C (reload a client mid-game).
+C (reload a client mid-game), D (`layout.spec.ts`: offline `#/dev/local?seed=123` at the viewports
+of `13-playtest-fixes.md` F3; asserts no page scroll, all game areas inside the viewport, hand card
+width ≥ 60 px on phones and ≤ 104 px everywhere; saves screenshots). Additional test ids for D:
+`opponent-seat`, `trick-area`, `phase-panel`, `trick-dismiss`, `setting-trick-display`, `last-trick`, and
+`create-bot-level` (Phase 13; scenario A creates its table with bot strength `easy`). The
+`bid-value` select no longer exists; bidding uses `bid-submit` (single "Bid N" button).
 
 ## 6. Component tests (jsdom)
 
 `// @vitest-environment jsdom` at the top; testing-library queries by role/name. See `06-ui-ux.md` §9.
+Phase 12 adds: `useShownTrick` hold tests (fake timers: full duration, next-trick cards held back,
+dismiss, no hold on first render, restart on a new trick), `Hand` `paused` + `--hand-n`,
+`BiddingPanel` single "Bid N" button, `CardChip` (visible `♥10`, accessible name "Ten of hearts"), settings migration `botDelayMs` → `trickDisplayMs`. Pure:
+`nextBidValue`/strict bidding (engine), bot opens with 18; `host.test.ts`: bots run synchronously
+without timers.
 
 ## 7. Commands and CI
 

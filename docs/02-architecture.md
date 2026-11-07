@@ -64,7 +64,9 @@ WebSkat/
       records.ts              build GameRecord from a finished game (+ both scoring systems)
       stats.ts                computeStats(records, players) — pure aggregations
       view.ts                 viewFor(state, playerId) — redaction lives here
-      bot.ts                  RandomBot: chooses a legal action
+      bot.ts                  botStep/runBots: lets the bot whose turn it is act (level = table.botLevel)
+      bot/                    bot strategies easy/normal/strong (14-bots.md); see only a BotView,
+                              never the full GameState (bots must not use hidden cards)
       index.ts
       *.test.ts
     net/
@@ -142,6 +144,11 @@ A `TableView` for player P may contain card identities only for:
 There is a required property test (`09-testing.md` §3): random games, after every action, for every
 viewer, assert that every card id occurring anywhere in `JSON.stringify(view)` is in the allowed set
 above.
+
+**Bots** run inside the host, which holds the full `GameState`, so they must not use cards their
+seat could not see either. Bot strategies only receive a `BotView` built by `botViewOf`
+(`src/table/bot/knowledge.ts`). It holds the same information a human player in that seat has.
+See `14-bots.md` §2 and its fairness property test.
 
 ## 4. Data flow of one move (play a card)
 

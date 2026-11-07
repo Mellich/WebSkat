@@ -32,3 +32,6 @@ Read first: `docs/04-game-engine.md` Part B, `docs/07-statistics.md`, `docs/02-a
 - Disconnected humans do not block `ready`; bots are always ready.
 - `viewFor` for a stranger id (not seated, not pending) must not throw — return a minimal view
   with `you.role = 'lobby'` and no game info beyond public table data.
+- Bots (`bot/`, Phase 13, `docs/14-bots.md`): strategies take a `BotView` only, never `GameState`.
+  `botViewOf` is the single place that reads the game for a bot. Every bot action is checked against
+  `enumerateActions`. Tuning constants live in `bot/tuning.ts`.

@@ -16,7 +16,7 @@ public *lobby room* for the table list. The host is the authority (`02-architect
 
 ```ts
 export const APP_ID = 'webskat-v1-7c2f9a';        // must be unique to this app
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;            // 2 since Phase 13 (TableView.table.botLevel)
 export const LOBBY_ROOM = 'webskat-lobby-v1';
 export const tableRoom = (key: string) => `webskat-t-${normalizeKey(key)}`;
 export const AD_INTERVAL_MS = 5000;
@@ -173,8 +173,8 @@ Behavior:
 1. `room = transport.join(tableRoom(key))`; register host as a player (already in `table`).
 2. Incoming `cmd`: parse → actor from map → `applyCommand` with `{ now(), seed: randomSeed() }`.
    - ok: `state = value.state`; broadcast the accepted view, then run bot actions one at a time;
-     broadcast/persist each resulting view and record. The host uses its local `botDelayMs` setting
-     between bot actions so played cards remain visible to all players; zero runs bots without pauses.
+     broadcast/persist each resulting view and record. Bots run without pauses; the clients keep
+     each finished trick visible for their own `trickDisplayMs` (06 §4).
    - error: send `{t:'error'}` to the sender only.
 3. `broadcastViews()`: for every connected non-bot player `p`: `viewFor(state, p.id)`; remote →
    `room.send('msg', {t:'view', view}, peerId)`; host → local listeners.

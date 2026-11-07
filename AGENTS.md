@@ -19,6 +19,8 @@ decision into `docs/12-open-questions.md`, and continue.**
 8. `docs/07-statistics.md` — records and statistics
 9. `docs/08-implementation-plan.md` — **the phase-by-phase task list you execute**
 10. `docs/09-testing.md`, `docs/10-assets.md`, `docs/11-deployment.md`
+11. `docs/13-playtest-fixes.md` — detailed spec for Phase 12 (strict bidding, trick display, mobile layout)
+12. `docs/14-bots.md` — detailed spec for Phase 13 (bot strength levels, bidding and card-play AI)
 
 Then read the `AGENTS.md` inside the folder you are working in (`src/engine`, `src/table`,
 `src/net`, `src/ui`).
