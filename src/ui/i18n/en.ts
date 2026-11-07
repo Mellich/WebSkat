@@ -35,6 +35,7 @@ export const en = {
   'home.status': 'Status',
   'home.rejoinTitle': 'Continue',
   'home.rejoin': 'Rejoin table {key}',
+  'home.resume': 'Resume hosted table {key}',
   'home.localGame': 'Offline practice (you and two bots)',
   'home.about': 'About',
   'home.trust': "The host's browser shuffles and sees all cards, like a friend dealing at a real table. No accounts, no server; game data only travels between the players' browsers.",

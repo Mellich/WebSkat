@@ -134,7 +134,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
         <TrickArea slots={trickSlots} labelOf={label} />
       </div>
 
-      <div className={styles.status} aria-live="polite">
+      <div className={styles.status} aria-live="polite" data-testid="status-line">
         <span>{statusLine}</span>
         {game.lastTrick === null ? null : (
           <button type="button" onClick={() => { setShowLast((v) => !v); }}>{t('trick.last')}</button>

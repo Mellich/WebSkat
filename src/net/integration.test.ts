@@ -3,37 +3,12 @@
 
 import { describe, expect, it } from 'vitest';
 import { ROLES, type CardId } from '../engine';
-import type { TableCommand, TableView } from '../table';
+
 import type { GameConnection, ConnectionEvent } from './connection';
-import { createRig, joinClient, lastView, settle, type Rig } from './testing';
-
-const CARD = /\b[CSHD](?:7|8|9|10|J|Q|K|A)\b/g;
-
-/** The next action of the player whose view offers one; null when nothing is offered. */
-function choose(view: TableView | null): TableCommand | null {
-  const g = view?.game;
-  if (g === null || g === undefined || g.phase === 'finished') return null;
-  const legal = g.legal;
-  if (legal.canClaim === true) return { type: 'game', action: { type: 'claim' } };
-  if (legal.bidValues?.includes(18) === true && g.bidding.currentBid === null) {
-    return { type: 'game', action: { type: 'bid', value: 18 } };
-  }
-  if (legal.canPassBid === true) return { type: 'game', action: { type: 'pass' } };
-  if (legal.canPickUp === true) return { type: 'game', action: { type: 'pickup-skat' } };
-  const discard = legal.discardFrom;
-  if (discard !== undefined && discard.length >= 2) {
-    const [a, b] = discard;
-    if (a !== undefined && b !== undefined) return { type: 'game', action: { type: 'discard', cards: [a, b] } };
-  }
-  const declaration = legal.declarations?.[0];
-  if (declaration !== undefined) return { type: 'game', action: { type: 'declare', declaration } };
-  const card = legal.playableCards?.[0];
-  if (card !== undefined) return { type: 'game', action: { type: 'play', card } };
-  return null;
-}
+import { CARD_PATTERN, createRig, joinClient, lastView, nextCommand, settle, type Rig } from './testing';
 
 function cardsIn(json: string): CardId[] {
-  return (json.match(CARD) ?? []) as CardId[];
+  return (json.match(CARD_PATTERN) ?? []) as CardId[];
 }
 
 describe('a complete game over the network', () => {
@@ -70,7 +45,7 @@ describe('a complete game over the network', () => {
 
     for (let round = 0; round < 400 && rig.host.getState().game?.engine.phase !== 'finished'; round++) {
       for (const p of players) {
-        const command = choose(lastView(p.events));
+        const command = nextCommand(lastView(p.events));
         if (command !== null) p.connection.send(command);
       }
       settle(rig);
@@ -93,4 +68,3 @@ describe('a complete game over the network', () => {
     expect(latestHistory).toEqual({ t: 'records', records: records });
   });
 });
-

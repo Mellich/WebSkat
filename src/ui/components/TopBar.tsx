@@ -42,7 +42,7 @@ export function TopBar() {
         {key === null ? null : <span className={styles.key}>{t('common.key')} {formatKey(key)}</span>}
       </div>
       <div className={styles.right}>
-        <span className={styles.status} title={statusText}>
+        <span className={styles.status} title={statusText} data-testid="connection-status" data-state={dot}>
           <span className={cls(styles.dot, styles[dot])} aria-hidden="true" />
           <span className={styles.statusText}>{statusText}</span>
         </span>

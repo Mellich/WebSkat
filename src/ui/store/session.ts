@@ -5,6 +5,8 @@ import type { ConnectionEvent, ConnectionStatus, GameConnection, Host } from '..
 import type { GameRecord, TableView } from '../../table';
 import { en } from '../i18n/en';
 import { translateNow } from '../i18n';
+import { loadRecordCache, saveRecordCache, RECORD_CACHE_LIMIT } from '../persist/records';
+import { browserStorage } from '../persist/storage';
 
 export interface Toast {
   readonly id: number;
@@ -27,7 +29,8 @@ export interface SessionState {
   readonly dismiss: (id: number) => void;
 }
 
-const EMPTY = { key: null, connection: null, host: null, status: null, reason: null, view: null, records: [] } as const;
+const EMPTY = { key: null, connection: null, host: null, status: null, reason: null, view: null } as const;
+
 
 /** Text for an error code: the translation if we have one, otherwise the host's message. */
 export function errorText(code: string, message: string): string {
@@ -44,6 +47,12 @@ export const useSession = create<SessionState>()((set, get) => {
     set((s) => ({ toasts: [...s.toasts, { id, text, kind }] }));
   };
 
+  /** Keeps the statistics available after a reload; the host's list is authoritative. */
+  const cache = (key: string | null, records: readonly GameRecord[]): void => {
+    const storage = browserStorage();
+    if (storage !== null && key !== null) saveRecordCache(storage, key, records.slice(-RECORD_CACHE_LIMIT));
+  };
+
   const handle = (e: ConnectionEvent): void => {
     switch (e.t) {
       case 'status':
@@ -54,10 +63,14 @@ export const useSession = create<SessionState>()((set, get) => {
         return;
       case 'records':
         set({ records: [...e.records] });
+        cache(get().key, e.records);
         return;
-      case 'record':
-        set((s) => ({ records: [...s.records, e.record] }));
+      case 'record': {
+        const records = [...get().records, e.record];
+        set({ records });
+        cache(get().key, records);
         return;
+      }
       case 'error':
         addToast(errorText(e.code, e.message), 'error');
         return;
@@ -70,17 +83,20 @@ export const useSession = create<SessionState>()((set, get) => {
 
   return {
     ...EMPTY,
+    records: [],
     toasts: [],
     attach({ key, connection, host }) {
       get().detach();
-      set({ ...EMPTY, key, connection, host: host ?? null, toasts: get().toasts });
+      const storage = browserStorage();
+      const cached = storage === null ? [] : loadRecordCache(storage, key);
+      set({ ...EMPTY, key, connection, host: host ?? null, records: cached, toasts: get().toasts });
       unsubscribe = connection.subscribe(handle);
     },
     detach() {
       unsubscribe?.();
       unsubscribe = null;
       const { connection } = get();
-      set({ ...EMPTY, toasts: get().toasts });
+      set({ ...EMPTY, records: [], toasts: get().toasts });
       connection?.close();
     },
     toast: addToast,

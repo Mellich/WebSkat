@@ -2,13 +2,10 @@
 
 import { create } from 'zustand';
 import { SettingsSchema, defaultSettings, loadSettings, saveSettings, type Settings } from '../persist/settings';
+import { browserStorage } from '../persist/storage';
 
 function browserLanguage(): string {
   return typeof navigator === 'undefined' ? 'en' : navigator.language;
-}
-
-function browserStorage(): Storage | null {
-  return typeof localStorage === 'undefined' ? null : localStorage;
 }
 
 function initial(): Settings {

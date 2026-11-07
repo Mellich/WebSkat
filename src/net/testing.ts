@@ -4,9 +4,35 @@ import { createClient } from './client';
 import { type ConnectionEvent, type GameConnection } from './connection';
 import { createFakeNetwork, type FakeNetwork } from './fake';
 import { createHost, type Host } from './host';
-import { createTable, type TableView } from '../table';
+import { createTable, type TableCommand, type TableView } from '../table';
 
 export const KEY = 'ABCD-EFGH';
+
+/** Matches the card ids that may appear in a view (docs/09 §3). */
+export const CARD_PATTERN = /\b[CSHD](?:7|8|9|10|J|Q|K|A)\b/g;
+
+/** The next action the player offered by this view should send; null when the view offers none. */
+export function nextCommand(view: TableView | null): TableCommand | null {
+  const g = view?.game;
+  if (g === null || g === undefined || g.phase === 'finished') return null;
+  const legal = g.legal;
+  if (legal.canClaim === true) return { type: 'game', action: { type: 'claim' } };
+  if (legal.bidValues?.includes(18) === true && g.bidding.currentBid === null) {
+    return { type: 'game', action: { type: 'bid', value: 18 } };
+  }
+  if (legal.canPassBid === true) return { type: 'game', action: { type: 'pass' } };
+  if (legal.canPickUp === true) return { type: 'game', action: { type: 'pickup-skat' } };
+  const discard = legal.discardFrom;
+  if (discard !== undefined && discard.length >= 2) {
+    const [a, b] = discard;
+    if (a !== undefined && b !== undefined) return { type: 'game', action: { type: 'discard', cards: [a, b] } };
+  }
+  const declaration = legal.declarations?.[0];
+  if (declaration !== undefined) return { type: 'game', action: { type: 'declare', declaration } };
+  const card = legal.playableCards?.[0];
+  if (card !== undefined) return { type: 'game', action: { type: 'play', card } };
+  return null;
+}
 
 export interface Rig {
   readonly net: FakeNetwork;

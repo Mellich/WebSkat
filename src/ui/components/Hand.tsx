@@ -35,10 +35,11 @@ export function Hand(props: HandProps) {
         const enabled = legal.includes(card);
         const handler = enabled ? (mode === 'discard' ? onToggle : onPlay) : undefined;
         const state = stateOf(card, props);
+        const testId = `hand-card-${card}`;
         return handler === undefined ? (
-          <Card key={card} id={card} label={label(card)} state={state} size="hand" />
+          <Card key={card} id={card} label={label(card)} state={state} size="hand" testId={testId} />
         ) : (
-          <Card key={card} id={card} label={label(card)} state={state} size="hand" onClick={() => { handler(card); }} />
+          <Card key={card} id={card} label={label(card)} state={state} size="hand" testId={testId} onClick={() => { handler(card); }} />
         );
       })}
     </div>

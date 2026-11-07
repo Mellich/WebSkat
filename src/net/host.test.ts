@@ -125,6 +125,18 @@ describe('commands', () => {
     expect(statusOf(anna.events)).toBe('kicked');
     expect(rig.host.getState().players.map((p) => p.id)).toEqual(['host']);
   });
+
+  it('does not seat a kicked player again when another player joins the room', () => {
+    const rig = createRig();
+    const anna = joinClient(rig, 'A', 'Anna');
+    settle(rig);
+    rig.host.connection.send({ type: 'kick', playerId: anna.connection.playerId() ?? '' });
+    settle(rig);
+    joinClient(rig, 'B', 'Ben');
+    settle(rig);
+    expect(rig.host.getState().players.map((p) => p.name)).toEqual(['Host', 'Ben']);
+    expect(statusOf(anna.events)).toBe('kicked');
+  });
 });
 
 describe('shutdown and failures', () => {

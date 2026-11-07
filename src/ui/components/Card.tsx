@@ -14,9 +14,10 @@ export interface CardProps {
   readonly size?: 'hand' | 'opponent' | 'trick';
   readonly back?: BackIndex;
   readonly onClick?: () => void;
+  readonly testId?: string;
 }
 
-export function Card({ id, label, state = 'normal', size = 'hand', back = DEFAULT_BACK, onClick }: CardProps) {
+export function Card({ id, label, state = 'normal', size = 'hand', back = DEFAULT_BACK, onClick, testId }: CardProps) {
   const src = id === 'back' ? backUrl(back) : cardUrl(id);
   const className = cls(
     styles.card,
@@ -35,6 +36,7 @@ export function Card({ id, label, state = 'normal', size = 'hand', back = DEFAUL
         height={178}
         decoding="async"
         draggable={false}
+        data-testid={testId}
       />
     );
   }
@@ -43,6 +45,7 @@ export function Card({ id, label, state = 'normal', size = 'hand', back = DEFAUL
       type="button"
       className={className}
       onClick={onClick}
+      data-testid={testId}
       disabled={state === 'disabled'}
       aria-label={label}
       aria-pressed={state === 'selected' ? true : undefined}

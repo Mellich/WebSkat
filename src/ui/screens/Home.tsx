@@ -3,14 +3,19 @@
 import { useEffect, useState } from 'react';
 import { createDirectory, isValidKey, type Directory, type TableAd } from '../../net';
 import { useT } from '../i18n';
-import { hostTable } from '../net/actions';
+import { hostTable, resumeHostedTable } from '../net/actions';
 import { getTransport } from '../net/transport';
+import { listHostedKeys } from '../persist/hosted';
 import { loadSession } from '../persist/session';
+import { browserStorage } from '../persist/storage';
 import { navigate, tableHash } from '../router';
 import { useSettings } from '../store/settings';
 import styles from './Home.module.css';
 
 const MAX_SEATS_OPTIONS = [3, 4, 5, 6] as const;
+
+/** A reload of the app at its start page rejoins the seat from the last session, once per page load. */
+let autoRejoinChecked = false;
 
 /** The part of a form event that the handlers use. */
 interface PreventableEvent {
@@ -27,7 +32,22 @@ export function Home() {
   const [joinKey, setJoinKey] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [tables, setTables] = useState<TableAd[] | null>(null);
-  const [stored] = useState(() => (typeof localStorage === 'undefined' ? null : loadSession(localStorage)));
+  const [stored] = useState(() => {
+    const storage = browserStorage();
+    return storage === null ? null : loadSession(storage);
+  });
+  const [hosted] = useState(() => {
+    const storage = browserStorage();
+    return storage === null ? [] : listHostedKeys(storage);
+  });
+
+  useEffect(() => {
+    if (autoRejoinChecked) return;
+    autoRejoinChecked = true;
+    if (stored !== null && window.location.hash.replace(/^#\/?$/, '') === '') {
+      navigate(tableHash(stored.key));
+    }
+  }, [stored]);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,17 +115,32 @@ export function Home() {
         {message === null ? null : <p className={styles.error} role="alert">{message}</p>}
       </section>
 
-      {stored === null ? null : (
+      {stored === null && hosted.length === 0 ? null : (
         <section className={styles.card}>
           <h2>{t('home.rejoinTitle')}</h2>
-          <button
-            type="button"
-            onClick={() => {
-              navigate(tableHash(stored.key));
-            }}
-          >
-            {t('home.rejoin', { key: stored.key })}
-          </button>
+          {stored === null ? null : (
+            <button
+              type="button"
+              onClick={() => {
+                navigate(tableHash(stored.key));
+              }}
+            >
+              {t('home.rejoin', { key: stored.key })}
+            </button>
+          )}
+          {hosted.map((key) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => {
+                void resumeHostedTable(key).then((ok) => {
+                  if (ok) navigate(tableHash(key));
+                });
+              }}
+            >
+              {t('home.resume', { key })}
+            </button>
+          ))}
         </section>
       )}
 
@@ -127,7 +162,7 @@ export function Home() {
           <input type="checkbox" checked={isPublic} onChange={(e) => { setIsPublic(e.target.checked); }} />
           <span>{t('home.public')}</span>
         </label>
-        <button type="submit">{t('home.create')}</button>
+        <button type="submit" data-testid="create-table">{t('home.create')}</button>
       </form>
 
       <form className={styles.card} onSubmit={join}>
@@ -141,8 +176,9 @@ export function Home() {
             onChange={(e) => { setJoinKey(e.target.value.toUpperCase()); }}
             autoCapitalize="characters"
             autoComplete="off"
+            data-testid="join-key-input"
           />
-          <button type="submit">{t('home.join')}</button>
+          <button type="submit" data-testid="join-submit">{t('home.join')}</button>
         </div>
       </form>
 

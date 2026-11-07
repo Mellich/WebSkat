@@ -22,6 +22,8 @@ export function createClient(opts: ClientOptions): GameConnection {
   let playerId: string | null = null;
   let token: string | undefined = opts.token;
   let closed = false;
+  // After a kick or a closed table the seat is gone for good: do not re-join when other peers arrive.
+  let ended = false;
 
   const setStatus = (status: ConnectionStatus, reason?: string): void => {
     emitter.emit(reason === undefined ? { t: 'status', status } : { t: 'status', status, reason });
@@ -74,10 +76,12 @@ export function createClient(opts: ClientOptions): GameConnection {
         return;
       case 'kicked':
         hostPeer = null;
+        ended = true;
         setStatus('kicked');
         return;
       case 'closed':
         hostPeer = null;
+        ended = true;
         setStatus('closed');
         return;
       case 'welcome':
@@ -94,7 +98,7 @@ export function createClient(opts: ClientOptions): GameConnection {
     if (!closed && channel === 'msg') onHostMessage(from, data);
   });
   room.onPeerJoin((peer) => {
-    if (!closed) sendJoin(peer);
+    if (!closed && !ended) sendJoin(peer);
   });
   room.onPeerLeave((peer) => {
     if (closed || peer !== hostPeer) return;

@@ -5,8 +5,7 @@ import type { ConnectionStatus } from '../../net';
 import { TopBar } from '../components/TopBar';
 import { useT, type Translator } from '../i18n';
 import type { TranslationKey } from '../i18n/en';
-import { joinTable, leaveTable } from '../net/actions';
-import { loadSession } from '../persist/session';
+import { leaveTable, openTable } from '../net/actions';
 import { navigate } from '../router';
 import { useSession } from '../store/session';
 import { useSettings } from '../store/settings';
@@ -26,9 +25,7 @@ export function TableScreen({ tableKey }: { readonly tableKey: string }) {
   const attached = attachedKey === tableKey && connection !== null;
   useEffect(() => {
     if (attached || name === '') return;
-    const stored = typeof localStorage === 'undefined' ? null : loadSession(localStorage);
-    const token = stored?.key === tableKey ? stored.token : undefined;
-    void joinTable(tableKey, name, token);
+    void openTable(tableKey, name);
   }, [attached, name, tableKey]);
 
   if (!attached) {
@@ -99,7 +96,7 @@ function ConnectionBanner({ status, reason }: { readonly status: ConnectionStatu
   if (text === null) return null;
   const leaving = status === 'rejected' || status === 'kicked' || status === 'closed' || status === 'host-lost';
   return (
-    <div className={styles.banner} role="alert">
+    <div className={styles.banner} role="alert" data-testid="connection-banner">
       <span>{text}</span>
       {leaving ? (
         <button

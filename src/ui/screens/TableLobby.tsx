@@ -102,6 +102,7 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
           <button
             type="button"
             disabled={full || gameRunning}
+            data-testid="add-bot"
             onClick={() => {
               connection.send({ type: 'add-bot' });
             }}
@@ -111,6 +112,7 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
           <button
             type="button"
             disabled={!canStart}
+            data-testid="start-game"
             onClick={() => {
               connection.send({ type: 'start' });
             }}

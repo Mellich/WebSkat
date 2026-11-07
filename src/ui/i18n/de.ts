@@ -36,6 +36,7 @@ export const de: Dict = {
   'home.status': 'Status',
   'home.rejoinTitle': 'Weitermachen',
   'home.rejoin': 'Zurück an Tisch {key}',
+  'home.resume': 'Gehosteten Tisch {key} fortsetzen',
   'home.localGame': 'Übungsspiel offline (du und zwei Bots)',
   'home.about': 'Über',
   'home.trust': 'Der Browser des Gastgebers mischt und sieht alle Karten, wie ein Freund am echten Tisch. Keine Konten, kein Server; Spieldaten gehen nur zwischen den Browsern der Spieler.',

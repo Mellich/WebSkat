@@ -172,13 +172,13 @@ with a manual calculation of at least 3 games), the chart renders, history rows 
 
 ## Phase 9 — Persistence, reconnect, resume, polish  (*05 §9–10*, *07 §4*)
 
-- [ ] Client session persistence + auto-rejoin on load; Home "Rejoin table".
-- [ ] Client record cache in `localStorage` (cap 500).
-- [ ] Host snapshot persistence + "Resume hosted table" (all humans start `connected:false`).
-- [ ] Host-lost banner and automatic re-join when the host returns.
-- [ ] Tab title "● your turn", favicon (simple SVG), PWA-less meta tags, `prefers-reduced-motion`.
-- [ ] Optional: lifetime personal stats on Home.
-- [ ] Error toasts for every `error.<CODE>`.
+- [x] Client session persistence + auto-rejoin on load; Home "Rejoin table".
+- [x] Client record cache in `localStorage` (cap 500).
+- [x] Host snapshot persistence + "Resume hosted table" (all humans start `connected:false`).
+- [x] Host-lost banner and automatic re-join when the host returns.
+- [x] Tab title "● your turn", favicon (simple SVG), PWA-less meta tags, `prefers-reduced-motion`.
+- [ ] Optional: lifetime personal stats on Home. *Skipped for now, see `12` I79.*
+- [x] Error toasts for every `error.<CODE>`.
 
 **Acceptance**: reload a client tab mid-game → seat reclaimed and hand visible again; reload the host
 tab → resume → clients reconnect and the game continues at the same state.
