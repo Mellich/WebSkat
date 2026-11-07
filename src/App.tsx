@@ -29,7 +29,7 @@ export function App() {
       case 'dev-gallery':
         return DevGallery === null ? <Home /> : <DevGallery />;
       case 'dev-local':
-        return DevLocal === null ? <Home /> : <DevLocal />;
+        return DevLocal === null ? <Home /> : <DevLocal seed={route.seed} />;
       case 'home':
         return <Home />;
       default: {

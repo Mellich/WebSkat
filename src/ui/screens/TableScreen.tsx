@@ -10,6 +10,7 @@ import { loadSession } from '../persist/session';
 import { navigate } from '../router';
 import { useSession } from '../store/session';
 import { useSettings } from '../store/settings';
+import { GameScreen } from '../game/GameScreen';
 import { TableLobby } from './TableLobby';
 import styles from './TableScreen.module.css';
 
@@ -40,10 +41,15 @@ export function TableScreen({ tableKey }: { readonly tableKey: string }) {
       <ConnectionBanner status={status} reason={reason} />
       {view === null ? (
         <p className={styles.note}>{t('table.loading')}</p>
-      ) : view.table.status === 'lobby' || view.you.role === 'pending' ? (
+      ) : view.table.status === 'lobby' || view.you.role === 'pending' || view.game === null ? (
         <TableLobby view={view} connection={connection} tableKey={tableKey} />
       ) : (
-        <p className={styles.note}>{t('table.inGame')}</p>
+        <GameScreen
+          key={`${String(view.game.number)}-${view.game.phase}`}
+          view={view}
+          game={view.game}
+          connection={connection}
+        />
       )}
     </div>
   );

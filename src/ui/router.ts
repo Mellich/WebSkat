@@ -6,12 +6,15 @@ import { isValidKey, normalizeKey } from '../net';
 export type Route =
   | { readonly kind: 'home' }
   | { readonly kind: 'table'; readonly key: string }
-  | { readonly kind: 'dev-local' }
+  | { readonly kind: 'dev-local'; readonly seed: number | null }
   | { readonly kind: 'dev-gallery' };
 
 export function parseRoute(hash: string): Route {
-  const path = hash.replace(/^#/, '');
-  if (path === '/dev/local') return { kind: 'dev-local' };
+  const [path = '', query = ''] = hash.replace(/^#/, '').split('?', 2);
+  if (path === '/dev/local') {
+    const seed = new URLSearchParams(query).get('seed');
+    return { kind: 'dev-local', seed: seed !== null && /^\d+$/.test(seed) ? Number(seed) : null };
+  }
   if (path === '/dev/gallery') return { kind: 'dev-gallery' };
   const table = /^\/t\/([^/]+)$/.exec(path);
   const raw = table?.[1];

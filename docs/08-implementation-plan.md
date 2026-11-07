@@ -142,13 +142,13 @@ can create/join a table by key and see each other in the lobby; Start works with
 
 ## Phase 7 — UI: playing a game  (*06 §1–4*)
 
-- [ ] `GameScreen` layout with `OpponentSeat`s, `SittingOutBar`, `TrickArea`, `SkatPile`, status line.
-- [ ] `BiddingPanel` (caller/listener/claim, bid history), `SkatDecision`, `DiscardPanel`,
+- [x] `GameScreen` layout with `OpponentSeat`s, `SittingOutBar`, `TrickArea`, `SkatPile`, status line.
+- [x] `BiddingPanel` (caller/listener/claim, bid history), `SkatDecision`, `DiscardPanel`,
       `DeclarationPicker` (+ floor value hint), playing phase with `Hand` driven by `legal`.
-- [ ] Trick display timing (06 §4), last-trick popover, turn indicators, "waiting for X" banner.
-- [ ] `ResultDialog` with breakdown and Continue/ready state (no stats yet beyond the delta table).
-- [ ] Touch two-tap play; keyboard support; `aria-live` announcements.
-- [ ] Component tests: `BiddingPanel`, `DeclarationPicker`.
+- [x] Trick display timing (06 §4), last-trick popover, turn indicators, "waiting for X" banner.
+- [x] `ResultDialog` with breakdown and Continue/ready state (no stats yet beyond the delta table).
+- [x] Touch two-tap play; keyboard support; `aria-live` announcements.
+- [x] Component tests: `BiddingPanel`, `DeclarationPicker`.
 
 **Acceptance**: in `#/dev/local` (you + 2 bots) a full game can be played through all phases, for
 each game type at least once (use a debug query `?seed=123` in DEV to reproduce a deal), including
