@@ -6,6 +6,7 @@ import type { TableView, ViewResult } from '../../table';
 import { useT, type Translator } from '../i18n';
 import { cardName, declarationLabel } from './labels';
 import { namesById } from './seats';
+import styles from './ResultDialog.module.css';
 
 export interface ResultDialogProps {
   readonly view: TableView;
@@ -42,7 +43,7 @@ export function ResultDialog({ view, result, onContinue }: ResultDialogProps) {
   const cardText = (cards: readonly CardId[]): string => cards.map((c) => cardName(c, t)).join(', ');
   return (
     <Shell {...shell}>
-      <p className="result-headline">{headline}</p>
+      <p className={styles.headline}>{headline}</p>
       {result.overbid ? <p>{t('result.overbid', { bid: result.bid, value: result.gameValue })}</p> : null}
       {result.declaration.kind === 'null' ? (
         <p>{t('result.nullValue', { value: result.gameValue })}</p>
@@ -57,7 +58,7 @@ export function ResultDialog({ view, result, onContinue }: ResultDialogProps) {
       {game?.discarded === null || game?.discarded === undefined || game.discarded.length === 0 ? null : (
         <p>{t('result.discarded')}: {cardText(game.discarded)}</p>
       )}
-      <table className="result-table">
+      <table className={styles.table}>
         <caption>{t('result.change')}</caption>
         <tbody>
           {view.table.players.map((p) => (
@@ -85,11 +86,11 @@ function Shell({ t, onContinue, iAmReady, waiting, children }: ShellProps) {
     ? t('result.waitingFor', { names: waiting.join(', ') })
     : t('result.waitingOthers');
   return (
-    <div className="result-backdrop">
-      <div className="result-dialog" role="dialog" aria-modal="true" aria-label={t('result.title')}>
+    <div className={styles.backdrop}>
+      <div className={styles.dialog} role="dialog" aria-modal="true" aria-label={t('result.title')}>
         <h2>{t('result.title')}</h2>
         {children}
-        {iAmReady ? <p className="result-waiting">{status}</p> : null}
+        {iAmReady ? <p className={styles.waiting}>{status}</p> : null}
         <button type="button" onClick={onContinue} disabled={iAmReady}>{t('result.continue')}</button>
       </div>
     </div>

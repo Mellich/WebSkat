@@ -158,12 +158,12 @@ passed-in and Hand/Ouvert; no illegal card is ever clickable.
 
 ## Phase 8 — Statistics UI, Geberskat polish  (*07*, *06*)
 
-- [ ] `StatsPanel` with tabs Standings / History / Charts, scoring toggle, `ScoreChart` (SVG).
-- [ ] `gameLabel(record, t)` helper shared with `ResultDialog`.
-- [ ] Records flow: host broadcasts `record`; clients append; stats recompute via `computeStats`.
-- [ ] Geberskat UX: sitting-out view, dealer marker, role chips (Vorhand etc.), lobby text; 4–6 player
+- [x] `StatsPanel` with tabs Standings / History / Charts, scoring toggle, `ScoreChart` (SVG).
+- [x] `gameLabel(record, t)` helper (used by the history; the result dialog uses `declarationLabel` on the live view, see I78).
+- [x] Records flow: host broadcasts `record`; clients append; stats recompute via `computeStats`.
+- [x] Geberskat UX: sitting-out view, dealer marker, role chips (Vorhand etc.), lobby text; 4–6 player
       dev-local mode with bots (`#/dev/local?players=5`).
-- [ ] Settings dialog (language, card back, confirm mode, scoring).
+- [x] Settings dialog (language, card back, confirm mode, scoring).
 
 **Acceptance**: after several games with 4–5 participants the stats show correct totals (compare
 with a manual calculation of at least 3 games), the chart renders, history rows match results.

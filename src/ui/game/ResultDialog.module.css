@@ -1,0 +1,72 @@
+/* Non-blocking: the backdrop lets clicks through, so the top bar and the statistics stay usable. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 8px;
+  pointer-events: none;
+}
+
+.dialog {
+  pointer-events: auto;
+  width: min(96vw, 460px);
+  max-height: 80dvh;
+  overflow: auto;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  background: #0f2615;
+  border: 1px solid rgb(255 255 255 / 22%);
+  box-shadow: 0 -8px 24px rgb(0 0 0 / 45%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+.dialog h2 {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+}
+
+.dialog p {
+  margin: 0;
+}
+
+.headline {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.table caption {
+  text-align: left;
+  color: var(--muted);
+  padding-bottom: 4px;
+}
+
+.table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.table td:last-child {
+  text-align: right;
+}
+
+.waiting {
+  color: var(--muted);
+}
+
+.dialog button {
+  align-self: flex-end;
+  margin-top: 6px;
+}

@@ -95,9 +95,10 @@ export function createHost(opts: HostOptions): Host {
     }
   }
 
-  function broadcastRecord(record: GameRecord): void {
-    emitter.emit({ t: 'record', record });
-    room.send('msg', recordMessage(record));
+  /** Remote clients get each new record; this browser's own listeners get the whole history. */
+  function broadcastRecords(created: readonly GameRecord[]): void {
+    for (const record of created) room.send('msg', recordMessage(record));
+    emitter.emit({ t: 'records', records: [...state.records] });
   }
 
   function reportError(actor: PlayerId, code: string, message: string): void {
@@ -123,7 +124,8 @@ export function createHost(opts: HostOptions): Host {
       unbind(command.playerId);
     }
     state = runBots(state, ctx, mulberry32(opts.randomSeed()));
-    for (const record of state.records.slice(recordsBefore)) broadcastRecord(record);
+    const created = state.records.slice(recordsBefore);
+    if (created.length > 0) broadcastRecords(created);
     broadcastViews();
     persist();
   }
@@ -218,6 +220,7 @@ export function createHost(opts: HostOptions): Host {
   room.onMessage(onMessage);
   room.onPeerLeave(onPeerLeave);
   emitter.emit({ t: 'status', status: 'connected' });
+  emitter.emit({ t: 'records', records: [...state.records] });
   broadcastViews();
 
   const connection: GameConnection = {

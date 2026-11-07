@@ -89,9 +89,8 @@ describe('a complete game over the network', () => {
       const received = p.events.filter((e) => e.t === 'record');
       expect(received).toHaveLength(1);
     }
-    const recordsOf = (events: readonly ConnectionEvent[]): number =>
-      events.filter((e) => e.t === 'record').length;
-    expect(recordsOf(players[0]?.events ?? [])).toBe(1);
+    const latestHistory = players[0]?.events.filter((e) => e.t === 'records').at(-1);
+    expect(latestHistory).toEqual({ t: 'records', records: records });
   });
 });
 

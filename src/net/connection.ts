@@ -36,15 +36,18 @@ export function createEmitter(): Emitter {
   const listeners = new Set<(e: ConnectionEvent) => void>();
   let status: ConnectionStatus | null = null;
   let view: ConnectionEvent | null = null;
+  let records: ConnectionEvent | null = null;
   return {
     emit(e) {
       if (e.t === 'status') status = e.status;
       if (e.t === 'view') view = e;
+      if (e.t === 'records') records = e;
       for (const listener of [...listeners]) listener(e);
     },
     subscribe(listener) {
       listeners.add(listener);
       if (status !== null) listener({ t: 'status', status });
+      if (records !== null) listener(records);
       if (view !== null) listener(view);
       return () => {
         listeners.delete(listener);
