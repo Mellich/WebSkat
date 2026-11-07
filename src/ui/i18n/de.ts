@@ -41,6 +41,12 @@ export const de: Dict = {
   'home.about': 'Über',
   'home.trust': 'Der Browser des Gastgebers mischt und sieht alle Karten, wie ein Freund am echten Tisch. Keine Konten, kein Server; Spieldaten gehen nur zwischen den Browsern der Spieler.',
 
+  'about.title': 'Über WebSkat',
+  'about.how': 'WebSkat ist Skat für drei bis sechs Spieler. Der Gastgeber (wer den Tisch angelegt hat) führt das Spiel im eigenen Browser aus, die anderen verbinden sich direkt mit ihm per WebRTC. Bei vier bis sechs Spielern setzen Geber und überzählige Spieler aus (Geberskat), der Platz wechselt nach jedem Spiel.',
+  'about.trust': 'Der Browser des Gastgebers mischt die Karten und sieht alle Hände, wie ein Freund am echten Tisch. Setze dich nur an Tische, deren Gastgeber du vertraust.',
+  'about.privacy': 'Keine Konten, keine Analyse, keine Cookies. Dein Browser speichert lokal deinen Namen, deine Einstellungen, deinen Platz an einem Tisch, die zwischengespeicherten Spielergebnisse und – für einen Tisch, den du hostest – den Tischzustand einschließlich der Karten. Signalisierungs-Relays erfahren nur, dass ein Browser einem Tisch beigetreten ist, und die Netzwerkadressen der Verbindung, nie Spielnachrichten.',
+  'about.storage': 'Wenn du einen Tisch verlässt, wird dein Platz bzw. der gehostete Tisch im Browser vergessen. Das Löschen der Website-Daten entfernt alles.',
+
   'table.loading': 'Verbinde mit dem Tisch…',
   'table.needName': 'Gib deinen Namen ein, um Tisch {key} beizutreten.',
   'table.join': 'Beitreten',

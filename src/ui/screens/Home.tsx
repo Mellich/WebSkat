@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createDirectory, isValidKey, type Directory, type TableAd } from '../../net';
+import { AboutDialog } from '../components/AboutDialog';
 import { useT } from '../i18n';
 import { hostTable, resumeHostedTable } from '../net/actions';
 import { getTransport } from '../net/transport';
@@ -32,6 +33,7 @@ export function Home() {
   const [joinKey, setJoinKey] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [tables, setTables] = useState<TableAd[] | null>(null);
+  const [about, setAbout] = useState(false);
   const [stored] = useState(() => {
     const storage = browserStorage();
     return storage === null ? null : loadSession(storage);
@@ -216,7 +218,15 @@ export function Home() {
 
       <footer className={styles.footer}>
         <p>{t('home.trust')}</p>
+        <button type="button" onClick={() => { setAbout(true); }}>{t('home.about')}</button>
       </footer>
+      {about ? (
+        <AboutDialog
+          onClose={() => {
+            setAbout(false);
+          }}
+        />
+      ) : null}
     </main>
   );
 }

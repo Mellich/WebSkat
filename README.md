@@ -1,10 +1,24 @@
 # WebSkat
 
 Skat in the browser, peer to peer. Three players, or four to six with Geberskat (the dealer and any
-extra players sit out, and the seat rotates). No accounts, no server of our own: the browsers talk
-to each other over WebRTC, and only the signaling step uses a relay.
+extra players sit out, and the seat rotates after each game). No accounts, no server of our own:
+the browsers talk to each other over WebRTC, and only the signaling step uses a relay.
 
-The plan and the rules live in `docs/`. Start with `docs/00-overview.md` and `AGENTS.md`.
+The plan and the rules live in `docs/`. Start with `docs/00-overview.md`; `AGENTS.md` lists the
+reading order and the hard rules.
+
+## How to play
+
+1. Open the page and enter your name.
+2. **Create table** (choose 3 to 6 seats, optionally list it publicly). You are the host.
+3. Share the key (`ABCD-EFGH`), the copied link, or the public list with the others. They enter
+   the key on the start page, or open the link.
+4. When at least three players are seated, the host presses **Start game**. Bots can fill seats
+   with **Add bot**.
+5. After each game, every player presses **Continue**; the next game is dealt when all connected
+   players are ready.
+
+Statistics (standings, history, charts, Seeger or standard scoring) are in the **Stats** dialog.
 
 ## Run it
 
@@ -14,7 +28,7 @@ Requires Node.js 22.12 or newer.
 npm install
 npm run dev          # http://localhost:5173, signaling through the public Nostr relays
 npm run build        # production build into dist/
-npm run preview      # serve dist/
+npm run preview      # serve dist/ locally
 ```
 
 Offline practice against two bots (development builds only): `#/dev/local`.
@@ -31,13 +45,61 @@ npm run e2e          # Playwright: several browsers play through the UI
 with `npx playwright install chromium`. To use an installed Chromium instead, set
 `WEBSKAT_CHROMIUM=/path/to/chromium`.
 
-## Signaling configuration
+## Deployment
+
+WebSkat is a static site. Build it with `npm run build` and serve `dist/` over HTTPS (WebRTC
+requires a secure context). The hash router needs no server rewrites, and `base: './'` works at a
+domain root and under a sub-path.
+
+- **GitHub Pages**: `.github/workflows/pages.yml` runs `npm run check`, `npm run build` and deploys
+  `dist/` on every push to `main`. Enable Pages with "GitHub Actions" as the source.
+- **Cloudflare Pages, Netlify, Vercel**: build command `npm run build`, output directory `dist`,
+  Node 22.
+- **Any static server**: copy `dist/`.
+
+The build generates the card images in `public/` from the originals in `assets/` (`npm run assets`).
+Do not change or delete the originals.
+
+## Signaling, relay and TURN
+
+Tables are found and connected through a signaling step (exchanging WebRTC offers and answers).
+Two options:
 
 | Variable | Meaning |
 |---|---|
-| `VITE_SIGNALING` | `nostr` (default) or `ws-relay` |
-| `VITE_RELAY_URLS` | optional comma-separated Nostr relays replacing the defaults |
+| `VITE_SIGNALING` | `nostr` (default, public Nostr relays) or `ws-relay` (your own relay) |
+| `VITE_RELAY_URLS` | optional comma-separated Nostr relays replacing the library defaults |
 | `VITE_RELAY_URL` | required for `ws-relay`, e.g. `wss://relay.example.com` |
-| `VITE_TURN_URL`, `VITE_TURN_USER`, `VITE_TURN_CREDENTIAL` | optional TURN server |
+| `VITE_TURN_URL`, `VITE_TURN_USER`, `VITE_TURN_CREDENTIAL` | optional TURN server for players behind strict NAT |
 
-Copy `.env.example` to `.env.local` to set them. Every `VITE_*` value ends up in the public bundle.
+Copy `.env.example` to `.env.local` to set them, at build time. Every `VITE_*` value ends up in the
+public JavaScript bundle, so use only low-value or short-lived TURN credentials.
+
+**Own relay.** `npm run relay` starts the small signaling server in `scripts/relay.mjs` on port
+8787 (`PORT` changes it). Deploy it to any Node host behind TLS (`wss://`), then build the client
+with `VITE_SIGNALING=ws-relay VITE_RELAY_URL=wss://your-relay`. The relay forwards signaling
+messages only.
+
+**TURN.** Most networks connect directly. Symmetric NATs and some corporate or mobile carrier
+networks need a TURN relay. A symptom is that two particular players cannot connect while others
+can. Any TURN server works (a hosted service or coturn); game data stays end-to-end encrypted.
+
+## Trust model and privacy
+
+- The **host's browser** shuffles the cards and sees every hand, like a friend dealing at a real
+  table. Only sit down at tables whose host you trust.
+- Players are connected directly (WebRTC, encrypted). Clients only receive their own view of the
+  table; other players' hands never leave the host's browser.
+- There are no accounts, analytics or cookies. The browser keeps in its local storage: your name,
+  settings, your seat at a table (a reconnect token), cached game records, and, for a table you
+  host, the table state including the cards (so that a reload can resume it). Leaving a table
+  forgets it; clearing the site data removes everything.
+- Signaling relays learn that some browser joined a table and the network addresses of the
+  connection (and so do the STUN servers). They never see game messages.
+
+## Project layout
+
+- `src/engine` (rules, pure), `src/table` (table, scoring, statistics, views, bots; pure),
+  `src/net` (protocol, host and client controllers, transports), `src/ui` (React screens).
+- `docs/` holds the specification and the decision log (`docs/12-open-questions.md`).
+- `e2e/` holds the Playwright tests.

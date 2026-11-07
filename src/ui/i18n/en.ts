@@ -40,6 +40,12 @@ export const en = {
   'home.about': 'About',
   'home.trust': "The host's browser shuffles and sees all cards, like a friend dealing at a real table. No accounts, no server; game data only travels between the players' browsers.",
 
+  'about.title': 'About WebSkat',
+  'about.how': 'WebSkat is Skat for three to six players. The host (whoever created the table) runs the game in their browser, and the others connect to the host directly with WebRTC. With four to six players the dealer and any extra players sit out (Geberskat), and the seat rotates.',
+  'about.trust': "The host's browser shuffles the cards and sees all hands, like a friend dealing at a real table. Only sit down at tables whose host you trust.",
+  'about.privacy': 'No accounts, no analytics, no cookies. Your browser keeps your name, your settings, your seat at a table, the cached game records and, for a table you host, the table state including the cards, in its local storage. Signaling relays learn that a browser joined a table and the network addresses of the connection, never game messages.',
+  'about.storage': 'Leaving a table forgets your seat, or the hosted table. Clearing the site data removes everything.',
+
   'table.loading': 'Connecting to the table…',
   'table.needName': 'Enter your name to join table {key}.',
   'table.join': 'Join',

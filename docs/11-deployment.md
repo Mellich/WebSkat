@@ -66,9 +66,9 @@ the "simple websocket server that forwards messages" fallback required by the pr
 
 ## 5. Release checklist
 
-- [ ] `npm run check` and `npm run e2e` green
+- [x] `npm run check` and `npm run e2e` green (e2e: three specs, see `12` I89)
 - [ ] `npm run build && npm run preview`: create a table on a laptop, join from a phone over
-      mobile data (different network) → plays a full game
-- [ ] Verify the 4-player Geberskat rotation manually once
-- [ ] Bundle size check (`dist/assets/*.js` gzipped < 300 kB)
-- [ ] README updated (how to host, trust model, relay/TURN)
+      mobile data (different network) → plays a full game *(not done: needs real devices)*
+- [ ] Verify the 4-player Geberskat rotation manually once *(covered by the e2e test on local relay; not on real WebRTC)*
+- [x] Bundle size check (`dist/assets/*.js` gzipped < 300 kB): main chunk 129 kB, lazy chunks 21 kB and 6 kB
+- [x] README updated (how to host, trust model, relay/TURN)
