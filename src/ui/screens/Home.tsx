@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createDirectory, isValidKey, type Directory, type TableAd } from '../../net';
 import { AboutDialog } from '../components/AboutDialog';
+import { logoUrl } from '../assets';
 import { useT } from '../i18n';
 import { hostTable, resumeHostedTable } from '../net/actions';
 import { getTransport } from '../net/transport';
@@ -98,8 +99,8 @@ export function Home() {
   return (
     <main className={styles.home}>
       <header className={styles.header}>
-        <h1>{t('app.name')}</h1>
-        <p>{t('home.title')}</p>
+        <img className={styles.logo} src={logoUrl()} alt="" />
+        <h1>{t('home.title')}</h1>
       </header>
 
       <section className={styles.card}>

@@ -13,7 +13,7 @@ export const en = {
   'common.back': 'Back',
   'common.key': 'Key',
 
-  'home.title': 'Play Skat with friends',
+  'home.title': 'Skatastic Online Tournament System',
   'home.name': 'Your name',
   'home.nameRequired': 'Please enter a name (1 to 20 characters).',
   'home.createTitle': 'Create a table',

@@ -14,7 +14,7 @@ export const de: Dict = {
   'common.back': 'Zurück',
   'common.key': 'Schlüssel',
 
-  'home.title': 'Skat mit Freunden spielen',
+  'home.title': 'Skatastisches Onlineturniersystem',
   'home.name': 'Dein Name',
   'home.nameRequired': 'Bitte gib einen Namen ein (1 bis 20 Zeichen).',
   'home.createTitle': 'Tisch eröffnen',

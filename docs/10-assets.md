@@ -2,6 +2,9 @@
 
 Originals (read-only, **never modify or delete**):
 
+| `assets/Das Skatastische Logo.PNG` | Supplied raster WebSkat logo; copied unchanged to `public/skatastisches-logo.png` for the Home screen and favicon |
+| `assets/Skatastischer Hirsch.svg` | Original vector logo, retained unchanged |
+
 | File | Size | Content |
 |---|---|---|
 | `assets/PlayingCards 128x178.png` | 1664 × 712, 16-bit RGBA, interlaced, 9.5 MB | 13 columns × 4 rows of 128 × 178 px cards |
@@ -91,7 +94,12 @@ export const backUrl = (i: 0 | 1 | 2 | 3) => `${import.meta.env.BASE_URL}backs/$
 - `<img width=128 height=178 decoding="async" draggable="false" alt="…">`.
 - Suit symbols for text are Unicode: ♣ ♠ ♥ ♦ (Clubs, Spades, Hearts, Diamonds).
 
-## Not provided
+## Logo and favicon
 
-No sounds, no table texture, no logo. Favicon: a simple inline SVG (♠ on green) in `public/favicon.svg`.
-Card art licensing is the user's responsibility (assets were provided by the user).
+The supplied `assets/Das Skatastische Logo.PNG` is the selected logo because its lettering is already
+rasterized as intended. Keep the original unchanged; its public copy is `public/skatastisches-logo.png`.
+Use this PNG on the Home screen and as the favicon. UI image URLs should use
+`import.meta.env.BASE_URL` (via `src/ui/assets.ts`) so deployments under a sub-path work.
+
+No sounds or table texture are provided. Card art licensing is the user's responsibility (assets were
+provided by the user).

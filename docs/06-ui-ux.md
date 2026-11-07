@@ -20,6 +20,7 @@ Screen **Table** renders `TableLobby` when `view.table.status === 'lobby'` (or t
 connection status dot, buttons **Stats**, **Settings**, **Leave**.
 
 ### Home
+- Show the supplied raster Skatastischer Hirsch logo centered at three times its original display size above a centered page title. The title is “Skatastisches Onlineturniersystem” in German and “Skatastic Online Tournament System” in English; use the public copy described in `10-assets.md` and provide empty alternative text because the adjacent title names the app.
 - Name input (stored in `localStorage`).
 - **Create table**: name (default "<Player>'s table"), max seats (3–6, default 3), public toggle →
   generates key, starts a host, navigates to `#/t/KEY`.

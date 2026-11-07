@@ -7,14 +7,21 @@
   gap: 14px;
 }
 
+.header {
+  text-align: center;
+}
+
+.logo {
+  display: block;
+  width: min(100%, 660px);
+  max-height: 510px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
 .header h1 {
   margin: 8px 0 0;
   font-size: clamp(1.8rem, 6vw, 2.6rem);
-}
-
-.header p {
-  margin: 4px 0 0;
-  color: var(--muted);
 }
 
 .card {

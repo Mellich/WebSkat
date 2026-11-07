@@ -176,7 +176,7 @@ with a manual calculation of at least 3 games), the chart renders, history rows 
 - [x] Client record cache in `localStorage` (cap 500).
 - [x] Host snapshot persistence + "Resume hosted table" (all humans start `connected:false`).
 - [x] Host-lost banner and automatic re-join when the host returns.
-- [x] Tab title "● your turn", favicon (simple SVG), PWA-less meta tags, `prefers-reduced-motion`.
+- [x] Tab title "● your turn", favicon (supplied Skatastischer Hirsch logo SVG), PWA-less meta tags, `prefers-reduced-motion`.
 - [ ] Optional: lifetime personal stats on Home. *Skipped for now, see `12` I79.*
 - [x] Error toasts for every `error.<CODE>`.
 

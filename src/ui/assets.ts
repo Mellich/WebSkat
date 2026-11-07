@@ -6,6 +6,10 @@ export type BackIndex = 0 | 1 | 2 | 3;
 
 export const DEFAULT_BACK: BackIndex = 2;
 
+export function logoUrl(): string {
+  return `${import.meta.env.BASE_URL}skatastisches-logo.png`;
+}
+
 export function cardUrl(id: CardId): string {
   return `${import.meta.env.BASE_URL}cards/${id}.webp`;
 }
