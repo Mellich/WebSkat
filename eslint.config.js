@@ -44,7 +44,7 @@ export default tseslint.config(
     extends: [tseslint.configs.strictTypeChecked],
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.core.json', './tsconfig.app.json', './tsconfig.node.json'],
+        project: ['./tsconfig.core.json', './tsconfig.app.json', './tsconfig.node.json', './tsconfig.e2e.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },

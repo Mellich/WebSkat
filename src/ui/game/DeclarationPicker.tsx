@@ -69,12 +69,13 @@ export function DeclarationPicker({ options, spitzen, bid, onDeclare }: Declarat
       <fieldset>
         <legend>{t('declare.game')}</legend>
         <div className="declare-games">
-          {games.map((g) => {
+          {games.map((g, index) => {
             const available = options.some((d) => sameGame(d, g));
             return (
               <button
                 key={label(g)}
                 type="button"
+                data-testid={`declare-option-${String(index)}`}
                 aria-pressed={choice !== null && sameChoice(choice, g)}
                 disabled={!available}
                 onClick={() => { pick(g); }}
@@ -111,6 +112,7 @@ export function DeclarationPicker({ options, spitzen, bid, onDeclare }: Declarat
       </p>
       <button
         type="button"
+        data-testid="declare-submit"
         disabled={matched === undefined}
         onClick={() => {
           if (matched !== undefined) onDeclare(matched);

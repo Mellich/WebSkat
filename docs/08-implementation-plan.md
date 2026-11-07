@@ -187,16 +187,16 @@ tab → resume → clients reconnect and the game continues at the same state.
 
 ## Phase 10 — End-to-end tests  (*09 §5*)
 
-- [ ] `playwright.config.ts` starting `npm run relay` and `vite` with
+- [x] `playwright.config.ts` starting `npm run relay` and `vite` with
       `VITE_SIGNALING=ws-relay VITE_RELAY_URL=ws://localhost:8787` (build env in `webServer`).
-- [ ] Chromium launch args: `--disable-features=WebRtcHideLocalIpsWithMdns`.
-- [ ] Test A: three browser contexts: host creates a table, two join by key, start, play one full
+- [x] Chromium launch args: `--disable-features=WebRtcHideLocalIpsWithMdns`.
+- [x] Test A: three browser contexts: host creates a table, two join by key, start, play one full
       game by repeatedly clicking the first enabled option for the active player, assert result
       dialog and stats row appear in all three.
-- [ ] Test B: public table appears in the list of a 4th context; join; Geberskat: 4 players, dealer
+- [x] Test B: public table appears in the list of a 4th context; join; Geberskat: 4 players, dealer
       sits out; next game another player sits out.
-- [ ] Test C: client reload mid-game rejoins.
-- [ ] `npm run e2e` documented in the README.
+- [x] Test C: client reload mid-game rejoins.
+- [x] `npm run e2e` documented in the README.
 
 **Acceptance**: `npm run e2e` green locally (requires `npx playwright install chromium`).
 

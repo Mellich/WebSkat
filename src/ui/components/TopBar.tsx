@@ -48,6 +48,7 @@ export function TopBar() {
         </span>
         <button
           type="button"
+          data-testid="open-stats"
           onClick={() => {
             setPanel('stats');
           }}
@@ -56,6 +57,7 @@ export function TopBar() {
         </button>
         <button
           type="button"
+          data-testid="open-settings"
           onClick={() => {
             setPanel('settings');
           }}
@@ -64,6 +66,7 @@ export function TopBar() {
         </button>
         <button
           type="button"
+          data-testid="leave-table"
           onClick={() => {
             if (inGame) setConfirming(true);
             else leave();

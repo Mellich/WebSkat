@@ -26,57 +26,96 @@ function turnOptions(turn: TurnConfig | null): { turnConfig?: { urls: string; us
   };
 }
 
-function handleFor(room: TrysteroRoom, selfId: string): RoomHandle {
+/** The listeners of one handle on a shared room. */
+interface Listeners {
+  readonly messages: ((channel: Channel, data: unknown, from: string) => void)[];
+  readonly joins: ((peer: string) => void)[];
+  readonly leaves: ((peer: string) => void)[];
+}
+
+/**
+ * One Trystero room with its actions and its listeners. Several handles may be attached to it; the
+ * room is left when the last one leaves.
+ */
+function sharedRoom(room: TrysteroRoom, selfId: string, onEmpty: () => void): { attach(): RoomHandle } {
   const actions = {
     cmd: room.makeAction<Json>('cmd'),
     msg: room.makeAction<Json>('msg'),
     ad: room.makeAction<Json>('ad'),
   };
-  const messageListeners: ((channel: Channel, data: unknown, from: string) => void)[] = [];
-  const joinListeners: ((peer: string) => void)[] = [];
-  const leaveListeners: ((peer: string) => void)[] = [];
+  const members = new Set<Listeners>();
 
   for (const channel of CHANNELS) {
     actions[channel].onMessage = (data, context) => {
-      for (const cb of messageListeners) cb(channel, data, context.peerId);
+      for (const member of members) {
+        for (const cb of member.messages) cb(channel, data, context.peerId);
+      }
     };
   }
   room.onPeerJoin = (peer) => {
-    for (const cb of joinListeners) cb(peer);
+    for (const member of members) {
+      for (const cb of member.joins) cb(peer);
+    }
   };
   room.onPeerLeave = (peer) => {
-    for (const cb of leaveListeners) cb(peer);
+    for (const member of members) {
+      for (const cb of member.leaves) cb(peer);
+    }
   };
 
   return {
-    selfId,
-    peers: () => Object.keys(room.getPeers()),
-    send(channel, data, target) {
-      const options = target === undefined ? undefined : { target };
-      actions[channel].send(data as Json, options).catch((error: unknown) => {
-        console.warn('send failed', error);
-      });
-    },
-    onMessage: (cb) => {
-      messageListeners.push(cb);
-    },
-    onPeerJoin: (cb) => {
-      joinListeners.push(cb);
-    },
-    onPeerLeave: (cb) => {
-      leaveListeners.push(cb);
-    },
-    leave() {
-      room.leave().catch((error: unknown) => {
-        console.warn('leave failed', error);
-      });
+    attach() {
+      const mine: Listeners = { messages: [], joins: [], leaves: [] };
+      members.add(mine);
+      return {
+        selfId,
+        peers: () => Object.keys(room.getPeers()),
+        send(channel, data, target) {
+          const options = target === undefined ? undefined : { target };
+          actions[channel].send(data as Json, options).catch((error: unknown) => {
+            console.warn('send failed', error);
+          });
+        },
+        onMessage: (cb) => {
+          mine.messages.push(cb);
+        },
+        onPeerJoin: (cb) => {
+          mine.joins.push(cb);
+        },
+        onPeerLeave: (cb) => {
+          mine.leaves.push(cb);
+        },
+        leave() {
+          if (!members.delete(mine)) return;
+          if (members.size > 0) return;
+          onEmpty();
+          room.leave().catch((error: unknown) => {
+            console.warn('leave failed', error);
+          });
+        },
+      };
     },
   };
 }
 
+/**
+ * Trystero returns the same room object for every join of one room id, and leaving it ends the room
+ * for everybody. The app joins the lobby room twice in one tab (the table list and an advertised
+ * table), so each id gets one Trystero room here, shared by all handles.
+ */
 function transportOf(join: JoinRoom, selfId: string): Transport {
+  const open = new Map<string, { attach(): RoomHandle }>();
   return {
-    join: (roomId) => handleFor(join(roomId), selfId),
+    join(roomId) {
+      let shared = open.get(roomId);
+      if (shared === undefined) {
+        shared = sharedRoom(join(roomId), selfId, () => {
+          open.delete(roomId);
+        });
+        open.set(roomId, shared);
+      }
+      return shared.attach();
+    },
   };
 }
 

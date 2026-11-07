@@ -56,6 +56,7 @@ export function BiddingPanel({ bidding, legal, nameOf, send }: BiddingPanelProps
               {t('bid.select')}{' '}
               <select
                 value={selected ?? ''}
+                data-testid="bid-value"
                 onChange={(e) => {
                   setChosen(Number(e.target.value));
                 }}
@@ -68,6 +69,7 @@ export function BiddingPanel({ bidding, legal, nameOf, send }: BiddingPanelProps
             <button
               type="button"
               disabled={selected === null}
+              data-testid="bid-submit"
               onClick={() => {
                 if (selected !== null) send({ type: 'bid', value: selected });
               }}
@@ -77,15 +79,15 @@ export function BiddingPanel({ bidding, legal, nameOf, send }: BiddingPanelProps
           </>
         ) : null}
         {legal.canHold === true && bidding.currentBid !== null ? (
-          <button type="button" onClick={() => { send({ type: 'hold' }); }}>
+          <button type="button" data-testid="bid-hold" onClick={() => { send({ type: 'hold' }); }}>
             {t('bid.hold', { value: bidding.currentBid })}
           </button>
         ) : null}
         {legal.canClaim === true ? (
-          <button type="button" onClick={() => { send({ type: 'claim' }); }}>{t('bid.claim')}</button>
+          <button type="button" data-testid="bid-claim" onClick={() => { send({ type: 'claim' }); }}>{t('bid.claim')}</button>
         ) : null}
         {legal.canPassBid === true ? (
-          <button type="button" onClick={() => { send({ type: 'pass' }); }}>{t('bid.pass')}</button>
+          <button type="button" data-testid="bid-pass" onClick={() => { send({ type: 'pass' }); }}>{t('bid.pass')}</button>
         ) : null}
       </div>
     </section>

@@ -57,6 +57,7 @@ export function StatsPanel({ records, players, viewerId, onClose }: StatsPanelPr
                 key={item.id}
                 type="button"
                 role="tab"
+                data-testid={`stats-tab-${item.id}`}
                 aria-selected={tab === item.id}
                 className={tab === item.id ? styles.active : undefined}
                 onClick={() => {

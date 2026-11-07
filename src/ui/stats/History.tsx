@@ -53,7 +53,7 @@ export function History({ records, players, scoring }: HistoryProps) {
             const declarer = r.declarerId === null ? '' : (players.find((p) => p.playerId === r.declarerId)?.name ?? '?');
             const played = r.outcome === 'played';
             return (
-              <tr key={r.id} className={played ? undefined : styles.passed}>
+              <tr key={r.id} className={played ? undefined : styles.passed} data-testid="history-row">
                 <td>{r.number}</td>
                 <td>{declarer}</td>
                 <td>

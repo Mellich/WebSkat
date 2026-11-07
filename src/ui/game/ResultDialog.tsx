@@ -87,11 +87,11 @@ function Shell({ t, onContinue, iAmReady, waiting, children }: ShellProps) {
     : t('result.waitingOthers');
   return (
     <div className={styles.backdrop}>
-      <div className={styles.dialog} role="dialog" aria-modal="true" aria-label={t('result.title')}>
+      <div className={styles.dialog} role="dialog" aria-modal="true" aria-label={t('result.title')} data-testid="result-dialog">
         <h2>{t('result.title')}</h2>
         {children}
         {iAmReady ? <p className={styles.waiting}>{status}</p> : null}
-        <button type="button" onClick={onContinue} disabled={iAmReady}>{t('result.continue')}</button>
+        <button type="button" onClick={onContinue} disabled={iAmReady} data-testid="continue">{t('result.continue')}</button>
       </div>
     </div>
   );

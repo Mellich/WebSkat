@@ -19,10 +19,10 @@ export function SkatDecision({ legal, isMine, declarerName, bid, send }: SkatDec
   return (
     <div className="skat-actions">
       {legal.canPickUp === true ? (
-        <button type="button" onClick={() => { send({ type: 'pickup-skat' }); }}>{t('skat.pickUp')}</button>
+        <button type="button" data-testid="pickup" onClick={() => { send({ type: 'pickup-skat' }); }}>{t('skat.pickUp')}</button>
       ) : null}
       {legal.canPlayHand === true ? (
-        <button type="button" onClick={() => { send({ type: 'play-hand' }); }}>{t('skat.playHand')}</button>
+        <button type="button" data-testid="play-hand" onClick={() => { send({ type: 'play-hand' }); }}>{t('skat.playHand')}</button>
       ) : null}
     </div>
   );
@@ -38,7 +38,7 @@ export function DiscardPanel({ selected, onDiscard }: DiscardPanelProps) {
   return (
     <div className="discard-panel">
       <p>{t('skat.selected', { count: selected })}</p>
-      <button type="button" disabled={selected !== 2} onClick={onDiscard}>
+      <button type="button" disabled={selected !== 2} data-testid="discard-submit" onClick={onDiscard}>
         {t('skat.discardButton')}
       </button>
     </div>

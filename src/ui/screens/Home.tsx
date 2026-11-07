@@ -188,7 +188,7 @@ export function Home() {
         {tables !== null && tables.length === 0 ? <p className={styles.muted}>{t('home.noPublic')}</p> : null}
         <ul className={styles.list}>
           {(tables ?? []).map((table) => (
-            <li key={table.key} className={styles.row}>
+            <li key={table.key} className={styles.row} data-testid="public-table">
               <span className={styles.rowName}>
                 <strong>{table.name}</strong>
                 <span className={styles.muted}> · {t('home.host')} {table.hostName}</span>
@@ -198,6 +198,7 @@ export function Home() {
               </span>
               <button
                 type="button"
+                data-testid="public-join"
                 onClick={() => {
                   if (requireName() !== null) navigate(tableHash(table.key));
                 }}

@@ -123,7 +123,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
       </div>
 
       {opponents.sittingOut.length > 0 ? (
-        <p className={styles.sittingOut} aria-label={t('sitOut.bar')}>
+        <p className={styles.sittingOut} aria-label={t('sitOut.bar')} data-testid="sitting-out">
           {t('sitOut.bar')}: {opponents.sittingOut.map((s) => s.player.name).join(', ')}
           {' · '}{t('role.dealer')}: {dealerName}
         </p>
@@ -190,7 +190,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
       </div>
 
       <div className={styles.hand}>
-        {amSittingOut ? <p>{t('sitOut.you', { name: dealerName })}</p> : null}
+        {amSittingOut ? <p data-testid="sitting-out-you">{t('sitOut.you', { name: dealerName })}</p> : null}
         {view.you.role === 'pending' || view.you.role === 'lobby' ? <p>{t('lobby.pending')}</p> : null}
         {myRole === null ? null : (
           <Hand
