@@ -2,11 +2,12 @@
 
 import { useSyncExternalStore } from 'react';
 import { isValidKey, normalizeKey } from '../net';
+import type { BotLevel } from '../table';
 
 export type Route =
   | { readonly kind: 'home' }
   | { readonly kind: 'table'; readonly key: string }
-  | { readonly kind: 'dev-local'; readonly seed: number | null; readonly players: number }
+  | { readonly kind: 'dev-local'; readonly seed: number | null; readonly players: number; readonly bots: BotLevel }
   | { readonly kind: 'dev-gallery' };
 
 export function parseRoute(hash: string): Route {
@@ -15,10 +16,12 @@ export function parseRoute(hash: string): Route {
     const params = new URLSearchParams(query);
     const seed = params.get('seed');
     const players = params.get('players');
+    const bots = params.get('bots');
     return {
       kind: 'dev-local',
       seed: seed !== null && /^\d+$/.test(seed) ? Number(seed) : null,
       players: players !== null && /^[3-6]$/.test(players) ? Number(players) : 3,
+      bots: bots === 'easy' || bots === 'strong' ? bots : 'normal',
     };
   }
   if (path === '/dev/gallery') return { kind: 'dev-gallery' };

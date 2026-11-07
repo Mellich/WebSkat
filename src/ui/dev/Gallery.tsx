@@ -5,6 +5,7 @@ import { ALL_CARDS, type CardId } from '../../engine';
 import type { BackIndex } from '../assets';
 import { cardLabel } from '../cardNames';
 import { Card } from '../components/Card';
+import { CardChips } from '../components/CardChip';
 import { Hand } from '../components/Hand';
 import { OpponentSeat } from '../components/OpponentSeat';
 import { SkatPile } from '../components/SkatPile';
@@ -32,6 +33,11 @@ export function Gallery() {
             <Card key={card} id={card} label={cardLabel(card)} size="opponent" />
           ))}
         </div>
+      </section>
+
+      <section>
+        <h2>Card symbols (cards in text)</h2>
+        <CardChips cards={ALL_CARDS} />
       </section>
 
       <section>

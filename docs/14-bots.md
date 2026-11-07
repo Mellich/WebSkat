@@ -63,7 +63,7 @@ export function botViewOf(game: GameState, role: Role): BotView;
 | File | Content |
 |---|---|
 | `index.ts` | `botAction(game, role, level, rand): GameAction` dispatcher. Builds the `BotView`, calls the level's strategy, **checks the result against `enumerateActions(game, role)`**, and falls back to a random legal action if it is not there (tests assert the fallback never happens) |
-| `knowledge.ts` | `BotView`, `botViewOf`, void detection |
+| `knowledge.ts` | `PlayView` (what card play needs; also built by `simulate.ts`), `BotView extends PlayView` (+ phase, bid, bidding, Skat, counts, `legal`, `actions`), `botViewOf`, `voidsOf` |
 | `cardsLeft.ts` | helpers on a `BotView`: `unknownCards(view)`, `remainingTrumps(view)`, `isTopRemaining(card, view)` (no higher card of the same effective suit is unplayed and outside own hand), `teamOf(role, view)`, `partnerOf(role, view)` |
 | `easy.ts` | the current random logic (moved from `bot.ts`) |
 | `evaluate.ts` | hand evaluation, best game, maximum bid (§4) |
@@ -73,6 +73,7 @@ export function botViewOf(game: GameState, role: Role): BotView;
 | `sample.ts` | random hidden-card deals consistent with a `BotView` (§6.1) |
 | `strong.ts` | Strong card play and Strong Skat estimate (§6) |
 | `tuning.ts` | all numeric constants (weights, thresholds, sample counts) in one place |
+| `arena.ts` | test support (not exported): engine-only games between levels (`playGame`, `match`), `envFlag`, `nowMs` |
 
 `src/table/bot.ts` keeps `botStep` and `runBots`. They read
 `s.botLevel` and call `botAction` from `bot/index.ts`. Engine helpers to reuse: `legalCards`,
@@ -90,12 +91,13 @@ Export anything missing from `src/engine/index.ts`. Do not copy rule logic into 
   - Score: CJ 3, SJ 2.5, HJ 2, DJ 1.5. Trump A 1.5, T 1.2, any other trump 0.8. Side ace 1.2. Side ten
     with the ace of its suit 1.0. Side ten with one other card of its suit 0.5. Each side-suit void
     +0.5 when `trumps ≥ 5`.
-  - `playable = trumps ≥ 5 && score ≥ SUIT_MIN` (`SUIT_MIN = 10` with Skat pickup,
-    `SUIT_MIN_HAND = 11.5`). With only 4 trumps: playable when `score ≥ SUIT_MIN + 2`.
+  - `playable = trumps ≥ 5 && score ≥ SUIT_MIN` (`SUIT_MIN = 8` with Skat pickup,
+    `SUIT_MIN_HAND = 9.5`; tuned, see `12` I101). With only 4 trumps: playable when
+    `score ≥ SUIT_MIN + 2`.
 - **Grand**. `jacks` = Jacks held. Score: CJ 3, SJ 2.5, HJ 2, DJ 1.5, each ace 1.5, ten with its ace
   1.0, ten with one other card of its suit 0.5.
-  - `playable = (jacks ≥ 3 || (jacks === 2 && hasCJ)) && score ≥ GRAND_MIN` (`GRAND_MIN = 11`,
-    hand `12.5`).
+  - `playable = (jacks ≥ 3 || (jacks === 2 && hasCJ)) && score ≥ GRAND_MIN` (`GRAND_MIN = 9.5`,
+    hand `11`).
 - **Null**. Null order is 7 < 8 < 9 < T < J < Q < K < A, and Jacks belong to their suit. A suit is
   *safe* when, for its cards sorted low to high, the k-th card (k = 0, 1, …) has null rank index
   `≤ 2k` (index 7 = 0, 8 = 1, …, A = 7). An empty suit is safe.
@@ -188,8 +190,9 @@ side suit with the fewest cards in hand.
   accept).
 
 ### 6.2 Choosing a card (PIMC)
-For each legal card `c` (skip sampling if only one is legal), for each of `SAMPLES = 40` sampled
-deals (generate the samples once and reuse them for every `c`): play `c`, then play out the rest of
+For each legal card `c` (skip sampling if only one is legal), for each of the sampled deals
+(`sampleCount` = `ROLLOUT_BUDGET / playable cards` = 120 / n, clamped to 12…40; generate the
+samples once and reuse them for every `c`): play `c`, then play out the rest of
 the game in `simulate.ts`. In the play-out, **every** player uses the Normal heuristics on its own
 (full-information-free) view of the sampled world. Build the `BotView` for each simulated player
 from the simulated state, so `heuristics.ts` is reused unchanged. Score each play-out from the bot's
@@ -201,14 +204,17 @@ team view:
 - Null: `100` if the bot's team wins the Null game in the play-out, else `0`.
 
 Pick the card with the highest mean. Ties go to the Normal heuristic's choice. Budget: one decision
-must take < 100 ms on a mid-range laptop. If the perf test fails, reduce `SAMPLES` in `tuning.ts`
-(minimum 16).
+must take < 100 ms (median) on an idle mid-range laptop; measured ≈ 50 ms. If the perf test fails,
+lower `ROLLOUT_BUDGET` in `tuning.ts`.
 
 ### 6.3 Strong auction
-Same rules as §4.3, but `maxBid` is estimated with the Skat: draw `SKAT_SAMPLES = 24` random Skats
-from the 22 unknown cards. For each, run the §4.4 discard + best game on the 12 cards. `maxBid` = the
+Same rules as §4.3, but `maxBid` is estimated with the Skat: draw `SKAT_SAMPLES = 16` random Skats
+from the 22 unknown cards. For each, try discards on the 12 cards (suit/Grand: only pairs of side
+cards; Null: only cards of unsafe suits) and keep the most valuable playable game. `maxBid` = the
 highest game value that is playable in ≥ 60% of the samples (Hand games still use the 10-card
-evaluation). Skat decision, discard and declare as in §4.4. Card play as §6.2.
+evaluation). The Skats are drawn with a seed derived from the 10 cards, so the estimate is a pure
+function of the hand and is memoized (64 entries) across the bids of one auction; `strongMaxBid`
+therefore takes no `rand`. Skat decision, discard and declare as in §4.4. Card play as §6.2.
 
 ## 7. Table, protocol and UI changes
 
@@ -216,7 +222,8 @@ evaluation). Skat decision, discard and declare as in §4.4. Card play as §6.2.
   `TableState.botLevel: BotLevel`. `createTable({ …, botLevel })` (optional argument, default
   `'normal'`).
 - `src/table/bot.ts`: `botStep(s, ctx, rand)` calls `botAction(game.engine, role, s.botLevel, rand)`.
-  `runBots` is unchanged.
+  `runBots` is unchanged. The host runs bots synchronously (Phase 12), so a strong decision
+  (≈ 50 ms) briefly blocks the host tab; acceptable, see §9 for the Web Worker option.
 - View: `TableView.table.botLevel` (`viewTypes.ts`, `view.ts`), zod in `src/net/schemaView.ts`
   (`z.enum(['easy','normal','strong'])`). Bump `PROTOCOL_VERSION` to 2 (`src/net/constants.ts`,
   `05` §1). Old clients get `rejected PROTOCOL_MISMATCH` instead of failing to parse views.
@@ -254,10 +261,11 @@ evaluation). Skat decision, discard and declare as in §4.4. Card play as §6.2.
    is ever dealt to someone else.
 6. `strong.test.ts`: deterministic for a seed; returns a legal card; a single legal card returns
    without sampling.
-7. `bot.legal.test.ts` (extends today's fuzz): 300 seeded games per level with three bots of that
-   level; the fallback in `bot/index.ts` is never used (add a counter or make the fallback throw in
-   tests through a flag).
-8. **Strength check** `bot.strength.test.ts`, kept in `npm run check`. Use 200 seeded deals; each deal
+7. `levels.test.ts`: 300 seeded games for `easy` and `normal`, 6 for `strong` (slow), three bots of
+   that level, calling `chooseBotAction` directly and asserting every choice is legal
+   (`isLegalChoice`), so the fallback in `botAction` is never needed; normal/strong bids always equal
+   `nextBidValue`.
+8. **Strength check** (in `levels.test.ts`, via `arena.ts` `match`), kept in `npm run check`. Use 200 seeded deals; each deal
    is played twice with seat assignments swapped (A = level X in one seat, B = level Y in the other
    two, then the reverse), summing the Seeger score per level:
    - `normal` must beat `easy`: normal's total Seeger score > easy's total, and normal wins ≥ 55%
@@ -265,10 +273,11 @@ evaluation). Skat decision, discard and declare as in §4.4. Card play as §6.2.
    - `strong` vs `normal`: only behind `BOT_BENCH=1` (`it.skipIf`) because it is slow. It reports the
      totals with `console.table` and expects `strong ≥ normal`.
    - Document the measured results in `12` (I101) when tuning.
-9. Performance: one `strong` card decision < 100 ms (median of 20 runs; skip under `CI=true` if
-   flaky, but keep it locally); one full game with three strong bots < 5 s.
-10. UI: `Home.test.tsx` checks the create form passes the selected level. `e2e` scenario A creates its
-    table with `create-bot-level` = `easy` (fast, deterministic), and the layout spec uses the default.
+9. Performance (`strong.test.ts`, only with `BOT_BENCH=1` because wall-clock limits are flaky while
+   the whole suite runs in parallel): one `strong` card decision < 100 ms (median of 20); one full
+   game with three strong bots < 5 s.
+10. UI: `Home.test.tsx` checks the create form passes the selected level and remembers it. The e2e
+    scenarios play with humans only, so the bot level does not affect them.
 
 ## 9. Not in scope
 - Per-bot levels, or changing the level after creation.

@@ -13,7 +13,7 @@
 .dialog {
   pointer-events: auto;
   width: min(96vw, 460px);
-  max-height: 80dvh;
+  max-height: calc(100dvh - 16px);
   overflow: auto;
   padding: 16px 18px;
   border-radius: var(--radius);

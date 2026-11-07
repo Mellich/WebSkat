@@ -168,8 +168,8 @@ Respect `prefers-reduced-motion` (no slide, only a fade). Details: `13-playtest-
   cards always fit the hand width. Hover raise only under `@media (hover: hover)`.
 - Layouts (CSS grid areas in `GameScreen.module.css`): **portrait/default** opponents top row, table,
   status, phase panel, hand; **compact landscape** (`orientation: landscape` and `max-height: 520px`)
-  opponents in left/right columns, phase panel overlaid in the table area, hand bottom, compact
-  TopBar; **large screens** (`min-width: 900px` and `min-height: 600px`) the portrait arrangement
+  opponents in left/right columns, phase panel overlaid on the table and status rows, hand bottom,
+  compact TopBar (icon-only buttons, also below 600 px width), opponent seats with at most 4 backs; **large screens** (`min-width: 900px` and `min-height: 600px`) the portrait arrangement
   centered with `max-width: 1040px`.
 - Table background: dark green felt (flat color + subtle radial gradient). Cards get a soft
   `filter: drop-shadow`. Palette and spacing tokens in `tokens.css`; dark theme only in v1.

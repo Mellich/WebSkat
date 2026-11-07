@@ -55,15 +55,16 @@ caller can only pass. The claim stage is unchanged (forehand claims 18 or passes
    - `src/table/view.test.ts` (expects length 63 → now 1);
    - scripted, fuzz and table tests that bid more than 18 directly.
 
-   Add a helper `bidUpTo(target, caller, listener)` to `src/engine/testing.ts`. It builds the
-   alternating `bid v` / `hold` steps from 18 up to `target`. Use it wherever a test needs a high
-   bid such as 36 or 48. Fixtures that only set `bid: 48` on a finished-game record
+   *(Implemented without a helper: the only engine test that needed a higher bid, the scripted
+   Null game in `game.scripted.test.ts`, spells out 18, 20, 22, 23 with holds. Add a `bidUpTo`
+   helper to `src/engine/testing.ts` if more such tests appear.)* Fixtures that only set `bid: 48` on a finished-game record
    (`src/table/fixtures.ts`) do not need changes.
 5. `src/table/bot.ts`: the logic stays as it is (pass with probability 0.6, otherwise bid/hold/claim).
    It becomes the `easy` level in Phase 13 (`14-bots.md`).
    `LOWEST_BIDS` has no effect any more, so delete it. Update the comment and `04` B3 (already done).
-   Add a test in `bot.test.ts`: over many seeds, every bot `bid` action equals
-   `nextBidValue(currentBid)`, and in every game where a bot opens, the first bid is 18.
+   *(Covered in Phase 13 by `src/table/bot/levels.test.ts`: every normal/strong `bid` equals
+   `nextBidValue(currentBid)`; easy bots only choose from the legal actions, which contain only
+   that value.)*
 6. `src/ui/game/BiddingPanel.tsx`: remove the `<select>` and the `chosen` state. When
    `legal.bidValues` has a value `v`, show one button labelled `t('bid.bidValue', { value: v })`
    ("Bid 20" / "Reize 20"), with `data-testid="bid-submit"`. Remove `bid.select` from both i18n files
@@ -151,17 +152,20 @@ wins or leads, the trick disappears after 0.6 s or sooner. The only timing setti
      (e) no hold on the first render;
      (f) a second finished trick during a hold restarts the hold with the new trick;
      (g) `displayMs = 0` never holds.
+     *(All seven are covered in `useShownTrick.test.tsx`.)*
 3. `src/ui/game/GameScreen.tsx`
    - `const trickDisplayMs = useSettings((s) => s.trickDisplayMs)` →
      `const shown = useShownTrick(game, trickDisplayMs)`.
    - Hand: pass a new prop `paused={shown.holding}`. In `Hand.tsx`, `paused` means no click handlers
      are attached but card states are calculated as usual, so legal cards do not turn grey. Add a
      `Hand.test.tsx` case for this.
-   - Clear `pending` when a hold starts (`useEffect` on `shown.holding`).
+   - Clear `pending` when a hold starts (`useEffect` on `shown.holding`; while holding the hand also
+     shows no selection).
    - Status line: while holding → `t('trick.takesNow', { name })`.
-   - `TrickArea`: add an optional `onDismiss` prop (set only while holding). When it is set, wrap the
-     slots in a `<button type="button" className={styles.dismiss} aria-label={t('trick.continue')}
-     data-testid="trick-dismiss">`. Style it with no visible button chrome and keep the full trick
+   - `TrickArea`: add optional `onDismiss` and `dismissLabel` props (set only while holding; the
+     label is `t('trick.continue')`, passed in because `TrickArea` has no i18n). When `onDismiss` is
+     set, wrap the slots in a `<button type="button" className={styles.dismiss}
+     aria-label={dismissLabel} data-testid="trick-dismiss">`. Style it with no visible button chrome and keep the full trick
      size.
    - Render `ResultDialog` only when `game.phase === 'finished' && !shown.holding`.
    - Update `06` §3 and §4 if the details turn out different (the docs already describe this).
@@ -173,8 +177,8 @@ wins or leads, the trick disappears after 0.6 s or sooner. The only timing setti
    - `src/ui/net/actions.ts` (and `src/ui/dev/localTable.ts` if it passes one): stop passing
      `botDelayMs`.
    - Update `host.test.ts` and any other tests that used `botDelayMs` or fake timers for bots. Add a
-     test: after one human command, all following bot actions have run before `handleCommand`
-     returns (no timers pending).
+     test: after one human command, all following bot actions have run at once
+     (`host.test.ts` "runs every bot turn right away, without pauses, until a human must act").
 5. `09-testing.md` §6: the new hook and settings tests are listed there (already done).
 
 **Done when** `npm run check` is green, and in `#/dev/local` with "Show finished trick" at 2 s every
@@ -252,8 +256,9 @@ Dialogs (Result, Settings, Stats, About) may scroll **inside** themselves.
      grid-template-columns: minmax(96px, 20%) 1fr minmax(96px, 20%);
      grid-template-rows: minmax(0, 1fr) auto auto;
      ```
-     The **phase panel is put in the `table` area** (`grid-area: table; align-self: center; z-index: 1;
-     max-height: 100%; overflow: auto`). During bidding, skat decision, discarding and declaring the
+     The **phase panel is put over the `table` and `status` rows** (`grid-area: 1 / 2 / 3 / 3;
+     align-self: center; z-index: 1; max-height: 100%; overflow: auto`, near-opaque background; the
+     panel itself says whose turn it is). During bidding, skat decision, discarding and declaring the
      trick area is empty, so nothing is hidden. The Skat pile shows next to the panel. The sitting-out
      bar becomes part of the status row (smaller font).
    - **Large screens** `@media (min-width: 900px) and (min-height: 600px)`: the portrait areas, with
@@ -269,8 +274,9 @@ Dialogs (Result, Settings, Stats, About) may scroll **inside** themselves.
      (`flex-wrap: wrap`), using `--card-w-opponent`.
    - `BiddingPanel`: the history is one line with `text-overflow: ellipsis` (the full text in `title`).
      Buttons in one row.
-   - `DeclarationPicker`: tiles in one row of 6 in compact landscape (3 × 2 in portrait); the panel
-     scrolls inside if needed.
+   - `DeclarationPicker`: 3 × 2 tiles everywhere (a row of 6 was tried: the labels wrapped), labels
+     never wrap; in compact landscape the tiles are 36 px high and the heading/legend are hidden; the
+     panel scrolls inside if needed.
    - `.status` min-height 28 px, font 0.9rem; the last-trick popover is shown as an absolutely
      positioned bubble over the table area, not as a flow paragraph (so it does not push the hand off
      screen).
@@ -300,9 +306,10 @@ Dialogs (Result, Settings, Stats, About) may scroll **inside** themselves.
      wrapper when it is not empty) has a bounding box inside the viewport;
    - card width: ≥ 60 when `min(width, height) ≤ 480`; ≤ 104 always;
    - save a screenshot per viewport to `test-results/layout-<name>.png` for review by hand.
-   - optional: drive one bot-free path into `discarding` (play hand = no; pick up) to check 12
-     cards. If the deal does not let the viewer win the bidding, try other seeds and write down a
-     working seed in the test.
+   - the test also drives the viewer through skat decision → pick up → discarding (12 cards) →
+     declaring → playing and checks every phase. It uses `?seed=6&bots=easy`: with a fixed seed the
+     practice host restarts the bot RNG on every bot turn, so an easy bot repeats its first choice
+     (with seed 6: pass) and the viewer wins the bidding.
 
 **Done when** `npm run check` and `npm run e2e` (incl. `layout.spec.ts`) are green, and the
 screenshots look right: nothing is cut off, cards are readable, and the desktop does not have

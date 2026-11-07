@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { ConnectionStatus } from '../../net';
 import { TopBar } from '../components/TopBar';
+import { cls } from '../classNames';
 import { useT, type Translator } from '../i18n';
 import type { TranslationKey } from '../i18n/en';
 import { leaveTable, openTable } from '../net/actions';
@@ -32,8 +33,9 @@ export function TableScreen({ tableKey }: { readonly tableKey: string }) {
     return name === '' ? <NameForm tableKey={tableKey} /> : <p className={styles.note}>{t('table.loading')}</p>;
   }
 
+  const inGame = view !== null && view.table.status !== 'lobby' && view.you.role !== 'pending' && view.game !== null;
   return (
-    <div className={styles.screen}>
+    <div className={cls(styles.screen, inGame && styles.fixed)}>
       <TopBar />
       <ConnectionBanner status={status} reason={reason} />
       {view === null ? (

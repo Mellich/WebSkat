@@ -112,70 +112,30 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
   const trickSlots = shown.plays.map((p) => ({ card: p.card, name: nameOf(p.playerId), winner: p.winner }));
   const showSkat = game.phase === 'bidding' || game.phase === 'skat-decision';
 
-  return (
-    <div className={styles.screen}>
-      <div className={styles.opponents}>
-        {opponents.active.map((seat) => (
-          <OpponentSeat
-            key={seat.player.id}
-            name={seat.player.name}
-            role={roleText(seat, t)}
-            count={game.handCounts[seat.player.id] ?? 0}
-            isTurn={game.turnId === seat.player.id}
-            isDeclarer={game.declarerId === seat.player.id}
-            openCards={game.openHands[seat.player.id] ?? []}
-            back={cardBack}
-            labelOf={label}
-          />
-        ))}
-      </div>
+  const seat = (index: number) => {
+    const s = opponents.active[index];
+    return s === undefined ? null : (
+      <OpponentSeat
+        name={s.player.name}
+        role={roleText(s, t)}
+        count={game.handCounts[s.player.id] ?? 0}
+        isTurn={game.turnId === s.player.id}
+        isDeclarer={game.declarerId === s.player.id}
+        openCards={game.openHands[s.player.id] ?? []}
+        back={cardBack}
+        labelOf={label}
+      />
+    );
+  };
 
-      {opponents.sittingOut.length > 0 ? (
-        <p className={styles.sittingOut} aria-label={t('sitOut.bar')} data-testid="sitting-out">
-          {t('sitOut.bar')}: {opponents.sittingOut.map((s) => s.player.name).join(', ')}
-          {' · '}{t('role.dealer')}: {dealerName}
-        </p>
-      ) : null}
-
-      <div className={styles.table}>
-        <SkatPile visible={showSkat} back={cardBack} label={t('skat.onTable')} />
-        <TrickArea slots={trickSlots} labelOf={label} {...(shown.holding ? { onDismiss: shown.dismiss, dismissLabel: t('trick.continue') } : {})} />
-      </div>
-
-      <div className={styles.status} aria-live="polite" data-testid="status-line">
-        <span>{statusLine}</span>
-        {game.lastTrick === null ? null : (
-          <button type="button" onClick={() => { setShowLast((v) => !v); }}>{t('trick.last')}</button>
-        )}
-      </div>
-      {showLast && game.lastTrick !== null ? (
-        <ul className={styles.lastTrick} data-testid="last-trick">
-          {game.lastTrick.plays.map((p) => (
-            <li key={p.playerId} className={p.playerId === game.lastTrick?.winnerId ? styles.trickWinner : undefined}>
-              {nameOf(p.playerId)} <CardChip card={p.card} />
-              {p.playerId === game.lastTrick?.winnerId ? ` — ${t('trick.takes', { name: nameOf(p.playerId) })}` : null}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      {declared === null ? null : (
-        <p className={styles.declared}>{t('status.declared', { game: declared, name: declarer })}</p>
-      )}
-
-      <div className={styles.phase}>
-        {game.phase === 'bidding' ? (
-          <BiddingPanel bidding={game.bidding} legal={game.legal} nameOf={nameOf} send={send} />
-        ) : null}
-        {game.phase === 'skat-decision' ? (
-          <SkatDecision
-            legal={game.legal}
-            isMine={myTurn}
-            declarerName={declarer}
-            bid={game.bid}
-            send={send}
-          />
-        ) : null}
-        {isDiscarding ? (
+  const phaseContent = (() => {
+    switch (game.phase) {
+      case 'bidding':
+        return <BiddingPanel bidding={game.bidding} legal={game.legal} nameOf={nameOf} send={send} />;
+      case 'skat-decision':
+        return <SkatDecision legal={game.legal} isMine={myTurn} declarerName={declarer} bid={game.bid} send={send} />;
+      case 'discarding':
+        return isDiscarding ? (
           <DiscardPanel
             selected={discardPick.length}
             onDiscard={() => {
@@ -186,9 +146,9 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
               }
             }}
           />
-        ) : null}
-        {game.phase === 'discarding' && !myTurn ? <p>{t('status.waitingFor', { name: declarer })}</p> : null}
-        {game.phase === 'declaring' && myTurn && game.legal.declarations !== undefined ? (
+        ) : <p>{t('status.waitingFor', { name: declarer })}</p>;
+      case 'declaring':
+        return myTurn && game.legal.declarations !== undefined ? (
           <DeclarationPicker
             options={game.legal.declarations}
             spitzen={game.declarerSpitzen}
@@ -197,9 +157,58 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
               send({ type: 'declare', declaration: d });
             }}
           />
+        ) : <p>{t('declare.waiting', { name: declarer })}</p>;
+      case 'playing':
+      case 'finished':
+        return null;
+      default: {
+        const unused: never = game.phase;
+        return unused;
+      }
+    }
+  })();
+
+  return (
+    <div className={styles.screen}>
+      <div className={styles.oppL}>{seat(0)}</div>
+      <div className={styles.oppR}>{seat(1)}</div>
+
+      <div className={styles.table}>
+        <SkatPile visible={showSkat} back={cardBack} label={t('skat.onTable')} />
+        <TrickArea slots={trickSlots} labelOf={label} {...(shown.holding ? { onDismiss: shown.dismiss, dismissLabel: t('trick.continue') } : {})} />
+        {showLast && game.lastTrick !== null ? (
+          <ul className={styles.lastTrick} data-testid="last-trick">
+            {game.lastTrick.plays.map((p) => (
+              <li key={p.playerId} className={p.playerId === game.lastTrick?.winnerId ? styles.trickWinner : undefined}>
+                {nameOf(p.playerId)} <CardChip card={p.card} />
+                {p.playerId === game.lastTrick?.winnerId ? ` — ${t('trick.takes', { name: nameOf(p.playerId) })}` : null}
+              </li>
+            ))}
+          </ul>
         ) : null}
-        {game.phase === 'declaring' && !myTurn ? <p>{t('declare.waiting', { name: declarer })}</p> : null}
       </div>
+
+      <div className={styles.status}>
+        <div className={styles.statusRow} aria-live="polite" data-testid="status-line">
+          <span>{statusLine}</span>
+          {game.lastTrick === null ? null : (
+            <button type="button" aria-pressed={showLast} onClick={() => { setShowLast((v) => !v); }}>{t('trick.last')}</button>
+          )}
+        </div>
+        {declared === null ? null : (
+          <p className={styles.declared}>{t('status.declared', { game: declared, name: declarer })}</p>
+        )}
+        {opponents.sittingOut.length > 0 ? (
+          <p className={styles.sittingOut} aria-label={t('sitOut.bar')} data-testid="sitting-out">
+            {t('sitOut.bar')}: {opponents.sittingOut.map((o) => o.player.name).join(', ')}
+            {' · '}{t('role.dealer')}: {dealerName}
+          </p>
+        ) : null}
+      </div>
+
+      {phaseContent === null ? null : (
+        <div className={styles.phase} data-testid="phase-panel">{phaseContent}</div>
+      )}
 
       <div className={styles.hand}>
         {amSittingOut ? <p data-testid="sitting-out-you">{t('sitOut.you', { name: dealerName })}</p> : null}

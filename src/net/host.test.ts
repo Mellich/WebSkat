@@ -115,6 +115,17 @@ describe('commands', () => {
     expect(rig.host.getState().gameCounter).toBe(1);
   });
 
+  it('runs every bot turn right away, without pauses, until a human must act', () => {
+    const rig = createRig();
+    rig.host.connection.send({ type: 'add-bot' });
+    rig.host.connection.send({ type: 'add-bot' });
+    rig.host.connection.send({ type: 'start' });
+    settle(rig);
+    const game = rig.host.getState().game;
+    const turn = game?.engine.turn ?? null;
+    expect(turn === null ? null : game?.roles[turn]).toBe('host');
+  });
+
   it('closes the connection of a kicked player', () => {
     const rig = createRig();
     const anna = joinClient(rig, 'A', 'Anna');

@@ -49,30 +49,39 @@ export function TopBar() {
         <button
           type="button"
           data-testid="open-stats"
+          aria-label={t('stats.open')}
+          title={t('stats.open')}
           onClick={() => {
             setPanel('stats');
           }}
         >
-          {t('stats.open')}
+          <span className={styles.icon} aria-hidden="true">📊</span>
+          <span className={styles.label}>{t('stats.open')}</span>
         </button>
         <button
           type="button"
           data-testid="open-settings"
+          aria-label={t('settings.open')}
+          title={t('settings.open')}
           onClick={() => {
             setPanel('settings');
           }}
         >
-          {t('settings.open')}
+          <span className={styles.icon} aria-hidden="true">⚙</span>
+          <span className={styles.label}>{t('settings.open')}</span>
         </button>
         <button
           type="button"
           data-testid="leave-table"
+          aria-label={t('common.leave')}
+          title={t('common.leave')}
           onClick={() => {
             if (inGame) setConfirming(true);
             else leave();
           }}
         >
-          {t('common.leave')}
+          <span className={styles.icon} aria-hidden="true">⎋</span>
+          <span className={styles.label}>{t('common.leave')}</span>
         </button>
       </div>
       {confirming ? (

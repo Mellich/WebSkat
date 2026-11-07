@@ -31,6 +31,27 @@ describe('useShownTrick', () => {
     expect(result.current.plays).toEqual([{ playerId: 'b', card: 'HA', winner: false }]);
   });
 
+  it('holds the trick when the finished trick and the next lead arrive in one update', () => {
+    const { result, rerender } = renderHook(({ g }) => useShownTrick(g, 600), { initialProps: { g: game({}) } });
+    const next = { leaderId: 'b', plays: [{ playerId: 'b', card: 'HA' as const }] };
+    act(() => { rerender({ g: game({ lastTrick: LAST, trick: next }) }); });
+    expect(result.current.holding).toBe(true);
+    expect(result.current.plays.map((p) => p.card)).toEqual(['CA', 'C10', 'C7']);
+  });
+
+  it('restarts the hold with a newer trick', () => {
+    const { result, rerender } = renderHook(({ g }) => useShownTrick(g, 600), { initialProps: { g: game({}) } });
+    act(() => { rerender({ g: game({ lastTrick: LAST }) }); });
+    act(() => { vi.advanceTimersByTime(400); });
+    const second: ViewLastTrick = { leaderId: 'b', winnerId: 'c', plays: [{ playerId: 'b', card: 'S7' }, { playerId: 'c', card: 'SA' }, { playerId: 'a', card: 'S8' }] };
+    act(() => { rerender({ g: game({ lastTrick: second }) }); });
+    act(() => { vi.advanceTimersByTime(400); });
+    expect(result.current.holding).toBe(true);
+    expect(result.current.winnerId).toBe('c');
+    act(() => { vi.advanceTimersByTime(200); });
+    expect(result.current.holding).toBe(false);
+  });
+
   it('does not hold the initial trick and supports dismiss and zero duration', () => {
     const { result, rerender } = renderHook(({ g, ms }) => useShownTrick(g, ms), {
       initialProps: { g: game({ lastTrick: LAST }), ms: 600 },

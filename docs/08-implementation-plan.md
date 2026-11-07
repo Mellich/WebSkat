@@ -219,29 +219,29 @@ Detailed instructions, file names and test cases: `13-playtest-fixes.md`. Do F1 
 `npm run check` after each.
 
 **F1 — strictly ascending bids (18, 20, 22, …)**
-- [ ] `nextBidValue` in `bidding.ts` (+ export); `applyBid` accepts only the next value; `legalBidValues` returns `[next]` or `[]`.
-- [ ] Engine tests for the new rule (`nextBidValue` table, jump rejected, stage 2 continues, after 264 only pass); `bidUpTo` test helper; fix tests that jumped (`game.legal.test.ts`, `view.test.ts`, scripted/fuzz).
-- [ ] Bot: remove `LOWEST_BIDS`; test that bots always open with 18 and only bid `nextBidValue`.
-- [ ] `BiddingPanel`: single "Bid N" button (`bid-submit`), no `<select>`; i18n `bid.bidValue`; component test; e2e helpers no longer use `bid-value`.
+- [x] `nextBidValue` in `bidding.ts` (+ export); `applyBid` accepts only the next value; `legalBidValues` returns `[next]` or `[]`.
+- [x] Engine tests for the new rule (next value only, jump rejected, `nextBidValue` incl. 264 → null); tests that jumped were fixed (`game.legal.test.ts`, `view.test.ts`; the scripted Null test spells out 18…23 instead of a `bidUpTo` helper).
+- [x] Bot: remove `LOWEST_BIDS`; bots only bid `nextBidValue` (asserted in `src/table/bot/levels.test.ts`, Phase 13).
+- [x] `BiddingPanel`: single "Bid N" button (`bid-submit`), no `<select>`; i18n `bid.bidValue`; component test; e2e helpers no longer use `bid-value`.
 
 **F2 — finished trick stays for the configured time**
-- [ ] Rename the setting `botDelayMs` → `trickDisplayMs` (Off/0.3/0.6/1/2 s, default 0.6 s) with migration of stored values; label "Show finished trick" (`setting-trick-display`); tests.
-- [ ] `useShownTrick(game, displayMs)` returns `{ plays, holding, winnerId, dismiss }`; holds next-trick cards back; tests with fake timers.
-- [ ] `GameScreen`: `Hand paused` while holding, clear pending tap, status "{name} takes the trick", `TrickArea onDismiss` (`trick-dismiss`), `ResultDialog` only after the hold.
-- [ ] Remove bot pacing: `host.ts` runs bots synchronously without delay; drop the `botDelayMs` host option; update `host.test.ts`.
+- [x] Rename the setting `botDelayMs` → `trickDisplayMs` (Off/0.3/0.6/1/2 s, default 0.6 s) with migration of stored values; label "Show finished trick" (`setting-trick-display`); tests.
+- [x] `useShownTrick(game, displayMs)` returns `{ plays, holding, winnerId, dismiss }`; holds next-trick cards back; tests with fake timers.
+- [x] `GameScreen`: `Hand paused` while holding, clear pending tap, status "{name} takes the trick", `TrickArea onDismiss` (`trick-dismiss`), `ResultDialog` only after the hold.
+- [x] Remove bot pacing: `host.ts` runs bots synchronously without delay; drop the `botDelayMs` host option; `host.test.ts` checks that all bot turns run at once until a human must act.
 
 **F3 — layout fits phones (portrait + landscape) and stays moderate on desktop**
-- [ ] Tokens: `--card-w` from width and height (cap 100 px); hover only on `(hover: hover)`.
-- [ ] `Hand`: `--hand-n` + CSS clamp overlap (10 and 12 cards fit).
-- [ ] `TableScreen` fixed `100dvh` during a game; `GameScreen` grid areas: portrait, compact landscape (opponents left/right, phase panel over table), large screens (max-width 1040 px).
-- [ ] Compact `TopBar` (icon buttons), `OpponentSeat` (max 4 backs + count, ouvert cards wrap), `BiddingPanel`, `DeclarationPicker`, last-trick bubble; dialogs `max-height: calc(100dvh - 16px)`.
-- [ ] Test ids `opponent-seat`, `trick-area`, `phase-panel`; `e2e/layout.spec.ts` for the 7 target viewports (no scroll, everything in view, card width limits, screenshots).
-- [ ] Manual visual pass in `#/dev/local` and `#/dev/gallery` for all phases at all target viewports.
+- [x] Tokens: `--card-w` from width and height (cap 100 px); hover only on `(hover: hover)`.
+- [x] `Hand`: `--hand-n` + CSS clamp overlap (10 and 12 cards fit).
+- [x] `TableScreen` fixed `100dvh` during a game; `GameScreen` grid areas: portrait, compact landscape (opponents left/right, phase panel over table), large screens (max-width 1040 px).
+- [x] Compact `TopBar` (icon buttons), `OpponentSeat` (max 4 backs + count, ouvert cards wrap), `BiddingPanel`, `DeclarationPicker`, last-trick bubble; dialogs `max-height: calc(100dvh - 16px)`.
+- [x] Test ids `opponent-seat`, `trick-area`, `phase-panel`; `e2e/layout.spec.ts` for the 7 target viewports (no scroll, everything in view, card width limits, screenshots).
+- [ ] Manual visual pass in `#/dev/local` and `#/dev/gallery` for all phases at all target viewports. *Done from the `layout.spec.ts` screenshots for bidding, skat decision, discarding (12 cards), declaring and playing at all 7 viewports. Not yet looked at: result dialog, ouvert opponent, 4-player sitting-out bar, gallery.*
 
 **F4 — small card symbols instead of written-out card names**
-- [ ] i18n `rankShort.*`; `cardShort` in `labels.ts` + test.
-- [ ] `CardChip`/`CardChips` component (white chip, coloured suit, short rank, full name as `aria-label`/`title`) + test; gallery row.
-- [ ] Use the chips in the last-trick bubble (`last-trick`, winner marked) and in `ResultDialog` (Skat, discarded); no other visible `cardName()` text left.
+- [x] i18n `rankShort.*`; `cardShort` in `labels.ts` + test.
+- [x] `CardChip`/`CardChips` component (white chip, coloured suit, short rank, full name as `aria-label`/`title`) + test; gallery row.
+- [x] Use the chips in the last-trick bubble (`last-trick`, winner marked) and in `ResultDialog` (Skat, discarded); no other visible `cardName()` text left.
 
 **Acceptance**: `npm run check` and `npm run e2e` green. In `#/dev/local`: bots open with 18 and
 nobody can jump a bid. With "Show finished trick" at 2 s, every finished trick (also the last one,
@@ -256,14 +256,14 @@ with the full names still available to screen readers.
 
 Detailed algorithms, constants and tests: `14-bots.md`. All bot code is pure (`src/table/bot/`).
 
-- [ ] `BotLevel` type, `TableState.botLevel` (default `normal`), `createTable` argument, view field + zod, `PROTOCOL_VERSION = 2`, old host snapshots load as `normal`.
-- [ ] `bot/knowledge.ts`: `BotView`, `botViewOf`, void detection; fairness property test (14 §2).
-- [ ] `bot/index.ts` dispatcher with legality check; `bot/easy.ts` = the current random bot; `bot.ts` uses `s.botLevel`.
-- [ ] `bot/cardsLeft.ts`, `bot/evaluate.ts`, `bot/auction.ts` (bid/hold/pass/claim up to `maxBid`, Skat decision, discard, declare) + tests.
-- [ ] `bot/heuristics.ts` (normal card play for declarer/defenders, suit/grand/null) + scenario tests.
-- [ ] `bot/sample.ts`, `bot/simulate.ts`, `bot/strong.ts` (PIMC card play, Skat-sampling auction) + tests, perf budget.
-- [ ] `bot.legal.test.ts` at all levels; `bot.strength.test.ts` (normal beats easy; strong vs normal behind `BOT_BENCH=1`); write the measured results into `12` I101.
-- [ ] UI: create-form bot strength select (`create-bot-level`, remembered as `lastBotLevel`), lobby shows the level, i18n, `Home.test.tsx`; `#/dev/local?bots=…`; e2e scenario A uses `easy`.
+- [x] `BotLevel` type, `TableState.botLevel` (default `normal`), `createTable` argument, view field + zod, `PROTOCOL_VERSION = 2`, old host snapshots load as `normal`.
+- [x] `bot/knowledge.ts`: `BotView`, `botViewOf`, void detection; fairness property test (14 §2).
+- [x] `bot/index.ts` dispatcher with legality check; `bot/easy.ts` = the current random bot; `bot.ts` uses `s.botLevel`.
+- [x] `bot/cardsLeft.ts`, `bot/evaluate.ts`, `bot/auction.ts` (bid/hold/pass/claim up to `maxBid`, Skat decision, discard, declare) + tests.
+- [x] `bot/heuristics.ts` (normal card play for declarer/defenders, suit/grand/null) + scenario tests.
+- [x] `bot/sample.ts`, `bot/simulate.ts`, `bot/strong.ts` (PIMC card play, Skat-sampling auction) + tests, perf budget.
+- [x] `levels.test.ts`: legality at all levels + strength (normal beats easy; strong vs normal behind `BOT_BENCH=1`); measured results in `12` I101.
+- [x] UI: create-form bot strength select (`create-bot-level`, remembered as `lastBotLevel`), lobby shows the level, i18n, `Home.test.tsx`; `#/dev/local?bots=…` (e2e scenarios have no bots, unchanged).
 
 **Acceptance**: `npm run check` and `npm run e2e` green. Creating a table offers Easy/Normal/Strong.
 In `#/dev/local?bots=normal` the bots pass with weak hands, bid up to sensible values with strong

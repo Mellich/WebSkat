@@ -58,3 +58,42 @@
 .cards > * + * {
   margin-left: calc(var(--card-w-opponent) * -0.7);
 }
+
+/* Open (ouvert) cards always show completely, wrapping onto more rows. */
+.open {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.open > * + * {
+  margin-left: calc(var(--card-w-opponent) * -0.3);
+}
+
+@media (max-width: 600px), (orientation: landscape) and (max-height: 520px) {
+  .seat {
+    padding: 4px 6px;
+    gap: 2px;
+  }
+
+  .header {
+    font-size: 0.85rem;
+    gap: 4px;
+  }
+
+  /* A short fan is enough; the count badge shows the real number. */
+  .backs > :nth-child(n + 5) {
+    display: none;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .seat {
+    justify-content: center;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+}

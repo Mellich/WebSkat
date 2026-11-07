@@ -27,7 +27,7 @@ describe('Hand', () => {
 
   it('shows all cards at full brightness when legality is irrelevant', () => {
     const { container } = render(<Hand cards={HAND} declaration={null} legal={[]} showAll />);
-    expect(container.querySelectorAll('.disabled')).toHaveLength(0);
+    expect(container.querySelectorAll('[class*="disabled"]')).toHaveLength(0);
     expect(screen.getAllByRole('img')).toHaveLength(HAND.length);
   });
 
@@ -48,6 +48,20 @@ describe('Hand', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Seven of clubs' }));
     expect(onToggle).toHaveBeenCalledWith('C7');
     expect(onPlay).not.toHaveBeenCalled();
+  });
+
+  it('keeps legal cards bright but not clickable while paused', () => {
+    const onPlay = vi.fn<(card: CardId) => void>();
+    const { container } = render(<Hand cards={HAND} declaration={null} legal={['HA']} paused onPlay={onPlay} />);
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
+    fireEvent.click(screen.getByRole('img', { name: 'Ace of hearts' }));
+    expect(onPlay).not.toHaveBeenCalled();
+    expect(container.querySelectorAll('[class*="disabled"]')).toHaveLength(HAND.length - 1);
+  });
+
+  it('tells the stylesheet how many cards to fit', () => {
+    const { container } = render(<Hand cards={HAND} declaration={null} legal={[]} />);
+    expect((container.firstElementChild as HTMLElement).style.getPropertyValue('--hand-n')).toBe('4');
   });
 
   it('marks the selected cards as pressed', () => {

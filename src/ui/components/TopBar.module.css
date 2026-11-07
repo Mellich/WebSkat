@@ -59,3 +59,56 @@
 .bad {
   background: var(--danger);
 }
+
+.right button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon {
+  display: none;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Small screens: one compact row, icon-only buttons (accessible names stay via aria-label). */
+@media (max-width: 600px), (orientation: landscape) and (max-height: 520px) {
+  .bar {
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+  }
+
+  .title {
+    flex: 1;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .key {
+    white-space: nowrap;
+    font-size: 0.8rem;
+  }
+
+  .right {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .right button {
+    padding: 0 8px;
+  }
+
+  .icon {
+    display: inline;
+  }
+
+  .label,
+  .statusText {
+    display: none;
+  }
+}

@@ -11,10 +11,12 @@ describe('parseRoute', () => {
     ['#/t/ABCD-EF0H', { kind: 'home' }],
     ['#/t/', { kind: 'home' }],
     ['#/t/ABCD-EFGH/extra', { kind: 'home' }],
-    ['#/dev/local', { kind: 'dev-local', seed: null, players: 3 }],
-    ['#/dev/local?seed=123', { kind: 'dev-local', seed: 123, players: 3 }],
-    ['#/dev/local?seed=abc&players=5', { kind: 'dev-local', seed: null, players: 5 }],
-    ['#/dev/local?players=9', { kind: 'dev-local', seed: null, players: 3 }],
+    ['#/dev/local', { kind: 'dev-local', seed: null, players: 3, bots: 'normal' }],
+    ['#/dev/local?seed=123', { kind: 'dev-local', seed: 123, players: 3, bots: 'normal' }],
+    ['#/dev/local?seed=abc&players=5', { kind: 'dev-local', seed: null, players: 5, bots: 'normal' }],
+    ['#/dev/local?players=9', { kind: 'dev-local', seed: null, players: 3, bots: 'normal' }],
+    ['#/dev/local?bots=strong', { kind: 'dev-local', seed: null, players: 3, bots: 'strong' }],
+    ['#/dev/local?bots=hard', { kind: 'dev-local', seed: null, players: 3, bots: 'normal' }],
     ['#/dev/gallery', { kind: 'dev-gallery' }],
   ] as const)('%j → %j', (hash, route) => {
     expect(parseRoute(hash)).toEqual(route);

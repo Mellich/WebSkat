@@ -64,8 +64,8 @@ Fuzz invariants (check after every action and at the end):
 - Bot levels (Phase 13, `14-bots.md` §8): fairness property (`botViewOf` and the chosen action do not
   change when cards the bot cannot see are swapped), evaluation/auction/heuristic scenario tests,
   sampling constraints, determinism, "legal fallback never used". Strength check: `normal` beats
-  `easy` (in `npm run check`); `strong` ≥ `normal` only with `BOT_BENCH=1`. Perf: a strong card
-  decision takes < 100 ms.
+  `easy` (in `npm run check`); `strong` ≥ `normal` and the wall-clock perf checks (strong card
+  decision < 100 ms median, full strong game < 5 s) only with `BOT_BENCH=1`.
 
 ## 4. Network (`src/net`)
 
@@ -103,14 +103,14 @@ C (reload a client mid-game), D (`layout.spec.ts`: offline `#/dev/local?seed=123
 of `13-playtest-fixes.md` F3; asserts no page scroll, all game areas inside the viewport, hand card
 width ≥ 60 px on phones and ≤ 104 px everywhere; saves screenshots). Additional test ids for D:
 `opponent-seat`, `trick-area`, `phase-panel`, `trick-dismiss`, `setting-trick-display`, `last-trick`, and
-`create-bot-level` (Phase 13; scenario A creates its table with bot strength `easy`). The
+`create-bot-level` (Phase 13; the e2e scenarios play without bots). The
 `bid-value` select no longer exists; bidding uses `bid-submit` (single "Bid N" button).
 
 ## 6. Component tests (jsdom)
 
 `// @vitest-environment jsdom` at the top; testing-library queries by role/name. See `06-ui-ux.md` §9.
 Phase 12 adds: `useShownTrick` hold tests (fake timers: full duration, next-trick cards held back,
-dismiss, no hold on first render, restart on a new trick), `Hand` `paused` + `--hand-n`,
+batched update, dismiss, no hold on first render, restart on a new trick, 0 = no hold), `Hand` `paused` + `--hand-n`,
 `BiddingPanel` single "Bid N" button, `CardChip` (visible `♥10`, accessible name "Ten of hearts"), settings migration `botDelayMs` → `trickDisplayMs`. Pure:
 `nextBidValue`/strict bidding (engine), bot opens with 18; `host.test.ts`: bots run synchronously
 without timers.

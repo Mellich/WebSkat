@@ -1,94 +1,188 @@
+/* Game screen layouts (docs/06-ui-ux.md §5): portrait (default), compact landscape, large screens.
+   The screen fills the remaining viewport height and never scrolls; see TableScreen. */
+
 .screen {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 8px;
   flex: 1;
-  max-width: 960px;
+  min-height: 0;
   width: 100%;
+  max-width: 960px;
   margin: 0 auto;
+  padding: 6px 8px;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  grid-template-areas:
+    'oppL oppR'
+    'table table'
+    'status status'
+    'phase phase'
+    'hand hand';
+  overflow: hidden;
 }
 
-.opponents {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.opponents > * {
-  flex: 1 1 0;
+.oppL {
+  grid-area: oppL;
   min-width: 0;
 }
 
-.sittingOut {
-  margin: 0;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.9rem;
+.oppR {
+  grid-area: oppR;
+  min-width: 0;
+}
+
+.oppL > *,
+.oppR > * {
+  height: 100%;
 }
 
 .table {
+  grid-area: table;
   position: relative;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: calc(var(--card-w-trick) * 178 / 128 + 60px);
+  gap: 6px;
   border-radius: 999px;
   background: radial-gradient(ellipse at center, rgb(255 255 255 / 6%), transparent 70%);
 }
 
 .status {
+  grid-area: status;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.statusRow {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  min-height: 40px;
+  min-height: 36px;
   text-align: center;
   font-weight: 600;
 }
 
-.lastTrick,
-.declared {
+.statusRow button {
+  min-height: 36px;
+  font-size: 0.9rem;
+  padding: 0 10px;
+}
+
+.declared,
+.sittingOut {
   margin: 0;
   text-align: center;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.lastTrick { list-style: none; padding: 0; }
-.lastTrick li { display: flex; align-items: center; justify-content: center; gap: 6px; }
-.trickWinner { font-weight: 700; color: var(--ink); }
-
-.phase {
+/* The last trick is a bubble over the table area, so it never pushes the hand off screen. */
+.lastTrick {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 4px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 6px 10px;
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px;
+  gap: 4px;
   border-radius: var(--radius);
   background: var(--panel);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 40%);
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.lastTrick li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trickWinner {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.phase {
+  grid-area: phase;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  min-height: 0;
+  max-height: 45dvh;
+  overflow: auto;
+  width: 100%;
+  max-width: 640px;
+  justify-self: center;
 }
 
 .phase :global(section) {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+}
+
+.phase :global(fieldset) {
+  margin: 0;
+  padding: 4px 6px 6px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.phase :global(legend) {
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .phase :global(.bidding-actions),
 .phase :global(.skat-actions),
-.phase :global(.discard-panel),
-.phase :global(.declare-games) {
+.phase :global(.discard-panel) {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
 }
 
+.phase :global(.bidding) > p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
 .phase :global(.declare-games) {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+
+.phase :global(.declare-games) button {
+  padding: 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
 }
 
 .phase :global(h3) {
@@ -101,14 +195,78 @@
 }
 
 .hand {
+  grid-area: hand;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .hand > p {
   margin: 0;
   color: var(--muted);
   text-align: center;
+}
+
+/* Phones held sideways: opponents beside the table, the phase panel over the (empty) trick area. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .screen {
+    max-width: none;
+    padding: 4px 8px;
+    gap: 4px;
+    grid-template-columns: minmax(96px, 20%) minmax(0, 1fr) minmax(96px, 20%);
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'oppL table oppR'
+      'oppL status oppR'
+      'hand hand hand';
+  }
+
+  /* Over the table and status rows; the panel itself says whose turn it is. */
+  .phase {
+    grid-area: 1 / 2 / 3 / 3;
+    align-self: center;
+    z-index: 1;
+    max-height: 100%;
+    background: rgb(10 30 16 / 94%);
+  }
+
+  .phase {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .phase :global(.declare-games) button,
+  .phase :global(.declare) > button {
+    min-height: 36px;
+  }
+
+  .phase :global(h3),
+  .phase :global(legend) {
+    display: none;
+  }
+
+  .phase :global(fieldset) {
+    padding: 4px;
+  }
+
+  .statusRow {
+    min-height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .statusRow button {
+    min-height: 30px;
+  }
+}
+
+/* Large screens: the portrait arrangement, centered and kept to a moderate size. */
+@media (min-width: 900px) and (min-height: 600px) {
+  .screen {
+    max-width: 1040px;
+    max-height: 900px;
+    gap: 10px;
+    padding: 10px 12px;
+  }
 }

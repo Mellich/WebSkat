@@ -16,6 +16,7 @@ body {
   color: var(--ink);
   background: radial-gradient(ellipse at center, var(--felt) 0%, var(--felt-dark) 100%);
   min-height: 100dvh;
+  overflow-x: hidden;
   padding:
     env(safe-area-inset-top)
     env(safe-area-inset-right)

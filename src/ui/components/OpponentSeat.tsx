@@ -43,13 +43,14 @@ export function OpponentSeat(props: OpponentSeatProps) {
     <section
       className={cls(styles.seat, isTurn && styles.turn, isDeclarer && styles.declarer)}
       aria-label={`${name}, ${String(count)} cards`}
+      data-testid="opponent-seat"
     >
       <header className={styles.header}>
         <span className={styles.name}>{name}</span>
         {role === undefined ? null : <span className={styles.role}>{role}</span>}
         <span className={styles.count} aria-hidden="true">×{count}</span>
       </header>
-      <div className={styles.cards}>
+      <div className={cls(styles.cards, openCards.length > 0 ? styles.open : styles.backs)}>
         {shownCards(count, openCards, labelOf).map((c) => (
           <Card key={c.key} id={c.id} label={c.label} size="opponent" {...(back === undefined ? {} : { back })} />
         ))}

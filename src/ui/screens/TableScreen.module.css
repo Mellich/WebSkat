@@ -4,6 +4,13 @@
   flex-direction: column;
 }
 
+/* During a game the page never scrolls: the game screen gets exactly the remaining height. */
+.fixed {
+  height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: 0;
+  overflow: hidden;
+}
+
 .note {
   padding: 24px;
   text-align: center;

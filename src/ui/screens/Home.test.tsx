@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useSettings } from '../store/settings';
 import { Home } from './Home';
@@ -7,6 +7,12 @@ import { Home } from './Home';
 // The directory needs the network; the form validation does not.
 vi.mock('../net/transport', () => ({
   getTransport: () => new Promise<never>(() => undefined),
+}));
+
+const hostTable = vi.fn((input: { readonly botLevel?: string }) => Promise.resolve(input.botLevel === undefined ? 'X' : 'ABCDEFGH'));
+vi.mock('../net/actions', () => ({
+  hostTable: (input: { readonly botLevel?: string }) => hostTable(input),
+  resumeHostedTable: () => Promise.resolve(),
 }));
 
 afterEach(() => {
@@ -39,6 +45,19 @@ describe('Home form validation', () => {
     fireEvent.change(screen.getByPlaceholderText('ABCD-EFGH'), { target: { value: 'abcd-efgh' } });
     fireEvent.click(screen.getByRole('button', { name: 'Join' }));
     expect(window.location.hash).toBe('#/t/ABCDEFGH');
+  });
+});
+
+describe('Create table', () => {
+  it('passes the chosen bot strength and remembers it', async () => {
+    useNameForTest('Anna');
+    render(<Home />);
+    fireEvent.change(screen.getByTestId('create-bot-level'), { target: { value: 'strong' } });
+    fireEvent.click(screen.getByTestId('create-table'));
+    await waitFor(() => {
+      expect(hostTable).toHaveBeenCalledWith(expect.objectContaining({ botLevel: 'strong' }));
+    });
+    expect(useSettings.getState().lastBotLevel).toBe('strong');
   });
 });
 

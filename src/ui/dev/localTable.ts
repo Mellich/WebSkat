@@ -4,10 +4,10 @@
 
 import { createFakeNetwork } from '../../net/fake';
 import { createHost, generateKey, normalizeKey, randomBytes, randomUint32 } from '../../net';
-import { createTable } from '../../table';
+import { createTable, type BotLevel } from '../../table';
 import { useSession } from '../store/session';
 
-export function startLocalTable(hostName: string, seed: number | null, players: number): string {
+export function startLocalTable(hostName: string, seed: number | null, players: number, bots: BotLevel = 'normal'): string {
   const key = normalizeKey(generateKey(randomBytes));
   const table = createTable({
     key,
@@ -16,6 +16,7 @@ export function startLocalTable(hostName: string, seed: number | null, players: 
     hostId: 'local-host',
     hostName,
     maxSeats: players,
+    botLevel: bots,
   });
   const host = createHost({
     transport: createFakeNetwork().transportFor('local'),

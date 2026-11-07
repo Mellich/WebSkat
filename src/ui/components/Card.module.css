@@ -38,9 +38,14 @@ button.card {
   cursor: pointer;
 }
 
-button.card:hover:not(:disabled),
 button.card:focus-visible {
   transform: translateY(-4px);
+}
+
+@media (hover: hover) {
+  button.card:hover:not(:disabled) {
+    transform: translateY(-4px);
+  }
 }
 
 .selected {
