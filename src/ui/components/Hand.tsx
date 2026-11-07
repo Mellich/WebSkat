@@ -12,6 +12,8 @@ export interface HandProps {
   readonly declaration: Declaration | null;
   /** Cards the viewer may click right now (from `view.game.legal`). */
   readonly legal: readonly CardId[];
+  /** Show the hand at full brightness when card legality is not relevant (e.g. bidding). */
+  readonly showAll?: boolean;
   readonly mode?: 'play' | 'discard';
   readonly selected?: readonly CardId[];
   readonly highlight?: readonly CardId[];
@@ -24,7 +26,7 @@ export interface HandProps {
 function stateOf(card: CardId, props: HandProps): CardState {
   if (props.selected?.includes(card) === true) return 'selected';
   if (props.highlight?.includes(card) === true) return 'highlight';
-  return props.legal.includes(card) ? 'normal' : 'disabled';
+  return props.showAll === true || props.legal.includes(card) ? 'normal' : 'disabled';
 }
 
 export function Hand(props: HandProps) {

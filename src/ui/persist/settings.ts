@@ -8,6 +8,7 @@ export const SettingsSchema = z.object({
   language: z.enum(['en', 'de']),
   cardBack: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
   confirmPlay: z.enum(['auto', 'always', 'never']),
+  botDelayMs: z.union([z.literal(0), z.literal(300), z.literal(600), z.literal(1000)]).default(600),
   scoring: z.enum(['seeger', 'standard']),
   reducedMotion: z.enum(['system', 'on', 'off']),
 });
@@ -22,6 +23,7 @@ export function defaultSettings(browserLanguage: string): Settings {
     language: browserLanguage.toLowerCase().startsWith('de') ? 'de' : 'en',
     cardBack: 2,
     confirmPlay: 'auto',
+    botDelayMs: 600,
     scoring: 'seeger',
     reducedMotion: 'system',
   };

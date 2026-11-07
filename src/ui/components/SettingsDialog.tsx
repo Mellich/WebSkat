@@ -85,6 +85,19 @@ export function SettingsDialog({ onClose }: SettingsDialogProps) {
           ))}
         </fieldset>
 
+        <label className={styles.field}>
+          <span>{t('settings.botDelay')}</span>
+          <select
+            value={settings.botDelayMs}
+            onChange={(e) => { update({ botDelayMs: Number(e.target.value) as 0 | 300 | 600 | 1000 }); }}
+          >
+            <option value={0}>{t('settings.botDelayOff')}</option>
+            <option value={300}>{t('settings.botDelayShort')}</option>
+            <option value={600}>{t('settings.botDelayDefault')}</option>
+            <option value={1000}>{t('settings.botDelayLong')}</option>
+          </select>
+        </label>
+
         <fieldset className={styles.field}>
           <legend>{t('stats.scoring')}</legend>
           {(['seeger', 'standard'] as const).map((mode) => (

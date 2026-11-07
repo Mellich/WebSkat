@@ -163,7 +163,7 @@ passed-in and Hand/Ouvert; no illegal card is ever clickable.
 - [x] Records flow: host broadcasts `record`; clients append; stats recompute via `computeStats`.
 - [x] Geberskat UX: sitting-out view, dealer marker, role chips (Vorhand etc.), lobby text; 4–6 player
       dev-local mode with bots (`#/dev/local?players=5`).
-- [x] Settings dialog (language, card back, confirm mode, scoring).
+- [x] Settings dialog (language, card back, confirm mode, scoring, adjustable bot-play delay).
 
 **Acceptance**: after several games with 4–5 participants the stats show correct totals (compare
 with a manual calculation of at least 3 games), the chart renders, history rows match results.

@@ -246,6 +246,11 @@ export const en = {
   'settings.confirmAuto': 'Two taps on touch screens',
   'settings.confirmAlways': 'Two taps everywhere',
   'settings.confirmNever': 'One tap',
+  'settings.botDelay': 'Pause between bot plays',
+  'settings.botDelayOff': 'Off',
+  'settings.botDelayShort': 'Short (0.3 s)',
+  'settings.botDelayDefault': 'Normal (0.6 s)',
+  'settings.botDelayLong': 'Long (1 s)',
 } as const;
 
 export type TranslationKey = keyof typeof en;

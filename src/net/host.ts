@@ -9,7 +9,7 @@ import {
   addPlayer,
   allPlayers,
   applyCommand,
-  runBots,
+  botStep,
   setConnected,
   viewFor,
   type Ctx,
@@ -35,6 +35,7 @@ export interface HostOptions {
   readonly tokens?: Readonly<Record<string, PlayerId>>;
   readonly now: () => number;
   readonly randomSeed: () => number;
+  readonly botDelayMs?: () => number;
   readonly randomId?: () => string;
   readonly randomToken?: () => string;
   readonly persist?: (snapshot: HostSnapshot) => void;
@@ -53,6 +54,7 @@ export function createHost(opts: HostOptions): Host {
   const hostId = opts.table.hostId;
   let state = opts.table;
   let stopped = false;
+  let botTimer: ReturnType<typeof setTimeout> | null = null;
   const tokens = new Map<string, PlayerId>(Object.entries(opts.tokens ?? {}));
   const tokenOf = new Map<PlayerId, string>([...tokens].map(([token, id]) => [id, token]));
   const peerOf = new Map<PlayerId, string>();
@@ -110,6 +112,28 @@ export function createHost(opts: HostOptions): Host {
     if (peer !== undefined) sendTo(peer, { t: 'error', code, message });
   }
 
+  async function runBotTurns(recordsBefore: number): Promise<void> {
+    const delay = opts.botDelayMs?.() ?? 0;
+    const rand = mulberry32(opts.randomSeed());
+    for (let step = 0; step < 100_000 && !stopped; step++) {
+      const next = botStep(state, ctx, rand);
+      if (next === null) break;
+      state = next;
+      const created = state.records.slice(recordsBefore);
+      if (created.length > 0) broadcastRecords(created);
+      broadcastViews();
+      persist();
+      if (delay > 0) {
+        await new Promise<void>((resolve) => {
+          botTimer = setTimeout(() => {
+            botTimer = null;
+            resolve();
+          }, delay);
+        });
+      }
+    }
+  }
+
   function handleCommand(actor: PlayerId, command: TableCommand): void {
     const recordsBefore = state.records.length;
     const result = applyCommand(state, actor, command, ctx());
@@ -123,11 +147,11 @@ export function createHost(opts: HostOptions): Host {
       if (peer !== undefined) sendTo(peer, { t: 'kicked' });
       unbind(command.playerId);
     }
-    state = runBots(state, ctx, mulberry32(opts.randomSeed()));
     const created = state.records.slice(recordsBefore);
     if (created.length > 0) broadcastRecords(created);
     broadcastViews();
     persist();
+    void runBotTurns(state.records.length);
   }
 
   function onJoin(peer: string, msg: JoinMessage): void {
@@ -237,6 +261,8 @@ export function createHost(opts: HostOptions): Host {
   function stop(): void {
     if (stopped) return;
     stopped = true;
+    if (botTimer !== null) clearTimeout(botTimer);
+    botTimer = null;
     room.send('msg', { t: 'closed' });
     if (adTimer !== null) clearInterval(adTimer);
     lobby?.leave();

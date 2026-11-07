@@ -197,6 +197,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
             cards={game.myHand}
             declaration={game.declaration}
             legal={isDiscarding ? discardable : playable}
+            showAll={game.phase === 'bidding'}
             mode={isDiscarding ? 'discard' : 'play'}
             selected={isDiscarding ? discardPick : pending === null ? [] : [pending]}
             highlight={isDiscarding && game.skat !== null ? game.skat : []}

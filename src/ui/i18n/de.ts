@@ -247,4 +247,9 @@ export const de: Dict = {
   'settings.confirmAuto': 'Zwei Tipps auf Touchscreens',
   'settings.confirmAlways': 'Überall zwei Tipps',
   'settings.confirmNever': 'Ein Tipp',
+  'settings.botDelay': 'Pause zwischen Bot-Zügen',
+  'settings.botDelayOff': 'Aus',
+  'settings.botDelayShort': 'Kurz (0,3 s)',
+  'settings.botDelayDefault': 'Normal (0,6 s)',
+  'settings.botDelayLong': 'Lang (1 s)',
 };

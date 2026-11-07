@@ -100,7 +100,7 @@ Passed in: "Everybody passed". Otherwise:
 
 | Component | Props (essential) | Notes |
 |---|---|---|
-| `Card` | `id: CardId \| 'back'`, `state?: 'normal'\|'disabled'\|'selected'\|'highlight'`, `onClick?`, `size` | `<button>` when clickable, else `<img>`. `alt`/`aria-label` from i18n ("Jack of clubs"). Image `src = ${BASE}cards/${id}.webp`. Illegal card = `disabled` (dimmed + not focusable). |
+| `Card` | `id: CardId \| 'back'`, `state?: 'normal'\|'disabled'\|'selected'\|'highlight'`, `onClick?`, `size` | `<button>` when clickable, else `<img>`. `alt`/`aria-label` from i18n ("Jack of clubs"). Image `src = ${BASE}cards/${id}.webp`. Illegal card = `disabled` (opaque card face with a translucent grey overlay + not focusable). During bidding, show every card at full brightness because the hand is needed for bidding; cards remain non-interactive. |
 | `Hand` | `cards`, `legal: CardId[]\|null`, `mode: 'play'\|'discard'`, `selected`, `onPlay`, `onToggle` | Overlapped fan (negative margin; overlap shrinks to fit width). Sorted via `sortHand(cards, declaration)`. Selected card raised by 12px. |
 | `OpponentSeat` | `player`, `role`, `count`, `isTurn`, `isDeclarer`, `openCards?` | Shows `Card back` stack (overlapped ×min(count,10)) + count badge; highlights when it is their turn; ouvert → real cards face up. |
 | `TrickArea` | `trick`, `lastTrick`, `players` | Three fixed slots mapped to seat positions; card appears with CSS transition; after a trick completes show it for ~1.2 s (UI timer) with a winner highlight, then clear — see §4. |
@@ -115,7 +115,7 @@ Passed in: "Everybody passed". Otherwise:
 - **Play a card**: mouse: single click. Touch (`(pointer: coarse)`): first tap selects (raises
   card), second tap on the same card plays (prevents mis-taps). Setting "Confirm card play" =
   *auto* (default) / *always* / *never*.
-- Illegal cards are disabled with `aria-disabled`; tapping them shows a small tooltip/toast:
+- Illegal cards stay fully opaque under a translucent grey overlay (never reduce the card face opacity) and are disabled with `aria-disabled`; tapping them shows a small tooltip/toast:
   "You must follow suit (♥)" — text keyed by a UI-side reason helper that only *describes* (it is
   fine to infer a message from the led card; it must not change enablement).
 - Keyboard: Tab through enabled cards, Enter/Space plays. `aria-live="polite"` region announces
@@ -174,12 +174,12 @@ Error codes map to messages under `error.<CODE>`.
 ## 7. Settings (persisted, zod-validated, `ui/persist/settings.ts`)
 
 `{ name, language, cardBack: 0|1|2|3, confirmPlay: 'auto'|'always'|'never', scoring: 'seeger'|'standard',
-reducedMotion: 'system'|'on'|'off' }`.
+`reducedMotion: 'system'|'on'|'off', botDelayMs: 0|300|600|1000 }`. The bot-play delay defaults to 600 ms and controls the pause between successive bot actions; 0 disables it. It is read live by the host for bot turns (so changing the setting takes effect during a game) and persisted locally.
 
 ## 8. Accessibility
 
 Buttons are real `<button>`s; modals trap focus and close on Esc; color is never the only signal
-(suit symbols have shapes; disabled cards also get reduced opacity **and** `aria-disabled`);
+(suit symbols have shapes; disabled cards also get a grey overlay **and** `aria-disabled`);
 contrast ratio ≥ 4.5:1 for text.
 
 ## 9. Component tests (few, `@testing-library/react`)

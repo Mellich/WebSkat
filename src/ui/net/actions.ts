@@ -18,6 +18,7 @@ import { loadHostSnapshot, removeHostSnapshot, resumableSnapshot, saveHostSnapsh
 import { clearSession, loadSession, saveSession } from '../persist/session';
 import { browserStorage } from '../persist/storage';
 import { useSession } from '../store/session';
+import { useSettings } from '../store/settings';
 import { getTransport } from './transport';
 
 const SAVE_DELAY_MS = 300;
@@ -57,6 +58,7 @@ function startHost(transport: Transport, table: TableState, tokens: HostSnapshot
     tokens,
     now: () => Date.now(),
     randomSeed: randomUint32,
+    botDelayMs: () => useSettings.getState().botDelayMs,
     lobby: transport,
     persist: saveSoon,
   });

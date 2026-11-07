@@ -25,6 +25,12 @@ describe('Hand', () => {
     expect(screen.getByRole('img', { name: 'Ace of hearts' }).tagName).toBe('IMG');
   });
 
+  it('shows all cards at full brightness when legality is irrelevant', () => {
+    const { container } = render(<Hand cards={HAND} declaration={null} legal={[]} showAll />);
+    expect(container.querySelectorAll('.disabled')).toHaveLength(0);
+    expect(screen.getAllByRole('img')).toHaveLength(HAND.length);
+  });
+
   it('reports the card that was played', () => {
     const onPlay = vi.fn<(card: CardId) => void>();
     render(<Hand cards={HAND} declaration={null} legal={['HA']} onPlay={onPlay} />);
