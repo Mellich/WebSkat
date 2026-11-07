@@ -126,13 +126,13 @@ network integration test passes.
 
 ## Phase 6 — UI shell: Home, Lobby, session  (*06 §1,6,7*, *05 §5–7*)
 
-- [ ] i18n (`en.ts`, `de.ts`, `t()`), settings store + persistence (zod-validated).
-- [ ] Session store (zustand) wiring `GameConnection` events → `view`, `records`, `status`, `toast`.
-- [ ] Home: name, create table (host with `createHost` + `createTrysteroTransport`), join by key,
+- [x] i18n (`en.ts`, `de.ts`, `t()`), settings store + persistence (zod-validated).
+- [x] Session store (zustand) wiring `GameConnection` events → `view`, `records`, `status`, `toast`.
+- [x] Home: name, create table (host with `createHost` + `createTrysteroTransport`), join by key,
       public list (`createDirectory`), validation and error messages.
-- [ ] Hash router (`#/t/KEY` auto-join, deep link), TopBar, Toast, Leave (with confirm when in game).
-- [ ] TableLobby: key copy/link copy, seat list, Start, Add bot, Kick, status.
-- [ ] **Offline dev mode**: `#/dev/local` creates a host + 2 bots using the **fake network**, so the
+- [x] Hash router (`#/t/KEY` auto-join, deep link), TopBar, Toast, Leave (with confirm when in game).
+- [x] TableLobby: key copy/link copy, seat list, Start, Add bot, Kick, status.
+- [x] **Offline dev mode**: `#/dev/local` creates a host + 2 bots using the **fake network**, so the
       whole UI can be developed without any WebRTC. (DEV builds only.)
 
 **Acceptance**: with `npm run dev` + `npm run relay` and `VITE_SIGNALING=ws-relay`, two browser tabs

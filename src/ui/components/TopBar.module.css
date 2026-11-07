@@ -1,0 +1,61 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgb(0 0 0 / 35%);
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+  flex-wrap: wrap;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.key {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ok {
+  background: #4ade80;
+}
+
+.wait {
+  background: var(--accent);
+}
+
+.bad {
+  background: var(--danger);
+}

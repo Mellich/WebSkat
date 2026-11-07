@@ -218,6 +218,7 @@ export function createHost(opts: HostOptions): Host {
   room.onMessage(onMessage);
   room.onPeerLeave(onPeerLeave);
   emitter.emit({ t: 'status', status: 'connected' });
+  broadcastViews();
 
   const connection: GameConnection = {
     playerId: () => hostId,

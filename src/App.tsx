@@ -1,6 +1,11 @@
 import { Suspense, lazy } from 'react';
+import { Toasts } from './ui/components/Toast';
+import { useRoute } from './ui/router';
+import { Home } from './ui/screens/Home';
+import { TableScreen } from './ui/screens/TableScreen';
 
-// Only development builds define the gallery; in production the import is removed entirely.
+// Development-only screens. The conditions are constants in production builds, so the lazy
+// imports are removed from the bundle.
 const DevGallery = import.meta.env.DEV
   ? lazy(async () => {
       const module = await import('./ui/dev/Gallery');
@@ -8,18 +13,36 @@ const DevGallery = import.meta.env.DEV
     })
   : null;
 
+const DevLocal = import.meta.env.DEV
+  ? lazy(async () => {
+      const module = await import('./ui/dev/DevLocal');
+      return { default: module.DevLocal };
+    })
+  : null;
+
 export function App() {
-  if (DevGallery !== null && window.location.hash === '#/dev/gallery') {
-    return (
-      <Suspense fallback={null}>
-        <DevGallery />
-      </Suspense>
-    );
-  }
+  const route = useRoute();
+  const screen = (() => {
+    switch (route.kind) {
+      case 'table':
+        return <TableScreen tableKey={route.key} />;
+      case 'dev-gallery':
+        return DevGallery === null ? <Home /> : <DevGallery />;
+      case 'dev-local':
+        return DevLocal === null ? <Home /> : <DevLocal />;
+      case 'home':
+        return <Home />;
+      default: {
+        const unused: never = route;
+        return unused;
+      }
+    }
+  })();
   return (
-    <main>
-      <h1>WebSkat</h1>
-      <p>The app shell is not built yet.</p>
-    </main>
+    <>
+      <Suspense fallback={null}>{screen}</Suspense>
+      <Toasts />
+    </>
   );
 }
+

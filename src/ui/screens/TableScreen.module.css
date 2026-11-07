@@ -1,0 +1,50 @@
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.note {
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 12px 0;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: rgb(229 72 77 / 25%);
+  border: 1px solid var(--danger);
+}
+
+.nameForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.nameForm input {
+  min-height: var(--tap);
+  font: inherit;
+  padding: 0 12px;
+  border-radius: var(--radius);
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: rgb(0 0 0 / 30%);
+  color: var(--ink);
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
