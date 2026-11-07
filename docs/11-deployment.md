@@ -19,7 +19,7 @@ needed.
 
 | Host | Notes |
 |---|---|
-| GitHub Pages | Workflow: checkout → setup-node 22 → `npm ci` → `npm run check` → `npm run build` → `actions/upload-pages-artifact` (`dist`) → `actions/deploy-pages`. `assets/` originals must be committed (the build generates `public/*`). |
+| GitHub Pages | Set source to **Deploy from a branch**, `gh-pages` / root. Run `npm run publish:pages`, then `git push origin gh-pages`. The script runs checks/build and prepares a commit containing only `dist/` plus `.nojekyll`. |
 | Cloudflare Pages / Netlify / Vercel | Build command `npm run build`, output `dist`, Node 22. |
 | Any static web server | Copy `dist/`. |
 

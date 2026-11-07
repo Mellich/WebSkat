@@ -205,7 +205,7 @@ tab → resume → clients reconnect and the game continues at the same state.
 ## Phase 11 — Deployment and docs  (*11-deployment.md*)
 
 - [x] `npm run build` output verified with `npm run preview` on a phone-sized viewport (home and About at 360 px; the game screen was checked in Phase 7 and by the e2e tests).
-- [x] GitHub Actions workflow (or documented manual steps) for static hosting (Pages/Cloudflare).
+- [x] GitHub Pages branch publishing via `npm run publish:pages`; GitHub Actions validates the source branch.
 - [x] `README.md`: what it is, how to play, how to run, trust model, relay + TURN options.
 - [ ] Final pass: a11y check, bundle size < 300 kB gzipped JS (excluding images), Lighthouse sanity. *Bundle: 129 kB gzipped main chunk (checked). The a11y audit and Lighthouse were not run (no audit tooling installed, network blocked); see `12` I94.*
 

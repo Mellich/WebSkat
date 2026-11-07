@@ -51,8 +51,7 @@ WebSkat is a static site. Build it with `npm run build` and serve `dist/` over H
 requires a secure context). The hash router needs no server rewrites, and `base: './'` works at a
 domain root and under a sub-path.
 
-- **GitHub Pages**: `.github/workflows/pages.yml` runs `npm run check`, `npm run build` and deploys
-  `dist/` on every push to `main`. Enable Pages with "GitHub Actions" as the source.
+- **GitHub Pages**: Set the Pages source to **Deploy from a branch**, branch `gh-pages`, folder `/ (root)`. Run `npm run publish:pages` to check and build the app and prepare a deployment commit from `dist/`; then push it with `git push origin gh-pages`. The script creates `gh-pages` if needed and does not change the current branch. The Pages build workflow validates `main` but does not deploy.
 - **Cloudflare Pages, Netlify, Vercel**: build command `npm run build`, output directory `dist`,
   Node 22.
 - **Any static server**: copy `dist/`.
