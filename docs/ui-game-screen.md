@@ -98,6 +98,10 @@ During bidding the hand is shown at full brightness but not clickable (`showAll`
 4. Player on turn is disconnected (`waitingFor`) → "Waiting for {name} to reconnect…".
 5. Otherwise → "Waiting for {name}…".
 
+Host only: while the game runs and the player on turn is disconnected (`waitingFor`), the status row
+also shows an **Abort game** button (`data-testid="abort-game"`, `AbortGameButton.tsx`). A confirm
+dialog comes first; the confirmed click sends `abort-game`, and the next game is dealt.
+
 ## 7. ResultDialog (`ResultDialog.tsx`)
 
 A bottom sheet whose backdrop lets clicks through, so TopBar (Stats, Settings) stays usable.

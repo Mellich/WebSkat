@@ -245,6 +245,9 @@ export function createHost(opts: HostOptions): Host {
       if (!stopped) handleCommand(hostId, command);
     },
     subscribe: (listener) => emitter.subscribe(listener),
+    leave: () => {
+      stop();
+    },
     close: () => {
       stop();
     },

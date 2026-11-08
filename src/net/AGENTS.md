@@ -41,7 +41,7 @@ Read first: `docs/networking.md` and `docs/architecture.md` §3–4. Visibility 
 | `protocol.ts` | message schemas (`ClientMessageSchema`, `HostMessageSchema`, `AdSchema`, …), types, builders `cmdMessage`, `viewMessage`, `recordMessage` |
 | `connection.ts` | `ConnectionStatus`, `ConnectionEvent`, `GameConnection`, `createEmitter` (replays status/records/view) |
 | `host.ts` | `createHost` → `Host` (`connection`, `stop`, `getState`, `snapshot`), `HostSnapshot` |
-| `client.ts` | `createClient` → `GameConnection` |
+| `client.ts` | `createClient` → `GameConnection` (`leave()` sends `leave`, then closes after `LEAVE_CLOSE_DELAY_MS`) |
 | `directory.ts` | `createDirectory(lobby, onChange)`, `TableAd` (public table list) |
 | `keys.ts` | `KEY_ALPHABET`, `normalizeKey`, `formatKey`, `isValidKey`, `generateKey`, `joinLink` |
 | `random.ts` | `randomBytes`, `randomHex`, `randomUint32` (Web Crypto) |

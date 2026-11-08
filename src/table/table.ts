@@ -16,8 +16,9 @@ import {
   MIN_SEATS,
   addPlayer,
   allPlayers,
+  markLeaving,
+  removeLeavers,
   removePlayer,
-  setConnected,
   touch,
   uniqueName,
 } from './seating';
@@ -79,8 +80,9 @@ const notHost = (): Outcome => err('NOT_HOST', 'Only the host can do this.');
 const gameRunning = (): Outcome => err('GAME_RUNNING', 'Wait until the game is finished.');
 const noFinishedGame = (): Outcome => err('WRONG_STATUS', 'No finished game to continue from.');
 
-/** Deals the next game with the players and the dealer pointer as they are now. */
-export function dealNext(s: TableState, ctx: Ctx): TableState {
+/** Deals the next game with the players and the dealer pointer as they are now. Leavers go first. */
+export function dealNext(state: TableState, ctx: Ctx): TableState {
+  const s = removeLeavers(state);
   const seated = allPlayers(s);
   if (seated.length < MIN_SEATS) {
     return touch({ ...s, players: seated, pending: [], game: null, status: 'lobby', ready: [] });
@@ -216,7 +218,7 @@ function leave(s: TableState, actor: PlayerId, ctx: Ctx): Outcome {
     return err('UNKNOWN_PLAYER', 'You are not at this table.');
   }
   if (s.game !== null && s.game.engine.phase !== 'finished') {
-    return plain(setConnected(s, actor, false));
+    return plain(markLeaving(s, actor));
   }
   return plain(tryDeal(toLobbyIfTooFew(removePlayer(s, actor)), ctx));
 }

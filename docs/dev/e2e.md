@@ -36,7 +36,7 @@ npx playwright test -g "fits phone"    # tests whose title matches
 |---|---|---|
 | `game.spec.ts` (A) | Host + 2 players: create, join by key, start, robots play one game; all three see the same result and one history row | ~1.5 min |
 | `geberskat.spec.ts` (B) | Public table found in the list by a 4th player; 4 players; the dealer sits out; after Continue the next game has another dealer/sitter | ~3.5 min |
-| `reconnect.spec.ts` (C) | Client reload mid-game gets seat and hand back; start page goes back to the stored table; host reload resumes and clients reconnect to the same game | — |
+| `reconnect.spec.ts` (C) | Client reload mid-game gets seat and hand back; start page goes back to the stored table; host reload resumes and clients reconnect to the same game; a client that leaves the lobby disappears from the host's seats | — |
 | `layout.spec.ts` (D) | Offline `#/dev/local?seed=6&bots=easy` at 7 viewports; checks every phase (§5) | — |
 
 ## 4. Helpers (`e2e/helpers.ts`, `e2e/robot.ts`)
@@ -80,7 +80,7 @@ viewer win the bidding.
 | Home | `create-table`, `join-key-input`, `join-submit`, `public-table`, `public-join` |
 | Table screen / TopBar | `connection-banner`, `connection-status`, `open-stats`, `open-settings`, `leave-table` |
 | Lobby | `table-key`, `seat-<i>`, `bot-level-<i>`, `add-bot`, `start-game` |
-| Game | `opponent-seat`, `trick-area`, `trick-dismiss`, `last-trick`, `status-line`, `sitting-out`, `sitting-out-you`, `phase-panel`, `hand-card-<CardId>` |
+| Game | `opponent-seat`, `trick-area`, `trick-dismiss`, `last-trick`, `status-line`, `sitting-out`, `sitting-out-you`, `phase-panel`, `hand-card-<CardId>`, `abort-game` (host, player on turn disconnected) |
 | Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass` |
 | Skat / declare | `pickup`, `play-hand`, `discard-submit`, `declare-option-0..5` (♣ ♠ ♥ ♦ Grand Null), `declare-submit` |
 | Result | `result-dialog`, `continue` |

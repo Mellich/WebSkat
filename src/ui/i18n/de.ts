@@ -82,7 +82,7 @@ export const de: Dict = {
   'topbar.status.connected': 'Verbunden',
   'topbar.status.connecting': 'Verbinde',
   'topbar.status.lost': 'Verbindung verloren',
-  'topbar.leaveConfirm': 'Tisch verlassen? Ein laufendes Spiel geht ohne dich weiter.',
+  'topbar.leaveConfirm': 'Tisch verlassen? Läuft ein Spiel, bleibt dein Platz bis zum nächsten Spiel erhalten.',
 
   'error.NOT_HOST': 'Das kann nur der Gastgeber.',
   'error.NOT_SEATED': 'Nur Spieler mit Platz können das.',
@@ -134,6 +134,8 @@ export const de: Dict = {
   'role.dealer': 'Geber',
   'role.sittingOut': 'Setzt aus',
 
+  'game.abort': 'Spiel abbrechen',
+  'game.abortConfirm': 'Dieses Spiel abbrechen? Es wird nicht gewertet, und das nächste Spiel wird gegeben.',
   'game.clubs': 'Kreuz',
   'game.spades': 'Pik',
   'game.hearts': 'Herz',

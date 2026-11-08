@@ -9,7 +9,7 @@ rotation, records and views, and runs bots.
 ```ts
 type PlayerId = string;          // host: `h<16 hex>`; remote: 16 hex (host-generated); bots: `bot-<seq>`
 type BotLevel = 'easy' | 'normal' | 'strong';
-interface Player { id; name /*1..20, unique*/; connected; isBot; botLevel?: BotLevel /*bots only*/ }
+interface Player { id; name /*1..20, unique*/; connected; isBot; botLevel?: BotLevel /*bots only*/; leaving?: boolean /*left during a running game; removed at the next deal*/ }
 type TableStatus = 'lobby' | 'in-game';   // 'in-game' while game !== null, incl. a finished game
 
 interface ActiveGame {
@@ -48,11 +48,13 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 |---|---|---|
 | `createTable({key, name, isPublic, hostId, hostName, maxSeats?})` | `table.ts` | Lobby with the host seated; `maxSeats` clamped to 3..6, default 6 |
 | `applyCommand(s, actor, command, ctx)` | `table.ts` | The reducer: `Result<{state, record}, TableErrorCode>` (§3) |
-| `dealNext(s, ctx)` | `table.ts` | Seats pending players; < 3 seated → back to lobby. Dealer = `nextDealerIdx % N`, pointer moves one seat on, `newGame(ctx.seed)`, roles from the rotation, `ready` = bots |
+| `dealNext(s, ctx)` | `table.ts` | Removes leavers first (`removeLeavers`), seats pending players; < 3 seated → back to lobby. Dealer = `nextDealerIdx % N`, pointer moves one seat on, `newGame(ctx.seed)`, roles from the rotation, `ready` = bots |
 | `tryDeal(s, ctx)` | `table.ts` | Deals the next game when the game is finished and every **connected human** is in `ready` |
 | `addPlayer(s, {id, name, isBot?, botLevel?})` | `seating.ts` | Known id → reconnect (`connected = true`). Else validates the name (`INVALID_NAME`), checks `players + pending < maxSeats` (`TABLE_FULL`), makes the name unique, seats the player if `game === null`, otherwise adds to `pending` |
 | `removePlayer(s, id)` | `seating.ts` | Removes from seats or pending; keeps the pointer on the same upcoming dealer (a removed seat before the pointer shifts it down); drops the id from `ready` |
-| `setConnected(s, id, connected)` | `seating.ts` | Flag only |
+| `setConnected(s, id, connected)` | `seating.ts` | Sets the `connected` flag; `connected = true` also clears `leaving` |
+| `markLeaving(s, id)` | `seating.ts` | Seated player leaves during a running game: `connected = false`, `leaving = true` (keeps the seat) |
+| `removeLeavers(s)` | `seating.ts` | `removePlayer` for every seated player with `leaving` (keeps the dealer pointer right) |
 | `uniqueName(existing, wanted)` | `seating.ts` | `Anna`, `Anna (2)`, … (cut to 20 chars) |
 | `rolesForDealer(players, dealerIdx)` | `rotation.ts` | forehand = d+1, middlehand = d+2, hindhand = d+3 (mod N); sitting out = dealer and d+4, d+5 (N ≥ 4) |
 | `pickFirstDealer(seed, n)` | `rotation.ts` | `seed % n` |
@@ -73,7 +75,7 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 | `kick {playerId}` | host | no game or finished | `removePlayer`; < 3 seated → lobby; then `tryDeal` | `NOT_HOST`, `GAME_RUNNING`, `CANNOT_KICK_HOST`, `UNKNOWN_PLAYER` |
 | `add-bot` | host | no game or finished | adds `bot-<seq>` named `Bot`, `Bot (2)`, … at level `normal` | `NOT_HOST`, `GAME_RUNNING`, `TABLE_FULL` |
 | `set-bot-level {playerId, level}` | host | any time | sets that bot's level; used from its next action | `NOT_HOST`, `UNKNOWN_PLAYER`, `NOT_A_BOT` |
-| `leave` | anyone | — | pending → removed. Seated + game running → only `connected = false`. Seated otherwise → removed (< 3 → lobby) | `HOST_CANNOT_LEAVE`, `UNKNOWN_PLAYER` |
+| `leave` | anyone | — | pending → removed. Seated + game running → `markLeaving` (seat kept, removed at the next deal). Seated otherwise → removed (< 3 → lobby) | `HOST_CANNOT_LEAVE`, `UNKNOWN_PLAYER` |
 
 `TableErrorCode` = `GameErrorCode` + `NOT_HOST`, `NOT_SEATED`, `NOT_ACTIVE_PLAYER`,
 `WRONG_STATUS`, `TOO_FEW_PLAYERS`, `TABLE_FULL`, `UNKNOWN_PLAYER`, `GAME_RUNNING`,
@@ -87,6 +89,8 @@ Joining is not a command: the host calls `addPlayer` when a `join` message arriv
 
 - The dealer pointer moves **when a game is dealt**, so it also moves for passed-in and aborted
   games.
+- A player who leaves during a running game keeps the seat (`leaving`, disconnected) until the next
+  deal; `dealNext` removes leavers first. Rejoining with the same id before that cancels the leave.
 - Pending players are seated only in `dealNext` (before roles are computed). New players are
   appended as the last seat. A dealt game never changes its participants.
 - Bots are always ready. Disconnected humans do not block the next deal; the game then waits on

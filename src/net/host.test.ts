@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createClient } from './client';
 import { createFakeNetwork } from './fake';
 import { createHost } from './host';
-import { tableRoom, JOIN_TIMEOUT_MS, PROTOCOL_VERSION } from './constants';
+import { tableRoom, JOIN_TIMEOUT_MS, LEAVE_CLOSE_DELAY_MS, PROTOCOL_VERSION } from './constants';
 import { createRig, errorsOf, joinClient, KEY, lastView, settle, statusOf } from './testing';
 
 import type { ConnectionEvent } from './connection';
@@ -147,6 +147,50 @@ describe('commands', () => {
     settle(rig);
     expect(rig.host.getState().players.map((p) => p.name)).toEqual(['Host', 'Ben']);
     expect(statusOf(anna.events)).toBe('kicked');
+  });
+});
+
+describe('leaving', () => {
+  it('sends the leave command, so the host removes the seat, then closes the client', () => {
+    vi.useFakeTimers();
+    const rig = createRig();
+    const anna = joinClient(rig, 'A', 'Anna');
+    settle(rig);
+    expect(rig.host.getState().players).toHaveLength(2);
+
+    anna.connection.leave();
+    settle(rig);
+    expect(rig.host.getState().players.map((p) => p.name)).toEqual(['Host']);
+    expect(statusOf(anna.events)).toBe('connected');
+
+    vi.advanceTimersByTime(LEAVE_CLOSE_DELAY_MS);
+    expect(statusOf(anna.events)).toBe('closed');
+    expect(rig.net.members(tableRoom(KEY))).not.toContain('A');
+  });
+
+  it('a client without a host connection only closes after the delay and sends nothing', () => {
+    vi.useFakeTimers();
+    const rig = createRig();
+    const anna = joinClient(rig, 'A', 'Anna');
+    settle(rig);
+    rig.net.drop('H');
+    settle(rig);
+    expect(statusOf(anna.events)).toBe('host-lost');
+
+    anna.connection.leave();
+    settle(rig);
+    expect(statusOf(anna.events)).toBe('host-lost');
+    vi.advanceTimersByTime(LEAVE_CLOSE_DELAY_MS);
+    expect(statusOf(anna.events)).toBe('closed');
+  });
+
+  it('the host leaving stops the table and closes every client', () => {
+    const rig = createRig();
+    const anna = joinClient(rig, 'A', 'Anna');
+    settle(rig);
+    rig.host.connection.leave();
+    settle(rig);
+    expect(statusOf(anna.events)).toBe('closed');
   });
 });
 

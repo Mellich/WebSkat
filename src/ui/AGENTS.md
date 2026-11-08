@@ -39,6 +39,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `screens/TableScreen.tsx` | `#/t/KEY`: name form, `openTable`, TopBar, connection banner, lobby or game |
 | `screens/TableLobby.tsx` | key + copy, seats, bot strength selects, Add bot, Start, Kick |
 | `game/GameScreen.tsx` | in-game layout, status line, phase panel switch, hand, result |
+| `game/AbortGameButton.tsx` | host's "Abort game" button in the status row, with a confirm dialog |
 | `game/BiddingPanel.tsx` | history + Bid N / Hold / Play (18) / Pass |
 | `game/SkatPanels.tsx` | `SkatDecision` (pick up / Hand), `DiscardPanel` |
 | `game/DeclarationPicker.tsx` | game tiles, extras, floor-value hint, Declare |

@@ -82,8 +82,25 @@ export function removePlayer(s: TableState, id: PlayerId): TableState {
   });
 }
 
+/** A reconnect (`connected` true) cancels a pending leave. */
 export function setConnected(s: TableState, id: PlayerId, connected: boolean): TableState {
-  const update = (list: readonly Player[]): Player[] =>
-    list.map((p) => (p.id === id ? { ...p, connected } : p));
-  return touch({ ...s, players: update(s.players), pending: update(s.pending) });
+  const update = (p: Player): Player => {
+    if (p.id !== id) return p;
+    return connected && p.leaving === true ? { ...p, connected, leaving: false } : { ...p, connected };
+  };
+  return touch({ ...s, players: s.players.map(update), pending: s.pending.map(update) });
+}
+
+/** A seated player leaves during a running game: keeps the seat until the next deal. */
+export function markLeaving(s: TableState, id: PlayerId): TableState {
+  const update = (p: Player): Player =>
+    p.id === id ? { ...p, connected: false, leaving: true } : p;
+  return touch({ ...s, players: s.players.map(update) });
+}
+
+/** Removes every seated player who left during the previous game (before the next deal). */
+export function removeLeavers(s: TableState): TableState {
+  return s.players
+    .filter((p) => p.leaving === true)
+    .reduce((acc, p) => removePlayer(acc, p.id), s);
 }

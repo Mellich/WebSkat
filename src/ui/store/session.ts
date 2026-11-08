@@ -24,7 +24,8 @@ export interface SessionState {
   readonly records: readonly GameRecord[];
   readonly toasts: readonly Toast[];
   readonly attach: (input: { readonly key: string; readonly connection: GameConnection; readonly host?: Host }) => void;
-  readonly detach: () => void;
+  /** 'leave' tells the host first (GameConnection.leave); 'close' just disconnects. */
+  readonly detach: (mode?: 'close' | 'leave') => void;
   readonly toast: (text: string, kind?: 'error' | 'info') => void;
   readonly dismiss: (id: number) => void;
 }
@@ -92,12 +93,13 @@ export const useSession = create<SessionState>()((set, get) => {
       set({ ...EMPTY, key, connection, host: host ?? null, records: cached, toasts: get().toasts });
       unsubscribe = connection.subscribe(handle);
     },
-    detach() {
+    detach(mode = 'close') {
       unsubscribe?.();
       unsubscribe = null;
       const { connection } = get();
       set({ ...EMPTY, records: [], toasts: get().toasts });
-      connection?.close();
+      if (mode === 'leave') connection?.leave();
+      else connection?.close();
     },
     toast: addToast,
     dismiss(id) {

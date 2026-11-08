@@ -26,8 +26,6 @@ All implementation phases 0–14 of the original plan are done (archive: `histor
 | a11y audit (axe) and Lighthouse run | Not run (`decisions.md` I94) |
 | Manual visual check of result dialog, ouvert opponent, 4-player bar at all viewports | Not done |
 | Full game between two real devices over the internet | Not done (needs real devices) |
-| `abort-game` command | Exists in the table layer; no button in the UI |
-| `leave` command | Exists in the table layer; the UI does not send it (Leave closes the connection instead, see `ui.md` §4) |
 
 ## 3. Features
 

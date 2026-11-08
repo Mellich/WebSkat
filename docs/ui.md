@@ -78,12 +78,13 @@ compact-landscape screens the buttons show icons only (📊 ⚙ ⎋) with `aria-
 | `hostTable({hostName, tableName, isPublic})` | New key, `createTable` (host id `h<hex>`), `createHost` (with lobby, `Date.now`, `randomUint32`, debounced snapshot save), attaches it to the session store, returns the key |
 | `openTable(key, name)` | Host snapshot for the key → resume as host; else join as client with the stored token if the session is for this key |
 | `resumeHostedTable(key)` | Resume from a snapshot (Home "Resume" button) |
-| `leaveTable()` | Detach and close the connection; delete the host snapshot (host) or the client session |
+| `leaveTable()` | Detach with `leave`: a client sends the `leave` command, the host stops the table; delete the host snapshot (host) or the client session |
 | `startOnce(key, fn)` (internal) | Merges concurrent starts for one key (React StrictMode runs effects twice) |
 
-Leaving does **not** send the `leave` command. A client that leaves simply disconnects: the host
-marks it disconnected and it stays seated until kicked. A host that leaves closes the table
-(`closed` to everyone) and forgets its snapshot.
+Leaving sends the `leave` command (`GameConnection.leave()`), then closes the client room after
+`LEAVE_CLOSE_DELAY_MS` (500 ms) so the command arrives first. In the lobby the host removes the seat
+at once; during a running game the seat stays until the next deal. A host that leaves closes the
+table (`closed` to everyone) and forgets its snapshot.
 
 ## 5. Stores (`store/`)
 

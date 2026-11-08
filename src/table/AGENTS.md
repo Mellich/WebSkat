@@ -22,7 +22,7 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 |---|---|
 | `types.ts` | `PlayerId`, `BotLevel`, `Player`, `TableStatus`, `ActiveGame`, `TableState`, `TableCommand`, `Ctx`, `TableErrorCode`, `GameKindLabel`, `ScoreDeltas`, `GameRecord`, `SUIT_LABELS` |
 | `table.ts` | `createTable`, `applyCommand` (the reducer), `dealNext`, `tryDeal`, `CommandResult` |
-| `seating.ts` | `MIN_SEATS`, `MAX_SEATS`, `MAX_NAME_LENGTH`, `allPlayers`, `touch`, `uniqueName`, `addPlayer`, `removePlayer`, `setConnected` |
+| `seating.ts` | `MIN_SEATS`, `MAX_SEATS`, `MAX_NAME_LENGTH`, `allPlayers`, `touch`, `uniqueName`, `addPlayer`, `removePlayer`, `setConnected`, `markLeaving`, `removeLeavers` |
 | `rotation.ts` | `pickFirstDealer`, `sittingOutSeats`, `rolesForDealer`, `roleOf` (Geberskat) |
 | `records.ts` | `seegerBonus`, `gameKindOf`, `makeRecord` |
 | `stats.ts` | `PlayerStats`, `TableStats`, `computeStats` |
@@ -34,7 +34,7 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 | `index.ts` | public re-exports (also `BotView` type) |
 | `testing.ts` | `tableWith`, `ctxFor`, `randomStep`, `playUntilRecords`, `pickRandom` |
 | `fixtures.ts` | `finishedGame`, `GRAND_144`, `DIAMONDS_LOST`, `NULL_OUVERT_WON` |
-| `*.test.ts` | `table`, `seating`, `rotation`, `records`, `stats`, `view`, `view.redaction`, `bot`, `bot/*` |
+| `*.test.ts` | `table`, `leave`, `seating`, `rotation`, `records`, `stats`, `view`, `view.redaction`, `bot`, `bot/*` |
 
 ## `view.ts` / `viewGame.ts` are the security boundary
 

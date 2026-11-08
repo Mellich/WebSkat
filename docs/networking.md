@@ -15,7 +15,7 @@ One Trystero room per table (`tableRoom(key)` = `webskat-t-<KEY>`), plus one sha
 (`webskat-lobby-v1`) for the public table list.
 
 `constants.ts`: `APP_ID = 'webskat-v1-7c2f9a'`, `PROTOCOL_VERSION = 3`, `LOBBY_ROOM`,
-`AD_INTERVAL_MS = 5000`, `AD_TTL_MS = 15000`, `JOIN_TIMEOUT_MS = 15000`.
+`AD_INTERVAL_MS = 5000`, `AD_TTL_MS = 15000`, `JOIN_TIMEOUT_MS = 15000`, `LEAVE_CLOSE_DELAY_MS = 500`.
 
 **Bump `PROTOCOL_VERSION`** whenever a message, command or view changes shape so that old
 browsers cannot talk to new ones. Version history: 1 initial, 2 table bot level (Phase 13),
@@ -122,7 +122,7 @@ HostSnapshot = { table: TableState, tokens: Record<token, PlayerId> }
 
 ```ts
 createClient({ transport, key, name, token?, onToken(token, playerId) }) → GameConnection
-interface GameConnection { playerId(); send(command); subscribe(listener) /* replays */; close() }
+interface GameConnection { playerId(); send(command); subscribe(listener) /* replays */; leave(); close() }
 type ConnectionStatus = 'connecting' | 'connected' | 'host-lost' | 'rejected' | 'kicked' | 'closed'
 type ConnectionEvent = status{status, reason?} | view | records | record | error{code, message}
 ```
@@ -164,6 +164,8 @@ type ConnectionEvent = status{status, reason?} | view | records | record | error
 |---|---|
 | Client reloads | Stored session → `openTable` re-joins with the token → same seat |
 | Client disconnects mid-game | `connected = false`; others see "waiting for X" when it is X's turn; no timers |
+| Client leaves (`leave()`) | Client sends `leave` (if the host is reachable), `ended = true`, closes the room after 500 ms. Host: lobby → seat removed; game running → `leaving`, removed at the next deal |
+| Host leaves (`leave()`) | Same as `stop()`: `closed` to every client |
 | Host reloads / crashes | Clients show `host-lost`; when the host reopens the table it resumes from the snapshot and clients re-join |
 | Wrong key / host offline | `rejected TIMEOUT` after 15 s |
 | Table full | `rejected TABLE_FULL` |

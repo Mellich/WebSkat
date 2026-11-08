@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createFakeNetwork } from '../../net/fake';
 import { createHost } from '../../net/host';
 import { createClient } from '../../net/client';
+import { LEAVE_CLOSE_DELAY_MS } from '../../net/constants';
 import { createTable } from '../../table';
 import { useSession } from './session';
 
@@ -47,6 +48,21 @@ describe('session store', () => {
     expect(state.key).toBeNull();
     expect(state.connection).toBeNull();
     expect(state.view).toBeNull();
+    host.stop();
+  });
+
+  it('tells the host when leaving, so the seat is removed', () => {
+    vi.useFakeTimers();
+    const { net, host } = hostOnNetwork();
+    const client = createClient({ transport: net.transportFor('C'), key: KEY, name: 'Anna', onToken: () => undefined });
+    useSession.getState().attach({ key: KEY, connection: client });
+    net.flush();
+    expect(host.getState().players).toHaveLength(2);
+    useSession.getState().detach('leave');
+    net.flush();
+    expect(host.getState().players.map((p) => p.name)).toEqual(['Host']);
+    vi.advanceTimersByTime(LEAVE_CLOSE_DELAY_MS);
+    vi.useRealTimers();
     host.stop();
   });
 });

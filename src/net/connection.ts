@@ -22,6 +22,8 @@ export interface GameConnection {
   send(command: TableCommand): void;
   /** Replays the latest status and view to a new listener. Returns the unsubscribe function. */
   subscribe(listener: (e: ConnectionEvent) => void): () => void;
+  /** Leaves the table for good: a client tells the host first; the host stops the table. */
+  leave(): void;
   close(): void;
 }
 

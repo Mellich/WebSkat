@@ -2,7 +2,7 @@
 // views it receives. It never changes game state itself.
 
 import type { TableCommand } from '../table';
-import { JOIN_TIMEOUT_MS, PROTOCOL_VERSION, tableRoom } from './constants';
+import { JOIN_TIMEOUT_MS, LEAVE_CLOSE_DELAY_MS, PROTOCOL_VERSION, tableRoom } from './constants';
 import { type ConnectionStatus, type Emitter, type GameConnection, createEmitter } from './connection';
 import { type ClientMessage, HostMessageSchema, cmdMessage } from './protocol';
 import type { RoomHandle, Transport } from './transport';
@@ -22,12 +22,22 @@ export function createClient(opts: ClientOptions): GameConnection {
   let playerId: string | null = null;
   let token: string | undefined = opts.token;
   let closed = false;
+  let leaveTimer: ReturnType<typeof setTimeout> | undefined;
   // After a kick or a closed table the seat is gone for good: do not re-join when other peers arrive.
   let ended = false;
 
   const setStatus = (status: ConnectionStatus, reason?: string): void => {
     emitter.emit(reason === undefined ? { t: 'status', status } : { t: 'status', status, reason });
   };
+
+  function close(): void {
+    if (closed) return;
+    closed = true;
+    clearTimeout(joinTimer);
+    clearTimeout(leaveTimer);
+    room.leave();
+    setStatus('closed');
+  }
 
   const joinTimer = setTimeout(() => {
     if (hostPeer === null && !closed && emitter.latestStatus() === 'connecting') {
@@ -118,12 +128,14 @@ export function createClient(opts: ClientOptions): GameConnection {
       room.send('cmd', cmdMessage(command), hostPeer);
     },
     subscribe: (listener) => emitter.subscribe(listener),
-    close(): void {
-      if (closed) return;
-      closed = true;
-      clearTimeout(joinTimer);
-      room.leave();
-      setStatus('closed');
+    leave(): void {
+      if (closed || leaveTimer !== undefined) return;
+      if (hostPeer !== null && !ended) {
+        room.send('cmd', cmdMessage({ type: 'leave' }), hostPeer);
+      }
+      ended = true;
+      leaveTimer = setTimeout(close, LEAVE_CLOSE_DELAY_MS);
     },
+    close,
   };
 }

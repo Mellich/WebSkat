@@ -81,7 +81,7 @@ export const en = {
   'topbar.status.connected': 'Connected',
   'topbar.status.connecting': 'Connecting',
   'topbar.status.lost': 'Connection lost',
-  'topbar.leaveConfirm': 'Leave the table? A running game continues without you.',
+  'topbar.leaveConfirm': 'Leave the table? If a game is running, your seat stays until the next game is dealt.',
 
   'error.NOT_HOST': 'Only the host can do that.',
   'error.NOT_SEATED': 'Only seated players can do that.',
@@ -133,6 +133,8 @@ export const en = {
   'role.dealer': 'Dealer',
   'role.sittingOut': 'Sitting out',
 
+  'game.abort': 'Abort game',
+  'game.abortConfirm': 'Abort this game? It is not scored, and the next game is dealt.',
   'game.clubs': 'Clubs',
   'game.spades': 'Spades',
   'game.hearts': 'Hearts',

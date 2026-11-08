@@ -12,6 +12,7 @@ import { TrickArea } from '../components/TrickArea';
 import { useT, type Translator } from '../i18n';
 import { useSettings } from '../store/settings';
 import { useSession } from '../store/session';
+import { AbortGameButton } from './AbortGameButton';
 import { BiddingPanel } from './BiddingPanel';
 import { DeclarationPicker } from './DeclarationPicker';
 import { cardName, declarationLabel } from './labels';
@@ -194,6 +195,9 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
       <div className={styles.status}>
         <div className={styles.statusRow} aria-live="polite" data-testid="status-line">
           <span>{statusLine}</span>
+          {view.you.id === view.table.hostId && game.phase !== 'finished' && game.waitingFor !== null ? (
+            <AbortGameButton onAbort={() => { connection.send({ type: 'abort-game' }); }} />
+          ) : null}
           {game.lastTrick === null ? null : (
             <button type="button" aria-pressed={showLast} onClick={() => { setShowLast((v) => !v); }}>{t('trick.last')}</button>
           )}

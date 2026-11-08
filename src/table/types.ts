@@ -14,6 +14,8 @@ export interface Player {
   readonly isBot: boolean;
   /** Strength of a bot (docs/bots.md); absent for humans and read as 'normal' for bots. */
   readonly botLevel?: BotLevel;
+  /** Left during a running game; removed at the next deal (docs/table.md §2). */
+  readonly leaving?: boolean;
 }
 
 /** 'in-game' while a game is dealt, including a finished game that waits for "ready". */

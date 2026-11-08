@@ -147,10 +147,13 @@ function forgetHostSnapshot(key: string): void {
   if (storage !== null) removeHostSnapshot(storage, key);
 }
 
-/** Leaves the current table for good: closes the connection and forgets the seat (or the hosted table). */
+/**
+ * Leaves the current table for good. A client sends `leave` (the host removes the seat at the next
+ * deal); the host closes the table. Either way the seat or the hosted table is forgotten locally.
+ */
 export function leaveTable(): void {
   const { key, host, detach } = useSession.getState();
-  detach();
+  detach('leave');
   if (key === null) return;
   if (host !== null) forgetHostSnapshot(key);
   const storage = browserStorage();

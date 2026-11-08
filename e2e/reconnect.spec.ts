@@ -12,6 +12,28 @@ import {
   type Player,
 } from './helpers';
 
+test.describe('leaving the table', () => {
+  test('a client that leaves the lobby disappears from the host seats', async ({ browser }) => {
+    const players: Player[] = [];
+    try {
+      const host = await newPlayer(browser, 'Hanna');
+      const anna = await newPlayer(browser, 'Anna');
+      const ben = await newPlayer(browser, 'Ben');
+      players.push(host, anna, ben);
+
+      const key = await createTable(host.page);
+      await joinTable(anna.page, key);
+      await joinTable(ben.page, key);
+      await expect(host.page.getByTestId('seat-2')).toBeVisible({ timeout: 15_000 });
+
+      await ben.page.getByTestId('leave-table').click();
+      await expect(host.page.getByTestId('seat-2')).toHaveCount(0, { timeout: 15_000 });
+    } finally {
+      await Promise.all(players.map((p) => p.context.close()));
+    }
+  });
+});
+
 test.describe('reloading during a game', () => {
   test('a client that reloads gets its seat and its hand back', async ({ browser }) => {
     const players: Player[] = [];
