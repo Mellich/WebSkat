@@ -28,7 +28,6 @@ All implementation phases 0–14 of the original plan are done (archive: `histor
 | Full game between two real devices over the internet | Not done (needs real devices) |
 | `abort-game` command | Exists in the table layer; no button in the UI |
 | `leave` command | Exists in the table layer; the UI does not send it (Leave closes the connection instead, see `ui.md` §4) |
-| Seeger score in the result dialog | The dialog shows the standard score only; Seeger is in the Stats dialog |
 | `reducedMotion` setting | Stored, but there is no control for it and nothing reads it |
 
 ## 3. Features

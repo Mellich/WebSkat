@@ -2,9 +2,10 @@
 
 import type { ReactNode } from 'react';
 
-import type { TableView, ViewResult } from '../../table';
+import type { GameRecord, TableView, ViewResult } from '../../table';
 import { CardChips } from '../components/CardChip';
 import { useT, type Translator } from '../i18n';
+import { signed } from '../stats/gameLabel';
 import { declarationLabel } from './labels';
 import { namesById } from './seats';
 import styles from './ResultDialog.module.css';
@@ -12,10 +13,14 @@ import styles from './ResultDialog.module.css';
 export interface ResultDialogProps {
   readonly view: TableView;
   readonly result: ViewResult;
+  /** The finished game's record, or null while it has not arrived yet. */
+  readonly record: GameRecord | null;
+  /** The scoring system chosen in Settings; the table shows its deltas. */
+  readonly scoring: 'seeger' | 'standard';
   readonly onContinue: () => void;
 }
 
-export function ResultDialog({ view, result, onContinue }: ResultDialogProps) {
+export function ResultDialog({ view, result, record, scoring, onContinue }: ResultDialogProps) {
   const t = useT();
   const names = namesById(view);
   const readyIds = new Set(view.table.readyIds);
@@ -60,12 +65,12 @@ export function ResultDialog({ view, result, onContinue }: ResultDialogProps) {
         <p>{t('result.discarded')}: <CardChips cards={game.discarded} /></p>
       )}
       <table className={styles.table}>
-        <caption>{t('result.change')}</caption>
+        <caption>{t('result.changeIn', { system: scoring === 'seeger' ? t('stats.seeger') : t('stats.standard') })}</caption>
         <tbody>
           {view.table.players.map((p) => (
             <tr key={p.id}>
               <td>{p.name}</td>
-              <td>{p.id === result.declarerId ? result.declarerScore : 0}</td>
+              <td>{record === null ? '…' : signed(record.scores[scoring][p.id] ?? 0)}</td>
             </tr>
           ))}
         </tbody>

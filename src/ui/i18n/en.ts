@@ -198,7 +198,7 @@ export const en = {
   'result.skat': 'Skat',
   'result.discarded': 'Discarded',
   'result.player': 'Player',
-  'result.change': 'Score change',
+  'result.changeIn': 'Score change ({system})',
   'result.continue': 'Continue',
   'result.waitingFor': 'Waiting for {names}',
   'result.waitingOthers': 'Waiting for the others…',

@@ -103,7 +103,7 @@ marks it disconnected and it stays seated until kicked. A host that leaves close
 | `cardBack` | 0–3 (2) | yes, with previews |
 | `confirmPlay` | `auto` (two taps on touch) \| `always` \| `never` (`auto`) | yes |
 | `trickDisplayMs` | 0, 300, 600, 1000, 2000 (600) | yes (`setting-trick-display`, "Show finished trick") |
-| `scoring` | `seeger` \| `standard` (`seeger`) | yes (also the toggle in Stats) |
+| `scoring` | `seeger` \| `standard` (`standard`) | yes (also the toggle in Stats; the result dialog reads it) |
 | `reducedMotion` | `system` \| `on` \| `off` (`system`) | **no; currently unused** |
 
 Stored under `webskat.settings`, parsed with zod; invalid data → defaults. Migration: an old

@@ -24,7 +24,7 @@ export function defaultSettings(browserLanguage: string): Settings {
     cardBack: 2,
     confirmPlay: 'auto',
     trickDisplayMs: 600,
-    scoring: 'seeger',
+    scoring: 'standard',
     reducedMotion: 'system',
   };
 }

@@ -199,7 +199,7 @@ export const de: Dict = {
   'result.skat': 'Skat',
   'result.discarded': 'Gedrückt',
   'result.player': 'Spieler',
-  'result.change': 'Punkteänderung',
+  'result.changeIn': 'Punkteänderung ({system})',
   'result.continue': 'Weiter',
   'result.waitingFor': 'Warte auf {names}',
   'result.waitingOthers': 'Warte auf die anderen…',

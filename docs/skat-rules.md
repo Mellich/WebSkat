@@ -345,7 +345,7 @@ where `loseValue` is as in 10.5 (`gameValue` if not overbid).
 "Every other seated player" = both defenders **and** all sitting-out players.
 
 Both systems are computed and stored for every game (`statistics.md`); the UI chooses which
-one to display (default: Seeger–Fabian).
+one to display (default: standard, `decisions.md` I108).
 
 ### 10.7 Worked examples = test vectors
 

@@ -106,8 +106,11 @@ A bottom sheet whose backdrop lets clicks through, so TopBar (Stats, Settings) s
 - Played: headline "{name} won/lost {game}", overbid line (bid vs value), calculation
   ("base × multiplier = value" or the Null value), card points declarer–defenders, tricks, Skat and
   discarded cards as `CardChips`.
-- Score table: one row per seated player with the **standard** delta (declarer's
-  `declarerScore`, others 0). It does not follow the Seeger/standard setting.
+- Score table: one row per seated player with the delta of the **selected** scoring system
+  (setting `scoring`, default standard), taken from the game's `GameRecord` in the session store
+  (`records`, matched by `record.number === game.number`). Cells show `…` until the record has
+  arrived. The caption names the system ("Score change (Standard)" / "Score change (Seeger–Fabian)").
+  The dialog computes no scores itself.
 - **Continue** (`continue`) sends `ready`; then it is disabled and shows "Waiting for: A, B"
   (connected humans not yet ready).
 

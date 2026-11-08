@@ -60,7 +60,7 @@ toggle (the same `scoring` setting as in Settings) and three tabs (`stats-tab-<i
 | `charts` | `ScoreChart.tsx`, `ByType.tsx` | SVG line chart of `series` (geometry in `chartGeometry.ts` `chartPlots`), games by type bars |
 
 Empty state: "No games played yet". The result dialog does **not** use these components
-(`ui-game-screen.md` §7).
+(`ui-game-screen.md` §7); it shows the game's record delta for the selected system.
 
 ## 4. Where records live
 

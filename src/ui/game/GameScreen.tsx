@@ -11,6 +11,7 @@ import { SkatPile } from '../components/SkatPile';
 import { TrickArea } from '../components/TrickArea';
 import { useT, type Translator } from '../i18n';
 import { useSettings } from '../store/settings';
+import { useSession } from '../store/session';
 import { BiddingPanel } from './BiddingPanel';
 import { DeclarationPicker } from './DeclarationPicker';
 import { cardName, declarationLabel } from './labels';
@@ -52,6 +53,8 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
   const t = useT();
   const confirmPlay = useSettings((s) => s.confirmPlay);
   const cardBack = useSettings((s) => s.cardBack);
+  const scoring = useSettings((s) => s.scoring);
+  const records = useSession((s) => s.records);
   const names = namesById(view);
   const nameOf = (id: string): string => names.get(id) ?? '?';
   const viewer = view.you.id;
@@ -235,6 +238,8 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
         <ResultDialog
           view={view}
           result={game.result}
+          record={records.find((r) => r.number === game.number) ?? null}
+          scoring={scoring}
           onContinue={() => {
             connection.send({ type: 'ready' });
           }}

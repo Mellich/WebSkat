@@ -35,9 +35,13 @@ describe('settings persistence', () => {
     expect(loadSettings(memoryStorage({ 'webskat.settings': JSON.stringify(withoutValue) }), 'en').trickDisplayMs).toBe(600);
   });
 
+  it('uses standard scoring by default', () => {
+    expect(defaultSettings('en').scoring).toBe('standard');
+  });
+
   it('round-trips valid settings', () => {
     const storage = memoryStorage();
-    const settings = { ...defaultSettings('en'), name: 'Anna', cardBack: 3 as const, scoring: 'standard' as const };
+    const settings = { ...defaultSettings('en'), name: 'Anna', cardBack: 3 as const, scoring: 'seeger' as const };
     saveSettings(storage, settings);
     expect(loadSettings(storage, 'en')).toEqual(settings);
   });

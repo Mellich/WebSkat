@@ -42,7 +42,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `game/BiddingPanel.tsx` | history + Bid N / Hold / Play (18) / Pass |
 | `game/SkatPanels.tsx` | `SkatDecision` (pick up / Hand), `DiscardPanel` |
 | `game/DeclarationPicker.tsx` | game tiles, extras, floor-value hint, Declare |
-| `game/ResultDialog.tsx` | result sheet, Continue / ready state |
+| `game/ResultDialog.tsx` | result sheet, score table of the selected scoring system, Continue / ready state |
 | `game/useShownTrick.ts` | holds a finished trick for `trickDisplayMs` |
 | `game/seats.ts` | `opponentsOf` (seat order relative to the viewer), `namesById` |
 | `game/labels.ts` | `cardName`, `cardShort`, `declarationLabel`, `spitzenLabel`, `suitKey`, `suitSymbol` |
