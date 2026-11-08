@@ -104,10 +104,10 @@ marks it disconnected and it stays seated until kicked. A host that leaves close
 | `confirmPlay` | `auto` (two taps on touch) \| `always` \| `never` (`auto`) | yes |
 | `trickDisplayMs` | 0, 300, 600, 1000, 2000 (600) | yes (`setting-trick-display`, "Show finished trick") |
 | `scoring` | `seeger` \| `standard` (`standard`) | yes (also the toggle in Stats; the result dialog reads it) |
-| `reducedMotion` | `system` \| `on` \| `off` (`system`) | **no; currently unused** |
-
 Stored under `webskat.settings`, parsed with zod; invalid data → defaults. Migration: an old
 `botDelayMs` value is copied to `trickDisplayMs`.
+
+Motion follows the system setting (`prefers-reduced-motion` rule in `styles/global.css`); there is no app setting for it.
 
 ## 7. Persistence (`persist/`)
 

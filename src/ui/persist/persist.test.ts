@@ -54,6 +54,13 @@ describe('settings persistence', () => {
   ])('falls back to the defaults for %s', (_name, raw) => {
     expect(loadSettings(memoryStorage({ 'webskat.settings': raw }), 'de')).toEqual(defaultSettings('de'));
   });
+
+  it('ignores the removed reducedMotion field of old settings', () => {
+    const old = { ...defaultSettings('en'), name: 'Anna', reducedMotion: 'on' };
+    const loaded = loadSettings(memoryStorage({ 'webskat.settings': JSON.stringify(old) }), 'en');
+    expect(loaded).toEqual({ ...defaultSettings('en'), name: 'Anna' });
+    expect('reducedMotion' in loaded).toBe(false);
+  });
 });
 
 describe('session persistence', () => {

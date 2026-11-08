@@ -10,7 +10,6 @@ export const SettingsSchema = z.object({
   confirmPlay: z.enum(['auto', 'always', 'never']),
   trickDisplayMs: z.union([z.literal(0), z.literal(300), z.literal(600), z.literal(1000), z.literal(2000)]).default(600),
   scoring: z.enum(['seeger', 'standard']),
-  reducedMotion: z.enum(['system', 'on', 'off']),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -25,7 +24,6 @@ export function defaultSettings(browserLanguage: string): Settings {
     confirmPlay: 'auto',
     trickDisplayMs: 600,
     scoring: 'standard',
-    reducedMotion: 'system',
   };
 }
 
