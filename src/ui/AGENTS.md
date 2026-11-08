@@ -31,13 +31,13 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 
 | Path | Contents |
 |---|---|
-| `router.ts` | `Route`, `parseRoute`, `useRoute`, `navigate`, `tableHash` |
+| `router.ts` | `Route` (table route carries `invite`), `parseRoute`, `useRoute`, `navigate`, `tableHash(key, invite?)` |
 | `assets.ts` | `cardUrl`, `backUrl`, `logoUrl`, `BackIndex`, `DEFAULT_BACK` |
 | `preload.ts` | `cardImageUrls(back)`, `preloadImages(urls)`: loads card faces and back once per page |
 | `cardNames.ts` | `cardLabel` (English fallback card name, default prop of components) |
 | `classNames.ts` | `cls(...)` joins class names |
 | `screens/Home.tsx` | start page: name, rejoin/resume, create, join by key, public list, About |
-| `screens/TableScreen.tsx` | `#/t/KEY`: name form, `openTable`, TopBar, connection banner, lobby or game |
+| `screens/TableScreen.tsx` | `#/t/KEY`: name form, `openTable(key, name, invite)`, TopBar, connection banner (Retry for `TIMEOUT`), lobby or game |
 | `screens/TableLobby.tsx` | key + copy, seats, bot strength selects, Add bot, Start, Kick |
 | `game/GameScreen.tsx` | in-game layout, bid bubbles, phase panel switch, hand, result |
 | `game/StatusArea.tsx` (+ `.module.css`) | status line row, declarer summary (`bid-summary`), sitting-out line |
@@ -54,11 +54,11 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `game/seats.ts` | `opponentsOf` (seat order relative to the viewer), `namesById` |
 | `game/trickPositions.ts` | `trickSeats` (who is left / right / bottom), `placeTrick` (plays → positions) |
 | `game/labels.ts` | `cardName`, `cardShort`, `declarationLabel`, `spitzenLabel`, `suitKey`, `suitSymbol` |
-| `components/` | `Card` (`disabled` = button that cannot be clicked), `Hand` (interactive hands are all buttons), `OpponentSeat`, `TrickArea`, `SkatPile`, `SpeechBubble`, `CardChip(s)`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog` (+ `.module.css`) |
+| `components/` | `Card` (`disabled` = button that cannot be clicked), `Hand` (interactive hands are all buttons), `OpponentSeat`, `TrickArea`, `SkatPile`, `SpeechBubble`, `CardChip(s)`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` (+ `PlayerRow`, `ReplaceChooser`, `InviteBox`; `PlayersDialog.module.css`) |
 | `stats/` | `StatsPanel`, `Standings`, `History`, `ScoreChart`, `ByType`, `chartGeometry.ts`, `gameLabel.ts` |
 | `store/session.ts` | `useSession` (connection, host, status, view, records, toasts), `errorText` |
 | `store/settings.ts` | `useSettings` (settings + `update`) |
-| `persist/` | `storage.ts` (`browserStorage`), `settings.ts`, `session.ts`, `hosted.ts` (host snapshots + migration), `records.ts` (record cache) |
+| `persist/` | `storage.ts` (`browserStorage`), `settings.ts`, `session.ts`, `hosted.ts` (host snapshots), `hostedMigrate.ts` (`migrateSnapshot`, all snapshot upgrades), `records.ts` (record cache) |
 | `net/actions.ts` | `hostTable`, `openTable`, `resumeHostedTable`, `leaveTable` |
 | `net/transport.ts` | `getTransport()` (one Trystero transport per page) |
 | `i18n/` | `en.ts` (source, `TranslationKey`), `de.ts`, `index.ts` (`translate`, `useT`, `translateNow`, `Language`) |

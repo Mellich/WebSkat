@@ -60,6 +60,12 @@ describe('links and room names', () => {
     expect(joinLink('abcdefgh', 'https://example.org/webskat/')).toBe('https://example.org/webskat/#/t/ABCD-EFGH');
   });
 
+  it('adds the invite code to the join link', () => {
+    expect(joinLink('abcdefgh', 'https://example.org/webskat/', 'wxyz2345')).toBe(
+      'https://example.org/webskat/#/t/ABCD-EFGH?invite=WXYZ-2345',
+    );
+  });
+
   it('builds the room name from the normalized key', () => {
     expect(tableRoom('abcd-efgh')).toBe('webskat-t-ABCDEFGH');
   });

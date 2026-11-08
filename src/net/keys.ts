@@ -29,7 +29,11 @@ export function generateKey(randomBytes: (n: number) => Uint8Array): string {
   return formatKey(key);
 }
 
-/** Link that opens the table in the app (`base` is e.g. `location.origin + location.pathname`). */
-export function joinLink(key: string, base: string): string {
-  return `${base}#/t/${formatKey(key)}`;
+/**
+ * Link that opens the table in the app (`base` is e.g. `location.origin + location.pathname`).
+ * With an invite code the link takes over a disconnected player's seat.
+ */
+export function joinLink(key: string, base: string, invite?: string): string {
+  const query = invite === undefined ? '' : `?invite=${formatKey(invite)}`;
+  return `${base}#/t/${formatKey(key)}${query}`;
 }

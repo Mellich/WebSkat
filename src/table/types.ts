@@ -49,12 +49,18 @@ export interface TableState {
   readonly seq: number; // increments on every state change
 }
 
+/** Who takes a seat in `replace-player`: a player waiting at the table, or a new bot. */
+export type ReplaceBy =
+  | { readonly kind: 'pending'; readonly playerId: PlayerId }
+  | { readonly kind: 'bot'; readonly level: BotLevel };
+
 export type TableCommand =
   | { readonly type: 'start' }
   | { readonly type: 'game'; readonly action: GameAction }
   | { readonly type: 'ready' }
   | { readonly type: 'abort-game' }
   | { readonly type: 'kick'; readonly playerId: PlayerId }
+  | { readonly type: 'replace-player'; readonly playerId: PlayerId; readonly by: ReplaceBy }
   | { readonly type: 'add-bot' }
   | { readonly type: 'set-bot-level'; readonly playerId: PlayerId; readonly level: BotLevel }
   | { readonly type: 'leave' };

@@ -16,6 +16,9 @@ describe('client messages', () => {
     ['a discard', { t: 'cmd', command: { type: 'game', action: { type: 'discard', cards: ['CJ', 'S10'] } } }],
     ['a declaration', { t: 'cmd', command: { type: 'game', action: { type: 'declare', declaration: { kind: 'null', hand: false, ouvert: false } } } }],
     ['a kick', { t: 'cmd', command: { type: 'kick', playerId: 'p2' } }],
+    ['a replacement by a waiting player', { t: 'cmd', command: { type: 'replace-player', playerId: 'p2', by: { kind: 'pending', playerId: 'cid' } } }],
+    ['a replacement by a bot', { t: 'cmd', command: { type: 'replace-player', playerId: 'p2', by: { kind: 'bot', level: 'easy' } } }],
+    ['a join with an invite', { t: 'join', v: 4, name: 'Anna', token: TOKEN, invite: 'ABCD-EFGH' }],
   ])('accepts %s', (_name, message) => {
     expect(ClientMessageSchema.safeParse(message).success).toBe(true);
   });
@@ -33,6 +36,10 @@ describe('client messages', () => {
     ['a missing command', { t: 'cmd' }],
     ['a non-object', 'join'],
     ['a discard with only one card', { t: 'cmd', command: { type: 'game', action: { type: 'discard', cards: ['CJ'] } } }],
+    ['a replacement with an unknown kind', { t: 'cmd', command: { type: 'replace-player', playerId: 'p2', by: { kind: 'ghost' } } }],
+    ['a bot replacement with an unknown level', { t: 'cmd', command: { type: 'replace-player', playerId: 'p2', by: { kind: 'bot', level: 'expert' } } }],
+    ['a replacement without a target', { t: 'cmd', command: { type: 'replace-player', by: { kind: 'bot', level: 'easy' } } }],
+    ['a join with an invalid invite', { t: 'join', v: 4, name: 'Anna', invite: '0OOO-1111' }],
   ])('rejects %s', (_name, message) => {
     expect(ClientMessageSchema.safeParse(message).success).toBe(false);
   });
@@ -122,5 +129,11 @@ describe('real views and records from the table layer', () => {
     const s = playedPassIn();
     expect(s.records).toHaveLength(1);
     expect(GameRecordSchema.safeParse(s.records[0]).success).toBe(true);
+  });
+});
+
+describe('rejections', () => {
+  it('accepts the invite rejection', () => {
+    expect(HostMessageSchema.safeParse({ t: 'rejected', reason: 'INVITE_INVALID' }).success).toBe(true);
   });
 });

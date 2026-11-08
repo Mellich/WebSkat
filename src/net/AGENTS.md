@@ -31,7 +31,7 @@ Read first: `docs/networking.md` and `docs/architecture.md` §3–4. Visibility 
 
 | File | Contents |
 |---|---|
-| `constants.ts` | `APP_ID`, `PROTOCOL_VERSION`, `LOBBY_ROOM`, `AD_INTERVAL_MS`, `AD_TTL_MS`, `JOIN_TIMEOUT_MS`, `tableRoom(key)` |
+| `constants.ts` | `APP_ID`, `PROTOCOL_VERSION`, `LOBBY_ROOM`, `AD_INTERVAL_MS`, `AD_TTL_MS`, `JOIN_TIMEOUT_MS`, `LEAVE_CLOSE_DELAY_MS`, `tableRoom(key)` |
 | `transport.ts` | `Channel`, `RoomHandle`, `Transport` interfaces (no library imports) |
 | `trysteroTransport.ts` | `createTrysteroTransport(config)`: Nostr or ws-relay, shared rooms per id, TURN |
 | `signalingConfig.ts` | `SignalingConfig`, `signalingConfigFrom(env)` (pure) |
@@ -40,14 +40,17 @@ Read first: `docs/networking.md` and `docs/architecture.md` §3–4. Visibility 
 | `schemaView.ts` | `TableViewSchema`, `GameRecordSchema` and nested schemas |
 | `protocol.ts` | message schemas (`ClientMessageSchema`, `HostMessageSchema`, `AdSchema`, …), types, builders `cmdMessage`, `viewMessage`, `recordMessage` |
 | `connection.ts` | `ConnectionStatus`, `ConnectionEvent`, `GameConnection`, `createEmitter` (replays status/records/view) |
-| `host.ts` | `createHost` → `Host` (`connection`, `stop`, `getState`, `snapshot`), `HostSnapshot` |
+| `host.ts` | `createHost` → `Host` (`connection`, `stop`, `getState`, `snapshot`, `invite`), `HostSnapshot`; joins (token or invite), kicked notices |
+| `peers.ts` | `createPeerMap()`: peer ↔ player bookkeeping (`bind`, `unbindPlayer`, `dropPeer`) |
+| `advertise.ts` | `startAdvertising({lobby, getState, hostId, now})`: lobby ads for public tables |
+| `invites.ts` | `createInvites(initial, newCode)`: single-use invite codes of disconnected players (`create`, `take`, `forget`, `toJSON`) |
 | `client.ts` | `createClient` → `GameConnection` (`leave()` sends `leave`, then closes after `LEAVE_CLOSE_DELAY_MS`) |
 | `directory.ts` | `createDirectory(lobby, onChange)`, `TableAd` (public table list) |
-| `keys.ts` | `KEY_ALPHABET`, `normalizeKey`, `formatKey`, `isValidKey`, `generateKey`, `joinLink` |
+| `keys.ts` | `KEY_ALPHABET`, `normalizeKey`, `formatKey`, `isValidKey`, `generateKey`, `joinLink(key, base, invite?)` |
 | `random.ts` | `randomBytes`, `randomHex`, `randomUint32` (Web Crypto) |
 | `index.ts` | public re-exports (not `fake.ts`, not `testing.ts`) |
 | `testing.ts` | test rig: `createRig`, `joinClient`, `settle`, `lastView`, `statusOf`, `errorsOf`, `nextCommand`, `CARD_PATTERN`, `KEY` |
-| `*.test.ts` | `protocol`, `keys`, `signalingConfig`, `directory`, `host`, `integration` (full game, no foreign cards), `resume` |
+| `*.test.ts` | `protocol`, `keys`, `signalingConfig`, `directory`, `host`, `integration` (full game, no foreign cards), `resume`, `invite` (invites and replacement over the wire) |
 
 ## Testing
 

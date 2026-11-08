@@ -6,7 +6,7 @@ import type { BotLevel } from '../table';
 
 export type Route =
   | { readonly kind: 'home' }
-  | { readonly kind: 'table'; readonly key: string }
+  | { readonly kind: 'table'; readonly key: string; readonly invite: string | null }
   | { readonly kind: 'dev-local'; readonly seed: number | null; readonly players: number; readonly bots: BotLevel }
   | { readonly kind: 'dev-gallery' };
 
@@ -28,7 +28,12 @@ export function parseRoute(hash: string): Route {
   const table = /^\/t\/([^/]+)$/.exec(path);
   const raw = table?.[1];
   if (raw !== undefined && isValidKey(decodeURIComponent(raw))) {
-    return { kind: 'table', key: normalizeKey(decodeURIComponent(raw)) };
+    const invite = new URLSearchParams(query).get('invite');
+    return {
+      kind: 'table',
+      key: normalizeKey(decodeURIComponent(raw)),
+      invite: invite !== null && isValidKey(invite) ? normalizeKey(invite) : null,
+    };
   }
   return { kind: 'home' };
 }
@@ -49,6 +54,8 @@ export function navigate(hash: string): void {
   window.location.hash = hash;
 }
 
-export function tableHash(key: string): string {
-  return `#/t/${normalizeKey(key)}`;
+/** `#/t/KEY`, or `#/t/KEY?invite=CODE` when an invite code is given (docs/ui.md §1). */
+export function tableHash(key: string, invite?: string): string {
+  const query = invite === undefined ? '' : `?invite=${normalizeKey(invite)}`;
+  return `#/t/${normalizeKey(key)}${query}`;
 }

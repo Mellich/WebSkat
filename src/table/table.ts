@@ -10,6 +10,7 @@ import {
   type Result,
 } from '../engine';
 import { makeRecord } from './records';
+import { replacePlayer } from './replace';
 import { pickFirstDealer, roleOf, rolesForDealer } from './rotation';
 import {
   MAX_SEATS,
@@ -240,6 +241,10 @@ export function applyCommand(
       return abortGame(s, actor, ctx);
     case 'kick':
       return kick(s, actor, c.playerId, ctx);
+    case 'replace-player': {
+      const replaced = replacePlayer(s, actor, c.playerId, c.by);
+      return replaced.ok ? plain(tryDeal(replaced.value, ctx)) : replaced;
+    }
     case 'add-bot':
       return actor === s.hostId ? addBot(s) : notHost();
     case 'set-bot-level':

@@ -7,7 +7,7 @@ import { cls } from '../classNames';
 import { useT, type Translator } from '../i18n';
 import type { TranslationKey } from '../i18n/en';
 import { leaveTable, openTable } from '../net/actions';
-import { navigate } from '../router';
+import { navigate, tableHash } from '../router';
 import { cardImageUrls, preloadImages } from '../preload';
 import { useSession } from '../store/session';
 import { useSettings } from '../store/settings';
@@ -15,7 +15,7 @@ import { GameScreen } from '../game/GameScreen';
 import { TableLobby } from './TableLobby';
 import styles from './TableScreen.module.css';
 
-export function TableScreen({ tableKey }: { readonly tableKey: string }) {
+export function TableScreen({ tableKey, invite }: { readonly tableKey: string; readonly invite: string | null }) {
   const t = useT();
   const attachedKey = useSession((s) => s.key);
   const connection = useSession((s) => s.connection);
@@ -32,8 +32,13 @@ export function TableScreen({ tableKey }: { readonly tableKey: string }) {
   const attached = attachedKey === tableKey && connection !== null;
   useEffect(() => {
     if (attached || name === '') return;
-    void openTable(tableKey, name);
-  }, [attached, name, tableKey]);
+    void openTable(tableKey, name, invite);
+  }, [attached, name, tableKey, invite]);
+
+  // The invite is used up once connected: drop it from the URL so a reload uses the new token.
+  useEffect(() => {
+    if (status === 'connected' && invite !== null) navigate(tableHash(tableKey));
+  }, [status, invite, tableKey]);
 
   if (!attached) {
     return name === '' ? <NameForm tableKey={tableKey} /> : <p className={styles.note}>{t('table.loading')}</p>;
@@ -65,6 +70,7 @@ const REJECTION_KEYS: Readonly<Record<string, TranslationKey>> = {
   TABLE_FULL: 'table.rejected.TABLE_FULL',
   PROTOCOL_MISMATCH: 'table.rejected.PROTOCOL_MISMATCH',
   BAD_NAME: 'table.rejected.BAD_NAME',
+  INVITE_INVALID: 'table.rejected.INVITE_INVALID',
 };
 
 /** The part of a form event that the handlers use. */
@@ -103,9 +109,22 @@ function ConnectionBanner({ status, reason }: { readonly status: ConnectionStatu
   const text = bannerText(status, reason, t);
   if (text === null) return null;
   const leaving = status === 'rejected' || status === 'kicked' || status === 'closed' || status === 'host-lost';
+  const retry = status === 'rejected' && reason === 'TIMEOUT';
   return (
     <div className={styles.banner} role="alert" data-testid="connection-banner">
       <span>{text}</span>
+      {retry ? (
+        <button
+          type="button"
+          data-testid="retry-join"
+          onClick={() => {
+            // Dropping the connection makes the effect in TableScreen join again.
+            useSession.getState().detach();
+          }}
+        >
+          {t('table.retry')}
+        </button>
+      ) : null}
       {leaving ? (
         <button
           type="button"

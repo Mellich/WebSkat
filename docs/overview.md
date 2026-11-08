@@ -39,7 +39,7 @@ All implementation phases 0–14 of the original plan are done (archive: `histor
 | F6 | Scoring: game value, overbidding, Schneider/Schwarz; standard and Seeger–Fabian | `skat-rules.md` §10 |
 | F7 | Table statistics: standings, history, chart | `statistics.md` |
 | F8 | Geberskat for 4–6 players | `skat-rules.md` §9, `table.md` |
-| F9 | Reconnect after reload (clients and host); players can join between games | `networking.md` §8 |
+| F9 | Reconnect after reload (clients and host); players can join between games; the host replaces a player who is gone (a waiting player or a bot) and invites a disconnected player again by code or link | `networking.md` §4, §8, §9; `table.md` §3 |
 | F10 | Card back choice, EN/DE, trick display time, two-tap play | `ui.md` §6 |
 | F11 | Bots with per-bot strength set by the host in the lobby | `bots.md` |
 | F12 | Offline practice (DEV builds): `#/dev/local` | `ui.md` §8 |

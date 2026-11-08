@@ -51,11 +51,17 @@ function startOnce(key: string, start: () => Promise<void>): Promise<void> {
   return promise;
 }
 
-function startHost(transport: Transport, table: TableState, tokens: HostSnapshot['tokens']): Host {
+function startHost(
+  transport: Transport,
+  table: TableState,
+  tokens: HostSnapshot['tokens'],
+  invites: HostSnapshot['invites'] = {},
+): Host {
   return createHost({
     transport,
     table,
     tokens,
+    invites,
     now: () => Date.now(),
     randomSeed: randomUint32,
 
@@ -93,7 +99,7 @@ async function attachResumedHost(snapshot: HostSnapshot): Promise<void> {
   if (useSession.getState().key === key) return;
   const transport = await getTransport();
   const resumed = resumableSnapshot(snapshot);
-  const host = startHost(transport, resumed.table, resumed.tokens);
+  const host = startHost(transport, resumed.table, resumed.tokens, resumed.invites);
   useSession.getState().attach({ key, connection: host.connection, host });
 }
 
@@ -106,8 +112,8 @@ export async function resumeHostedTable(key: string): Promise<boolean> {
   return true;
 }
 
-/** Joins a table by key as a client. A stored token reclaims an old seat. */
-async function attachClient(key: string, name: string, token: string | undefined): Promise<void> {
+/** Joins a table by key as a client. A stored token reclaims an old seat; an invite takes one over. */
+async function attachClient(key: string, name: string, token: string | undefined, invite: string | null): Promise<void> {
   const transport = await getTransport();
   const storage = browserStorage();
   const connection = createClient({
@@ -115,6 +121,7 @@ async function attachClient(key: string, name: string, token: string | undefined
     key,
     name,
     ...(token === undefined ? {} : { token }),
+    ...(invite === null ? {} : { invite }),
     onToken: (newToken) => {
       if (storage !== null) saveSession(storage, { key, name, token: newToken });
     },
@@ -124,9 +131,10 @@ async function attachClient(key: string, name: string, token: string | undefined
 
 /**
  * Opens a table for the table route: if this browser hosts it, the host is resumed; otherwise it
- * joins as a client, reclaiming the seat with the stored token when there is one.
+ * joins as a client. With an invite it takes over that seat (the stored token is ignored), else
+ * the stored token reclaims the old seat.
  */
-export function openTable(key: string, name: string): Promise<void> {
+export function openTable(key: string, name: string, invite: string | null = null): Promise<void> {
   return startOnce(key, async () => {
     const storage = browserStorage();
     const snapshot = storage === null ? null : loadHostSnapshot(storage, key);
@@ -135,7 +143,8 @@ export function openTable(key: string, name: string): Promise<void> {
       return;
     }
     const stored = storage === null ? null : loadSession(storage);
-    await attachClient(key, name, stored?.key === key ? stored.token : undefined);
+    const token = invite === null && stored?.key === key ? stored.token : undefined;
+    await attachClient(key, name, token, invite);
   });
 }
 

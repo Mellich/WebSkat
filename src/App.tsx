@@ -25,7 +25,7 @@ export function App() {
   const screen = (() => {
     switch (route.kind) {
       case 'table':
-        return <TableScreen tableKey={route.key} />;
+        return <TableScreen tableKey={route.key} invite={route.invite} />;
       case 'dev-gallery':
         return DevGallery === null ? <Home /> : <DevGallery />;
       case 'dev-local':

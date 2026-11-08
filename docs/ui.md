@@ -9,12 +9,13 @@ React 19 function components, plain CSS modules, zustand stores. File map and fo
 ## 1. Routes (`router.ts`, `App.tsx`)
 
 No router library. `useRoute()` reads `location.hash` (`useSyncExternalStore`);
-`navigate(hash)` sets it; `tableHash(key)` → `#/t/<KEY>`.
+`navigate(hash)` sets it; `tableHash(key, invite?)` → `#/t/<KEY>` or `#/t/<KEY>?invite=<CODE>`.
 
 | Hash | Route | Screen |
 |---|---|---|
 | `#/` or anything unknown | `home` | `screens/Home.tsx` |
-| `#/t/ABCD-EFGH` (any case, dash optional) | `table` (key normalized) | `screens/TableScreen.tsx` |
+| `#/t/ABCD-EFGH` (any case, dash optional) | `table` (key normalized, `invite` null) | `screens/TableScreen.tsx` |
+| `#/t/ABCD-EFGH?invite=WXYZ-2345` | `table` with `invite` (normalized; an invalid code is ignored) | same; the invite is taken over, then dropped from the URL |
 | `#/dev/local?seed=N&players=3..6&bots=easy\|normal\|strong` | `dev-local` | `dev/DevLocal.tsx` (DEV builds only, else Home) |
 | `#/dev/gallery` | `dev-gallery` | `dev/Gallery.tsx` (DEV builds only, else Home) |
 
@@ -30,8 +31,9 @@ Top to bottom:
    (`webskat.host.*`) exist: "Rejoin table KEY" and "Resume hosted table KEY" buttons.
 4. **Create a table**: table name (default "<name>'s table", max 40) and "List publicly". No seat
    count, no bot strength. Calls `hostTable` and opens `#/t/KEY` (`create-table`).
-5. **Join with a key**: input (`join-key-input`, upper-cased while typing) + Join
-   (`join-submit`); invalid key → inline error `home.invalidKey`.
+5. **Join with a key**: input (`join-key-input`, upper-cased while typing) + optional invite code
+   (`join-invite-input`, `home.inviteCode`) + Join (`join-submit`); invalid key → inline error
+   `home.invalidKey`; invalid invite → `home.invalidInvite`; valid → `#/t/KEY?invite=CODE`.
 6. **Public tables**: live list from `createDirectory` (`public-table` rows: name, host, seats
    `n/6`, `public-join` button). "Looking for public tables…" until the first ad arrives, then "No
    public tables found yet" when empty.
@@ -45,17 +47,35 @@ exists, Home navigates to that table (`decisions.md` I80).
 
 `TableScreen` for `#/t/KEY`:
 - No stored name → a small name form, then join.
-- Otherwise `openTable(key, name)` once (§4), "Connecting…" until attached.
+- Otherwise `openTable(key, name, invite)` once (§4), "Connecting…" until attached.
+- With an invite, once `connected` the route is replaced by `#/t/KEY` (the used code leaves the
+  URL, so a reload uses the new token).
 - Always shows `TopBar` and, for non-`connected` statuses, a `connection-banner` (connecting,
-  host lost, rejected with reason text, kicked, closed) with a Back/Leave button.
+  host lost, rejected with reason text, kicked, closed) with a Back/Leave button. A
+  `rejected TIMEOUT` also shows **Retry** (`retry-join`): it drops the connection, and the effect
+  joins again with the stored session. `INVITE_INVALID` has its own text.
 - Shows `TableLobby` while `view.table.status === 'lobby'`, the viewer is `pending`, or there is
   no game; otherwise `GameScreen` (keyed by game number, so each game starts with fresh local
   state). During a game the screen is fixed to `100dvh` and never scrolls.
 
 `TopBar` (`components/TopBar.tsx`): table name, key, connection dot + text
-(`connection-status`, `data-state` ok/wait/bad), buttons Stats (`open-stats`), Settings
-(`open-settings`), Leave (`leave-table`; asks for confirmation while a game runs). On narrow or
-compact-landscape screens the buttons show icons only (📊 ⚙ ⎋) with `aria-label`s.
+(`connection-status`, `data-state` ok/wait/bad), buttons Stats (`open-stats`), Players
+(`open-players`), Settings (`open-settings`), Leave (`leave-table`; asks for confirmation while a
+game runs). On narrow or compact-landscape screens the buttons show icons only (📊 👥 ⚙ ⎋) with
+`aria-label`s.
+
+`PlayersDialog` (`components/PlayersDialog.tsx`, Esc closes; split into `PlayerRow.tsx`,
+`ReplaceChooser.tsx`, `InviteBox.tsx`): opened from the top bar with the live view and the
+connection; `invite` is `host.invite` for the host and `null` for guests.
+- Seats (`players-row-<seat>`): name, host and bot badges, role in the running game
+  (`role.*`, "Sitting out"), online dot.
+- Host, per non-host seat: during a running game **Replace** (`replace-<seat>`) → chooser
+  (`replace-with`: each waiting player, or Bot; `replace-level` picks the strength when Bot is chosen, default normal;
+  `replace-confirm` sends `replace-player`). Otherwise **Kick** (`players-kick-<seat>`, confirm dialog).
+- Host, disconnected human: **Invite again** (`reinvite-<seat>`) → `invite-code` (formatted) and
+  `invite-link` with copy buttons; `null` → `players.inviteFailed`.
+- Waiting players in `players-pending` with `players.pendingHint`.
+- Host, running game: the abort button (`players-abort-game`, plan 03's `AbortGameButton`).
 
 `TableLobby`:
 - Key `ABCD-EFGH` (`table-key`) with Copy key / Copy link (clipboard API; not available on
@@ -64,7 +84,7 @@ compact-landscape screens the buttons show icons only (📊 ⚙ ⎋) with `aria-
   online dot, Kick button (host, not for the host; confirm dialog).
 - Bot strength: host gets a `<select>` per bot (`bot-level-<seat>`, Easy/Normal/Strong, sends
   `set-bot-level`); others see the level as text.
-- Pending players listed below the seats.
+- Pending players listed below the seats (the Players dialog shows them too).
 - Host: **Add bot** (`add-bot`, disabled when full or a game is running), **Start game**
   (`start-game`, enabled with ≥ 3 seated players or bots) + hint. Others: "Waiting for the host…"
   or, when pending, "You'll be seated when the current game ends".
@@ -76,7 +96,7 @@ compact-landscape screens the buttons show icons only (📊 ⚙ ⎋) with `aria-
 |---|---|
 | `getTransport()` | One Trystero transport per page, from `signalingConfigFrom(import.meta.env)` |
 | `hostTable({hostName, tableName, isPublic})` | New key, `createTable` (host id `h<hex>`), `createHost` (with lobby, `Date.now`, `randomUint32`, debounced snapshot save), attaches it to the session store, returns the key |
-| `openTable(key, name)` | Host snapshot for the key → resume as host; else join as client with the stored token if the session is for this key |
+| `openTable(key, name, invite = null)` | Host snapshot for the key → resume as host; else join as client: with an invite it takes over that seat (the stored token is ignored), otherwise with the stored token if the session is for this key |
 | `resumeHostedTable(key)` | Resume from a snapshot (Home "Resume" button) |
 | `leaveTable()` | Detach with `leave`: a client sends the `leave` command, the host stops the table; delete the host snapshot (host) or the client session |
 | `startOnce(key, fn)` (internal) | Merges concurrent starts for one key (React StrictMode runs effects twice) |
@@ -120,7 +140,7 @@ blocked) and the `persist/*` modules. Values are validated on read.
 |---|---|---|
 | `webskat.settings` | `settings.ts` | settings (zod) |
 | `webskat.session` | `session.ts` | `{key, name, token}` of the client seat (zod) |
-| `webskat.host.<KEY>` | `hosted.ts` | `HostSnapshot` (shape guard `isTableState`; migrates the old table-wide `botLevel`) |
+| `webskat.host.<KEY>` | `hosted.ts` | `HostSnapshot` (shape guard `isTableState`; the `invites` field is optional, so old snapshots load). Upgrades live in `hostedMigrate.ts` (`migrateSnapshot`: the old table-wide `botLevel`) |
 | `webskat.records.<KEY>` | `records.ts` | cached records, max 500 (zod) |
 
 ## 8. Dev screens (DEV builds only, lazy imports removed from production)
@@ -157,7 +177,7 @@ blocked) and the `persist/*` modules. Values are validated on read.
 | `SpeechBubble` | bid bubble with a tail toward the speaker; positioned by `GameScreen` (`bid-bubble-*`), `aria-hidden` |
 | `SkatPile` | two backs during bidding / Skat decision |
 | `CardChip`, `CardChips` | card as text chip `♥10` with full name as `aria-label`/`title` |
-| `TopBar`, `Toasts`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog` | Dialogs close on Esc |
+| `TopBar`, `Toasts`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` | Dialogs close on Esc |
 | `stats/*` | `statistics.md` §3 |
 
 Styling: `styles/tokens.css` (colors, `--card-w` etc.), `styles/global.css` (includes a

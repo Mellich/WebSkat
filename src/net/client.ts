@@ -12,6 +12,8 @@ export interface ClientOptions {
   readonly key: string;
   readonly name: string;
   readonly token?: string;
+  /** Invite code from a link: takes over a disconnected player's seat (docs/networking.md §4). */
+  readonly invite?: string;
   readonly onToken: (token: string, playerId: string) => void;
 }
 
@@ -21,6 +23,7 @@ export function createClient(opts: ClientOptions): GameConnection {
   let hostPeer: string | null = null;
   let playerId: string | null = null;
   let token: string | undefined = opts.token;
+  let invite: string | undefined = opts.invite;
   let closed = false;
   let leaveTimer: ReturnType<typeof setTimeout> | undefined;
   // After a kick or a closed table the seat is gone for good: do not re-join when other peers arrive.
@@ -46,9 +49,13 @@ export function createClient(opts: ClientOptions): GameConnection {
   }, JOIN_TIMEOUT_MS);
 
   function sendJoin(peer: string): void {
-    const join: ClientMessage = token === undefined
-      ? { t: 'join', v: PROTOCOL_VERSION, name: opts.name }
-      : { t: 'join', v: PROTOCOL_VERSION, name: opts.name, token };
+    const join: ClientMessage = {
+      t: 'join',
+      v: PROTOCOL_VERSION,
+      name: opts.name,
+      ...(token === undefined ? {} : { token }),
+      ...(invite === undefined ? {} : { invite }),
+    };
     room.send('cmd', join, peer);
   }
 
@@ -61,6 +68,7 @@ export function createClient(opts: ClientOptions): GameConnection {
         hostPeer = from;
         playerId = msg.playerId;
         token = msg.token;
+        invite = undefined;
         clearTimeout(joinTimer);
         setStatus('connected');
         opts.onToken(msg.token, msg.playerId);

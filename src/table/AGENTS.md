@@ -20,8 +20,9 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 
 | File | Contents |
 |---|---|
-| `types.ts` | `PlayerId`, `BotLevel`, `Player`, `TableStatus`, `ActiveGame`, `TableState`, `TableCommand`, `Ctx`, `TableErrorCode`, `GameKindLabel`, `ScoreDeltas`, `GameRecord`, `SUIT_LABELS` |
+| `types.ts` | `PlayerId`, `BotLevel`, `Player`, `TableStatus`, `ActiveGame`, `TableState`, `TableCommand`, `ReplaceBy`, `Ctx`, `TableErrorCode`, `GameKindLabel`, `ScoreDeltas`, `GameRecord`, `SUIT_LABELS` |
 | `table.ts` | `createTable`, `applyCommand` (the reducer), `dealNext`, `tryDeal`, `CommandResult` |
+| `replace.ts` | `replacePlayer` (`replace-player`: a waiting player or a bot takes the seat, role, sitting-out and dealer slot) |
 | `seating.ts` | `MIN_SEATS`, `MAX_SEATS`, `MAX_NAME_LENGTH`, `allPlayers`, `touch`, `uniqueName`, `addPlayer`, `removePlayer`, `setConnected`, `markLeaving`, `removeLeavers` |
 | `rotation.ts` | `pickFirstDealer`, `sittingOutSeats`, `rolesForDealer`, `roleOf` (Geberskat) |
 | `records.ts` | `seegerBonus`, `gameKindOf`, `makeRecord` |
@@ -34,7 +35,7 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 | `index.ts` | public re-exports (also `BotView` type) |
 | `testing.ts` | `tableWith`, `ctxFor`, `randomStep`, `playUntilRecords`, `pickRandom` |
 | `fixtures.ts` | `finishedGame`, `GRAND_144`, `DIAMONDS_LOST`, `NULL_OUVERT_WON` |
-| `*.test.ts` | `table`, `leave`, `seating`, `rotation`, `records`, `stats`, `view`, `view.redaction`, `bot`, `bot/*` |
+| `*.test.ts` | `table`, `leave`, `replace`, `seating`, `rotation`, `records`, `stats`, `view`, `view.redaction`, `bot`, `bot/*` |
 
 ## `view.ts` / `viewGame.ts` are the security boundary
 

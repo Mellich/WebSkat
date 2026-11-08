@@ -4,6 +4,7 @@
 
 import type { HostSnapshot } from '../../net';
 import type { TableState } from '../../table';
+import { migrateSnapshot } from './hostedMigrate';
 
 const PREFIX = 'webskat.host.';
 
@@ -59,33 +60,10 @@ export function loadHostSnapshot(storage: KeyValueStorage, key: string): HostSna
   if (raw === null) return null;
   try {
     const parsed: unknown = JSON.parse(raw);
-    migrateBotLevel(parsed);
+    migrateSnapshot(parsed);
     return isSnapshot(parsed) ? parsed : null;
   } catch {
     return null;
-  }
-}
-
-const LEVELS: readonly unknown[] = ['easy', 'normal', 'strong'];
-
-/**
- * Snapshots from protocol version 2 kept one bot strength for the whole table. Each bot gets that
- * strength (or 'normal') as its own; the table field is dropped.
- */
-function migrateBotLevel(parsed: unknown): void {
-  if (typeof parsed !== 'object' || parsed === null || !('table' in parsed)) return;
-  const table = parsed.table;
-  if (typeof table !== 'object' || table === null) return;
-  const t = table as Record<string, unknown>;
-  const level = LEVELS.includes(t.botLevel) ? t.botLevel : 'normal';
-  delete t.botLevel;
-  for (const list of [t.players, t.pending]) {
-    if (!Array.isArray(list)) continue;
-    for (const p of list as unknown[]) {
-      if (typeof p !== 'object' || p === null) continue;
-      const player = p as Record<string, unknown>;
-      if (player.isBot === true && !LEVELS.includes(player.botLevel)) player.botLevel = level;
-    }
   }
 }
 

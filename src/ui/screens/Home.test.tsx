@@ -39,6 +39,25 @@ describe('Home form validation', () => {
     expect(window.location.hash).toBe('');
   });
 
+  it('rejects an invalid invite code before navigating', () => {
+    useNameForTest('Anna');
+    render(<Home />);
+    fireEvent.change(screen.getByPlaceholderText('ABCD-EFGH'), { target: { value: 'ABCD-EFGH' } });
+    fireEvent.change(screen.getByTestId('join-invite-input'), { target: { value: 'WXYZ0000' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Join' }));
+    expect(screen.getByRole('alert').textContent).toContain('not a valid invite code');
+    expect(window.location.hash).toBe('');
+  });
+
+  it('passes a valid invite code to the table route', () => {
+    useNameForTest('Anna');
+    render(<Home />);
+    fireEvent.change(screen.getByPlaceholderText('ABCD-EFGH'), { target: { value: 'ABCD-EFGH' } });
+    fireEvent.change(screen.getByTestId('join-invite-input'), { target: { value: 'wxyz-2345' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Join' }));
+    expect(window.location.hash).toBe('#/t/ABCDEFGH?invite=WXYZ2345');
+  });
+
   it('navigates to a valid key with a name', () => {
     useNameForTest('Anna');
     render(<Home />);

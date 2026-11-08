@@ -16,6 +16,8 @@ export const JoinSchema = z.object({
   v: z.number().int(),
   name: z.string().min(1).max(40),
   token: hexToken.optional(),
+  /** Invite code (docs/networking.md §4): takes over a disconnected player's seat. */
+  invite: z.string().refine(isValidKey, { message: 'invalid invite' }).optional(),
 });
 
 export const CmdSchema = z.object({
@@ -57,7 +59,7 @@ export const ErrorSchema = z.object({
 
 export const RejectedSchema = z.object({
   t: z.literal('rejected'),
-  reason: z.enum(['TABLE_FULL', 'PROTOCOL_MISMATCH', 'BAD_NAME']),
+  reason: z.enum(['TABLE_FULL', 'PROTOCOL_MISMATCH', 'BAD_NAME', 'INVITE_INVALID']),
 });
 
 /** Messages the host sends to a client (channel `msg`). */

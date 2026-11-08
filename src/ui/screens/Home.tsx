@@ -1,7 +1,7 @@
 // Start screen: name, create a table, join with a key, public tables, rejoin.
 
 import { useEffect, useState } from 'react';
-import { createDirectory, isValidKey, type Directory, type TableAd } from '../../net';
+import { createDirectory, isValidKey, normalizeKey, type Directory, type TableAd } from '../../net';
 import { AboutDialog } from '../components/AboutDialog';
 import { logoUrl } from '../assets';
 import { useT } from '../i18n';
@@ -30,6 +30,7 @@ export function Home() {
   const [tableName, setTableName] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [joinKey, setJoinKey] = useState('');
+  const [inviteDraft, setInviteDraft] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [tables, setTables] = useState<TableAd[] | null>(null);
   const [about, setAbout] = useState(false);
@@ -89,8 +90,13 @@ export function Home() {
       setMessage(t('home.invalidKey'));
       return;
     }
+    const invite = normalizeKey(inviteDraft);
+    if (invite !== '' && !isValidKey(invite)) {
+      setMessage(t('home.invalidInvite'));
+      return;
+    }
     if (requireName() === null) return;
-    navigate(tableHash(joinKey));
+    navigate(tableHash(joinKey, invite === '' ? undefined : invite));
   };
 
   return (
@@ -171,6 +177,18 @@ export function Home() {
             data-testid="join-key-input"
           />
           <button type="submit" data-testid="join-submit">{t('home.join')}</button>
+        </div>
+        <div className={styles.inline}>
+          <input
+            type="text"
+            aria-label={t('home.inviteCode')}
+            placeholder={t('home.invitePlaceholder')}
+            value={inviteDraft}
+            onChange={(e) => { setInviteDraft(e.target.value.toUpperCase()); }}
+            autoCapitalize="characters"
+            autoComplete="off"
+            data-testid="join-invite-input"
+          />
         </div>
       </form>
 

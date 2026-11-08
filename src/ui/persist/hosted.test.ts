@@ -34,6 +34,22 @@ function tableWithBot(): TableState {
 }
 
 describe('host snapshots in localStorage', () => {
+  it('keeps the invite codes of a snapshot', () => {
+    const storage = memoryStorage();
+    const snapshot: HostSnapshot = { ...snapshotOf(tableWith(3)), invites: { WXYZ2345: 'p1' } };
+    saveHostSnapshot(storage, snapshot);
+    expect(loadHostSnapshot(storage, 'TESTKEY')?.invites).toEqual({ WXYZ2345: 'p1' });
+    expect(resumableSnapshot(snapshot).invites).toEqual({ WXYZ2345: 'p1' });
+  });
+
+  it('loads a snapshot from before invites without them', () => {
+    const storage = memoryStorage();
+    saveHostSnapshot(storage, snapshotOf(tableWith(3)));
+    const loaded = loadHostSnapshot(storage, 'TESTKEY');
+    expect(loaded).not.toBeNull();
+    expect(loaded?.invites).toBeUndefined();
+  });
+
   it('returns the snapshot that was saved', () => {
     const storage = memoryStorage();
     const snapshot = snapshotOf(tableWith(3));

@@ -14,12 +14,13 @@ Browser ──WebRTC data channels (P2P, encrypted)── Browser
 One Trystero room per table (`tableRoom(key)` = `webskat-t-<KEY>`), plus one shared lobby room
 (`webskat-lobby-v1`) for the public table list.
 
-`constants.ts`: `APP_ID = 'webskat-v1-7c2f9a'`, `PROTOCOL_VERSION = 3`, `LOBBY_ROOM`,
+`constants.ts`: `APP_ID = 'webskat-v1-7c2f9a'`, `PROTOCOL_VERSION = 4`, `LOBBY_ROOM`,
 `AD_INTERVAL_MS = 5000`, `AD_TTL_MS = 15000`, `JOIN_TIMEOUT_MS = 15000`, `LEAVE_CLOSE_DELAY_MS = 500`.
 
 **Bump `PROTOCOL_VERSION`** whenever a message, command or view changes shape so that old
 browsers cannot talk to new ones. Version history: 1 initial, 2 table bot level (Phase 13),
-3 per-bot `botLevel` + `set-bot-level` (Phase 14).
+3 per-bot `botLevel` + `set-bot-level` (Phase 14), 4 `replace-player`, `join.invite`,
+`INVITE_INVALID` (plan 07).
 
 ## 2. Transport (`transport.ts`, `trysteroTransport.ts`, `fake.ts`)
 
@@ -62,36 +63,46 @@ typed `z.ZodType<T>` against the table/engine types, so drift is a compile error
 
 Client → host (channel `cmd`):
 ```
-{ t:'join', v:number, name: 1..40 chars, token?: 32 hex }
+{ t:'join', v:number, name: 1..40 chars, token?: 32 hex, invite?: 8 symbols (ABCD-EFGH) }
 { t:'cmd', command: TableCommand }
 ```
 
 Host → client (channel `msg`):
 ```
-{ t:'welcome', v:3, playerId, token }       targeted
+{ t:'welcome', v:4, playerId, token }       targeted
 { t:'view', view: TableView }                targeted, per player
 { t:'records', records: GameRecord[] }       targeted, after every welcome
 { t:'record', record: GameRecord }           broadcast after each finished game
 { t:'error', code, message, ref? }           targeted to the sender
-{ t:'rejected', reason: 'TABLE_FULL' | 'PROTOCOL_MISMATCH' | 'BAD_NAME' }
+{ t:'rejected', reason: 'TABLE_FULL' | 'PROTOCOL_MISMATCH' | 'BAD_NAME' | 'INVITE_INVALID' }
 { t:'kicked' }                               targeted
 { t:'closed' }                               broadcast when the host stops
 ```
 
 Lobby (channel `ad`, only in the lobby room):
 ```
-{ t:'ad', v:3, key, name, hostName, seats, maxSeats, status:'lobby'|'in-game', ts }
+{ t:'ad', v:4, key, name, hostName, seats, maxSeats, status:'lobby'|'in-game', ts }
 ```
 
 ## 4. Identity and joining (`host.ts` `onJoin`)
 
 1. `v !== PROTOCOL_VERSION` → `rejected PROTOCOL_MISMATCH`.
-2. Known `token` of a player still at the table → re-bind this peer to that player (an older peer
-   of the same player is unmapped: the newest tab wins), `setConnected(true)`.
-3. Otherwise, if this peer has no player yet: new id (`randomHex(8)`), name trimmed and cut to 20
+2. `invite` present (`takeInvite`): the code is taken (single use, `normalizeKey`). The player must
+   still be at the table, not a bot and disconnected; otherwise `rejected INVITE_INVALID`. On
+   success: the player's old tokens stop working, a new token is issued, this peer is bound to the
+   player and the player is connected. The token check below is skipped.
+3. Else, known `token` of a player still at the table → re-bind this peer to that player (an older
+   peer of the same player is unmapped: the newest tab wins), `setConnected(true)`.
+4. Otherwise, if this peer has no player yet: new id (`randomHex(8)`), name trimmed and cut to 20
    chars, `addPlayer` (`TABLE_FULL` → `rejected TABLE_FULL`, invalid name → `rejected BAD_NAME`),
    new token (`randomHex(16)`).
-4. Send `welcome`, then `records`; broadcast views to everyone; persist.
+5. Send `welcome`, then `records`; broadcast views to everyone; persist.
+
+Invite codes (`invites.ts`, decision I126): the host creates one for a **disconnected human** via
+`host.invite(playerId)` (never via a table command, and only the host's own UI can call it). The
+code is 8 symbols of `KEY_ALPHABET`, stored normalized, single use, and dropped when its player is
+removed. It travels only inside the invite link (`joinLink(key, base, invite)` →
+`…#/t/ABCD-EFGH?invite=WXYZ-2345`). It never appears in a view, record or broadcast.
 
 `onPeerLeave(peer)`: `setConnected(false)`, unmap, broadcast views, persist. The host's own player
 has no peer; it uses the loop-back connection.
@@ -99,36 +110,40 @@ has no peer; it uses the loop-back connection.
 ## 5. Host controller (`createHost`, `host.ts`)
 
 ```ts
-createHost({ transport, table, tokens?, now, randomSeed, randomId?, randomToken?, persist?, lobby? })
-  → { connection: GameConnection, stop(), getState(), snapshot(): HostSnapshot }
-HostSnapshot = { table: TableState, tokens: Record<token, PlayerId> }
+createHost({ transport, table, tokens?, invites?, now, randomSeed, randomId?, randomToken?, randomInvite?, persist?, lobby? })
+  → { connection: GameConnection, stop(), getState(), snapshot(): HostSnapshot, invite(playerId): string | null }
+HostSnapshot = { table: TableState, tokens: Record<token, PlayerId>, invites?: Record<code, PlayerId> }
 ```
 
 - Joins `tableRoom(key)`. Emits status `connected`, the records and its own view at once.
 - `handleCommand(actor, command)` (also used by the loop-back `connection.send`):
   `applyCommand` with `{ now(), seed: randomSeed() }`. Error → `error` to the actor only. Success →
-  replace state; a kicked player gets `kicked`; new records go out; views go to every connected
+  replace state; after `kick` or `replace-player`, every player who left gets `kicked`, loses its
+  peer, tokens and invite codes (`forgetPlayer`); new records go out; views go to every connected
   non-bot player with a peer (plus local listeners); `persist(snapshot)`; then **bot turns run
   synchronously** (`botStep` until `null`), each followed by records + views + persist. No pauses:
   clients slow down the display themselves (`ui-game-screen.md` §5).
 - Records: remote peers get one `record` per finished game; the host's own listeners get the whole
   list as a `records` event.
+- `invite(playerId)`: a code for a disconnected human (not the host, not a bot, not connected), else
+  `null`. Returns the existing code of that player when there is one. Persists.
 - Public tables (`isPublic` and `lobby` given): join the lobby room, send an `ad` every 5 s and
-  to each peer joining the lobby; no ads while `players + pending >= maxSeats`.
+  to each peer joining the lobby; no ads while `players + pending >= maxSeats` (`advertise.ts`).
 - `stop()`: broadcast `closed`, clear the ad timer, leave rooms, emit status `closed`.
 - State is replaced only synchronously inside handlers (single-threaded reducer loop).
 
 ## 6. Client controller (`createClient`, `client.ts`) and `GameConnection`
 
 ```ts
-createClient({ transport, key, name, token?, onToken(token, playerId) }) → GameConnection
+createClient({ transport, key, name, token?, invite?, onToken(token, playerId) }) → GameConnection
 interface GameConnection { playerId(); send(command); subscribe(listener) /* replays */; leave(); close() }
 type ConnectionStatus = 'connecting' | 'connected' | 'host-lost' | 'rejected' | 'kicked' | 'closed'
 type ConnectionEvent = status{status, reason?} | view | records | record | error{code, message}
 ```
 
-- Joins the table room, status `connecting`, sends `join` to every present and newly joining peer
-  (only the host answers).
+- Joins the table room, status `connecting`, sends `join` (with `invite` while it is set) to every
+  present and newly joining peer (only the host answers). The first `welcome` clears `invite`; later
+  re-joins use the token.
 - First valid `welcome` fixes `hostPeer`; status `connected`; `onToken` (the UI stores the
   session). Later `msg`s from other peers are ignored. A `rejected` before welcome → status
   `rejected` with the reason.
@@ -146,8 +161,8 @@ type ConnectionEvent = status{status, reason?} | view | records | record | error
   keeps them by key, prunes entries older than 15 s every second, calls `onChange` with the list
   sorted by name. Home creates it while mounted and stops it on unmount.
 - `keys.ts`: `KEY_ALPHABET` (32 symbols, no 0/O/1/I), `generateKey(randomBytes)` → `ABCD-EFGH`,
-  `normalizeKey` (uppercase, no spaces/dashes), `isValidKey`, `formatKey`, `joinLink(key, base)`
-  → `${base}#/t/ABCD-EFGH`. Inside the app keys are always stored **normalized** (no dash).
+  `normalizeKey` (uppercase, no spaces/dashes), `isValidKey`, `formatKey`, `joinLink(key, base,
+  invite?)` → `${base}#/t/ABCD-EFGH` plus `?invite=WXYZ-2345` when given. Inside the app keys are always stored **normalized** (no dash).
 - `random.ts`: `randomBytes`, `randomHex`, `randomUint32` (Web Crypto).
 
 ## 8. Persistence and resume (wired in `src/ui/net/actions.ts`)
@@ -157,6 +172,8 @@ type ConnectionEvent = status{status, reason?} | view | records | record | error
   (`resumableSnapshot`: every human except the host starts `connected: false`; bots unchanged).
   Clients in `host-lost` re-join with their tokens.
 - Clients store `{key, name, token}` in `localStorage['webskat.session']` and re-join with it.
+- The snapshot's `invites` (unused codes) are kept on resume (`resumableSnapshot`), so a link
+  handed out before a reload still works.
 
 ## 9. Failure matrix
 
@@ -164,6 +181,9 @@ type ConnectionEvent = status{status, reason?} | view | records | record | error
 |---|---|
 | Client reloads | Stored session → `openTable` re-joins with the token → same seat |
 | Client disconnects mid-game | `connected = false`; others see "waiting for X" when it is X's turn; no timers |
+| Player lost its token (other device, cleared storage) | Host player opens Players → "Invite again" → sends the link; the player opens it and takes the seat (`INVITE_INVALID` if used or not valid) |
+| Player is gone for good | Host replaces the seat (`replace-player`) by a waiting player or a bot; the old player gets `kicked` |
+| Client gets `rejected TIMEOUT` | The client shows a Retry button that re-joins with the stored session |
 | Client leaves (`leave()`) | Client sends `leave` (if the host is reachable), `ended = true`, closes the room after 500 ms. Host: lobby → seat removed; game running → `leaving`, removed at the next deal |
 | Host leaves (`leave()`) | Same as `stop()`: `closed` to every client |
 | Host reloads / crashes | Clients show `host-lost`; when the host reopens the table it resumes from the snapshot and clients re-join |

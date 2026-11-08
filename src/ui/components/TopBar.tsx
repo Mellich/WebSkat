@@ -9,6 +9,7 @@ import { navigate } from '../router';
 import { StatsPanel } from '../stats/StatsPanel';
 import { useSession } from '../store/session';
 import { ConfirmDialog } from './ConfirmDialog';
+import { PlayersDialog } from './PlayersDialog';
 import { SettingsDialog } from './SettingsDialog';
 import styles from './TopBar.module.css';
 
@@ -18,8 +19,10 @@ export function TopBar() {
   const status = useSession((s) => s.status);
   const view = useSession((s) => s.view);
   const records = useSession((s) => s.records);
+  const connection = useSession((s) => s.connection);
+  const host = useSession((s) => s.host);
   const [confirming, setConfirming] = useState(false);
-  const [panel, setPanel] = useState<'stats' | 'settings' | null>(null);
+  const [panel, setPanel] = useState<'stats' | 'players' | 'settings' | null>(null);
   const players = useMemo(
     () => (view === null ? [] : view.table.players.map((p) => ({ id: p.id, name: p.name }))),
     [view],
@@ -57,6 +60,18 @@ export function TopBar() {
         >
           <span className={styles.icon} aria-hidden="true">📊</span>
           <span className={styles.label}>{t('stats.open')}</span>
+        </button>
+        <button
+          type="button"
+          data-testid="open-players"
+          aria-label={t('players.open')}
+          title={t('players.open')}
+          onClick={() => {
+            setPanel('players');
+          }}
+        >
+          <span className={styles.icon} aria-hidden="true">👥</span>
+          <span className={styles.label}>{t('players.open')}</span>
         </button>
         <button
           type="button"
@@ -98,6 +113,16 @@ export function TopBar() {
           records={records}
           players={players}
           viewerId={view.you.id}
+          onClose={() => {
+            setPanel(null);
+          }}
+        />
+      ) : null}
+      {panel === 'players' && view !== null && connection !== null ? (
+        <PlayersDialog
+          view={view}
+          connection={connection}
+          invite={host === null ? null : (id) => host.invite(id)}
           onClose={() => {
             setPanel(null);
           }}

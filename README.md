@@ -22,6 +22,12 @@ implemented are in `docs/skat-rules.md`. Contributors and coding agents read `AG
 
 Statistics (standings, history, charts, Seeger or standard scoring) are in the **Stats** dialog.
 
+**If a player drops out:** a player whose browser lost the connection keeps its seat and can come
+back with the same browser. The host opens **Players** (👥) to see who is offline. If a player
+lost its browser data, the host can **Invite again** and send the link; that player opens it and
+takes the seat back. If a player is gone for good, the host can **Replace** the seat during a game
+with a waiting player or a bot.
+
 ## Run it
 
 Requires Node.js 22.12 or newer.

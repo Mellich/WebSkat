@@ -18,26 +18,34 @@ import {
   type TableCommand,
   type TableState,
 } from '../table';
-import { AD_INTERVAL_MS, LOBBY_ROOM, PROTOCOL_VERSION, tableRoom } from './constants';
+import { startAdvertising } from './advertise';
+import { PROTOCOL_VERSION, tableRoom } from './constants';
 import { type Emitter, type GameConnection, createEmitter } from './connection';
-import { type AdMessage, type HostMessage, type JoinMessage, ClientMessageSchema, recordMessage, viewMessage } from './protocol';
-import { randomHex } from './random';
+import { createInvites, type Invites } from './invites';
+import { generateKey } from './keys';
+import { type HostMessage, type JoinMessage, ClientMessageSchema, recordMessage, viewMessage } from './protocol';
+import { createPeerMap } from './peers';
+import { randomBytes, randomHex } from './random';
 import type { Channel, RoomHandle, Transport } from './transport';
 
 export interface HostSnapshot {
   readonly table: TableState;
   readonly tokens: Readonly<Record<string, PlayerId>>;
+  /** Unused invite codes (normalized) of disconnected players. */
+  readonly invites?: Readonly<Record<string, PlayerId>>;
 }
 
 export interface HostOptions {
   readonly transport: Transport;
   readonly table: TableState;
   readonly tokens?: Readonly<Record<string, PlayerId>>;
+  readonly invites?: Readonly<Record<string, PlayerId>>;
   readonly now: () => number;
   readonly randomSeed: () => number;
 
   readonly randomId?: () => string;
   readonly randomToken?: () => string;
+  readonly randomInvite?: () => string;
   readonly persist?: (snapshot: HostSnapshot) => void;
   /** Transport for the lobby room; used only for public tables. */
   readonly lobby?: Transport;
@@ -48,6 +56,8 @@ export interface Host {
   stop(): void;
   getState(): TableState;
   snapshot(): HostSnapshot;
+  /** An invite code for a disconnected human player; null for anybody else (docs/networking.md §4). */
+  invite(playerId: PlayerId): string | null;
 }
 
 export function createHost(opts: HostOptions): Host {
@@ -57,40 +67,29 @@ export function createHost(opts: HostOptions): Host {
 
   const tokens = new Map<string, PlayerId>(Object.entries(opts.tokens ?? {}));
   const tokenOf = new Map<PlayerId, string>([...tokens].map(([token, id]) => [id, token]));
-  const peerOf = new Map<PlayerId, string>();
-  const playerOf = new Map<string, PlayerId>();
+  const peers = createPeerMap();
   const warned = new Set<string>();
   const emitter: Emitter = createEmitter();
   const room: RoomHandle = opts.transport.join(tableRoom(state.key));
   const newId = opts.randomId ?? (() => randomHex(8));
   const newToken = opts.randomToken ?? (() => randomHex(16));
+  const invites: Invites = createInvites(opts.invites ?? {}, opts.randomInvite ?? (() => generateKey(randomBytes)));
   const ctx = (): Ctx => ({ now: opts.now(), seed: opts.randomSeed() });
 
-  const snapshot = (): HostSnapshot => ({ table: state, tokens: Object.fromEntries(tokens) });
+  const snapshot = (): HostSnapshot => ({
+    table: state,
+    tokens: Object.fromEntries(tokens),
+    invites: invites.toJSON(),
+  });
   const persist = (): void => opts.persist?.(snapshot());
   const sendTo = (peer: string, msg: HostMessage): void => {
     room.send('msg', msg, peer);
   };
 
-  function bind(peer: string, id: PlayerId): void {
-    const previousPeer = peerOf.get(id);
-    if (previousPeer !== undefined && previousPeer !== peer) playerOf.delete(previousPeer);
-    const previousId = playerOf.get(peer);
-    if (previousId !== undefined && previousId !== id) peerOf.delete(previousId);
-    playerOf.set(peer, id);
-    peerOf.set(id, peer);
-  }
-
-  function unbind(id: PlayerId): void {
-    const peer = peerOf.get(id);
-    peerOf.delete(id);
-    if (peer !== undefined) playerOf.delete(peer);
-  }
-
   function broadcastViews(): void {
     emitter.emit({ t: 'view', view: viewFor(state, hostId) });
     for (const p of allPlayers(state)) {
-      const peer = peerOf.get(p.id);
+      const peer = peers.peerOf(p.id);
       if (peer !== undefined && p.connected && !p.isBot) {
         sendTo(peer, viewMessage(viewFor(state, p.id)));
       }
@@ -108,7 +107,7 @@ export function createHost(opts: HostOptions): Host {
       emitter.emit({ t: 'error', code, message });
       return;
     }
-    const peer = peerOf.get(actor);
+    const peer = peers.peerOf(actor);
     if (peer !== undefined) sendTo(peer, { t: 'error', code, message });
   }
 
@@ -126,6 +125,18 @@ export function createHost(opts: HostOptions): Host {
     }
   }
 
+  /** Forgets a player who left the table: its peer is told, its tokens and invites stop working. */
+  function forgetPlayer(id: PlayerId): void {
+    const peer = peers.peerOf(id);
+    if (peer !== undefined) sendTo(peer, { t: 'kicked' });
+    peers.unbindPlayer(id);
+    for (const [token, owner] of tokens) {
+      if (owner === id) tokens.delete(token);
+    }
+    tokenOf.delete(id);
+    invites.forget(id);
+  }
+
   function handleCommand(actor: PlayerId, command: TableCommand): void {
     const recordsBefore = state.records.length;
     const result = applyCommand(state, actor, command, ctx());
@@ -133,11 +144,13 @@ export function createHost(opts: HostOptions): Host {
       reportError(actor, result.error.code, result.error.message);
       return;
     }
+    const before = allPlayers(state);
     state = result.value.state;
-    if (command.type === 'kick' && !allPlayers(state).some((p) => p.id === command.playerId)) {
-      const peer = peerOf.get(command.playerId);
-      if (peer !== undefined) sendTo(peer, { t: 'kicked' });
-      unbind(command.playerId);
+    if (command.type === 'kick' || command.type === 'replace-player') {
+      const remaining = new Set(allPlayers(state).map((p) => p.id));
+      for (const p of before) {
+        if (!remaining.has(p.id)) forgetPlayer(p.id);
+      }
     }
     const created = state.records.slice(recordsBefore);
     if (created.length > 0) broadcastRecords(created);
@@ -151,31 +164,60 @@ export function createHost(opts: HostOptions): Host {
       sendTo(peer, { t: 'rejected', reason: 'PROTOCOL_MISMATCH' });
       return;
     }
-    const known = msg.token === undefined ? undefined : tokens.get(msg.token);
-    if (known !== undefined && allPlayers(state).some((p) => p.id === known)) {
-      bind(peer, known);
-      state = setConnected(state, known, true);
-    } else if (!playerOf.has(peer)) {
-      const id = newId();
-      const name = msg.name.trim().slice(0, MAX_NAME_LENGTH);
-      const added = addPlayer(state, { id, name });
-      if (!added.ok) {
-        sendTo(peer, { t: 'rejected', reason: added.error.code === 'TABLE_FULL' ? 'TABLE_FULL' : 'BAD_NAME' });
-        return;
-      }
-      state = added.value;
-      const token = newToken();
-      tokens.set(token, id);
-      tokenOf.set(id, token);
-      bind(peer, id);
-    }
-    const id = playerOf.get(peer);
+    const admitted = msg.invite !== undefined ? takeInvite(peer, msg.invite) : admitByToken(peer, msg.token, msg.name);
+    if (!admitted) return;
+    const id = peers.playerOf(peer);
     const token = id === undefined ? undefined : tokenOf.get(id);
     if (id === undefined || token === undefined) return;
     sendTo(peer, { t: 'welcome', v: PROTOCOL_VERSION, playerId: id, token });
     sendTo(peer, { t: 'records', records: [...state.records] });
     broadcastViews();
     persist();
+  }
+
+  /** Takes over a disconnected human's seat with a single-use invite; false when it is rejected. */
+  function takeInvite(peer: string, code: string): boolean {
+    const id = invites.take(code);
+    const player = id === null ? undefined : allPlayers(state).find((p) => p.id === id);
+    if (id === null || player === undefined || player.isBot || player.connected) {
+      sendTo(peer, { t: 'rejected', reason: 'INVITE_INVALID' });
+      return false;
+    }
+    issueToken(id);
+    peers.bind(peer, id);
+    state = setConnected(state, id, true);
+    return true;
+  }
+
+  /** A new token for `id`; the old tokens of that player stop working. */
+  function issueToken(id: PlayerId): void {
+    for (const [oldToken, owner] of tokens) {
+      if (owner === id) tokens.delete(oldToken);
+    }
+    const token = newToken();
+    tokens.set(token, id);
+    tokenOf.set(id, token);
+  }
+
+  /** Re-binds a known token, or seats a new player. False when the table rejects the newcomer. */
+  function admitByToken(peer: string, token: string | undefined, name: string): boolean {
+    const known = token === undefined ? undefined : tokens.get(token);
+    if (known !== undefined && allPlayers(state).some((p) => p.id === known)) {
+      peers.bind(peer, known);
+      state = setConnected(state, known, true);
+      return true;
+    }
+    if (peers.playerOf(peer) !== undefined) return true;
+    const id = newId();
+    const added = addPlayer(state, { id, name: name.trim().slice(0, MAX_NAME_LENGTH) });
+    if (!added.ok) {
+      sendTo(peer, { t: 'rejected', reason: added.error.code === 'TABLE_FULL' ? 'TABLE_FULL' : 'BAD_NAME' });
+      return false;
+    }
+    state = added.value;
+    issueToken(id);
+    peers.bind(peer, id);
+    return true;
   }
 
   function onMessage(channel: Channel, data: unknown, from: string): void {
@@ -193,45 +235,22 @@ export function createHost(opts: HostOptions): Host {
       onJoin(from, msg);
       return;
     }
-    const actor = playerOf.get(from);
+    const actor = peers.playerOf(from);
     if (actor !== undefined) handleCommand(actor, msg.command);
   }
 
   function onPeerLeave(peer: string): void {
-    const id = playerOf.get(peer);
+    const id = peers.dropPeer(peer);
     if (id === undefined) return;
-    playerOf.delete(peer);
-    peerOf.delete(id);
     state = setConnected(state, id, false);
     broadcastViews();
     persist();
   }
 
   // Public tables advertise themselves in the lobby room (directory.ts reads them).
-  const lobby = opts.lobby !== undefined && state.isPublic ? opts.lobby.join(LOBBY_ROOM) : null;
-  function advertise(target?: string): void {
-    if (lobby === null) return;
-    const everyone = allPlayers(state);
-    if (everyone.length >= state.maxSeats) return;
-    const ad: AdMessage = {
-      t: 'ad',
-      v: PROTOCOL_VERSION,
-      key: state.key,
-      name: state.name,
-      hostName: state.players.find((p) => p.id === hostId)?.name ?? '',
-      seats: everyone.length,
-      maxSeats: state.maxSeats,
-      status: state.status,
-      ts: opts.now(),
-    };
-    lobby.send('ad', ad, target);
-  }
-  const adTimer = lobby === null ? null : setInterval(() => {
-    advertise();
-  }, AD_INTERVAL_MS);
-  lobby?.onPeerJoin((peer) => {
-    advertise(peer);
-  });
+  const advertising = opts.lobby !== undefined && state.isPublic
+    ? startAdvertising({ lobby: opts.lobby, getState: () => state, hostId, now: opts.now })
+    : null;
 
   room.onMessage(onMessage);
   room.onPeerLeave(onPeerLeave);
@@ -258,11 +277,18 @@ export function createHost(opts: HostOptions): Host {
     stopped = true;
 
     room.send('msg', { t: 'closed' });
-    if (adTimer !== null) clearInterval(adTimer);
-    lobby?.leave();
+    advertising?.stop();
     room.leave();
     emitter.emit({ t: 'status', status: 'closed' });
   }
 
-  return { connection, stop, getState: () => state, snapshot };
+  function invite(playerId: PlayerId): string | null {
+    const player = allPlayers(state).find((p) => p.id === playerId);
+    if (player === undefined || player.isBot || playerId === hostId || player.connected) return null;
+    const code = invites.create(playerId);
+    persist();
+    return code;
+  }
+
+  return { connection, stop, getState: () => state, snapshot, invite };
 }

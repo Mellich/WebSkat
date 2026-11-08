@@ -55,6 +55,7 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 | `setConnected(s, id, connected)` | `seating.ts` | Sets the `connected` flag; `connected = true` also clears `leaving` |
 | `markLeaving(s, id)` | `seating.ts` | Seated player leaves during a running game: `connected = false`, `leaving = true` (keeps the seat) |
 | `removeLeavers(s)` | `seating.ts` | `removePlayer` for every seated player with `leaving` (keeps the dealer pointer right) |
+| `replacePlayer(s, actor, target, by)` | `replace.ts` | Gives the seat of `target` to a pending player or a new bot (`ReplaceBy`). Same index in `players`; `roles`, `sittingOut` and `dealerId` of a dealt game map to the newcomer; `engine`, `number`, `seed`, `recorded` unchanged. Only the errors of §3 |
 | `uniqueName(existing, wanted)` | `seating.ts` | `Anna`, `Anna (2)`, … (cut to 20 chars) |
 | `rolesForDealer(players, dealerIdx)` | `rotation.ts` | forehand = d+1, middlehand = d+2, hindhand = d+3 (mod N); sitting out = dealer and d+4, d+5 (N ≥ 4) |
 | `pickFirstDealer(seed, n)` | `rotation.ts` | `seed % n` |
@@ -72,7 +73,8 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 | `game {action}` | an active player of the running game | game dealt and not finished | `engine.applyAction(role, action)`. If the game finishes: record created once, `recorded = true`, `ready` = bots, then `tryDeal` | `WRONG_STATUS`, `NOT_ACTIVE_PLAYER`, any `GameErrorCode` |
 | `ready` | a seated player | game finished | adds to `ready`, then `tryDeal` | `WRONG_STATUS`, `NOT_SEATED` |
 | `abort-game` | host | game running | drops the game (no record) and deals the next one (pointer already moved) | `NOT_HOST`, `WRONG_STATUS` |
-| `kick {playerId}` | host | no game or finished | `removePlayer`; < 3 seated → lobby; then `tryDeal` | `NOT_HOST`, `GAME_RUNNING`, `CANNOT_KICK_HOST`, `UNKNOWN_PLAYER` |
+| `kick {playerId}` | host | no game or finished | `removePlayer`; < 3 seated → lobby; then `tryDeal`. During a running game use `replace-player` | `NOT_HOST`, `GAME_RUNNING`, `CANNOT_KICK_HOST`, `UNKNOWN_PLAYER` |
+| `replace-player {playerId, by}` | host | any time | `by = {kind:'pending', playerId}` (a waiting player) or `{kind:'bot', level}` (new bot `bot-<seq>`, always ready). The target leaves the table; its seat, role and dealer slot go to the newcomer (`replacePlayer`). A finished game may now be fully ready → `tryDeal` | `NOT_HOST`, `CANNOT_KICK_HOST` (target is the host), `UNKNOWN_PLAYER` (no such seated target, or no such waiting player) |
 | `add-bot` | host | no game or finished | adds `bot-<seq>` named `Bot`, `Bot (2)`, … at level `normal` | `NOT_HOST`, `GAME_RUNNING`, `TABLE_FULL` |
 | `set-bot-level {playerId, level}` | host | any time | sets that bot's level; used from its next action | `NOT_HOST`, `UNKNOWN_PLAYER`, `NOT_A_BOT` |
 | `leave` | anyone | — | pending → removed. Seated + game running → `markLeaving` (seat kept, removed at the next deal). Seated otherwise → removed (< 3 → lobby) | `HOST_CANNOT_LEAVE`, `UNKNOWN_PLAYER` |
@@ -92,7 +94,8 @@ Joining is not a command: the host calls `addPlayer` when a `join` message arriv
 - A player who leaves during a running game keeps the seat (`leaving`, disconnected) until the next
   deal; `dealNext` removes leavers first. Rejoining with the same id before that cancels the leave.
 - Pending players are seated only in `dealNext` (before roles are computed). New players are
-  appended as the last seat. A dealt game never changes its participants.
+  appended as the last seat. A dealt game never changes its roles; the host can change who holds a
+  role with `replace-player` (decision I125). Records keep the names of the time they were made.
 - Bots are always ready. Disconnected humans do not block the next deal; the game then waits on
   their turn (`view.game.waitingFor`).
 - A bot-only table (or one whose humans are all disconnected) keeps dealing by itself because

@@ -5,6 +5,7 @@ import { type ConnectionEvent, type GameConnection } from './connection';
 import { createFakeNetwork, type FakeNetwork } from './fake';
 import { createHost, type Host } from './host';
 import { createTable, type TableCommand, type TableView } from '../table';
+import { KEY_ALPHABET } from './keys';
 
 export const KEY = 'ABCD-EFGH';
 
@@ -39,10 +40,22 @@ export interface Rig {
   readonly host: Host;
 }
 
+/** Invite codes 1, 2, ... as valid 8-symbol keys (unique for every test table). */
+function inviteCode(n: number): string {
+  let rest = n;
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += KEY_ALPHABET[rest % 32] ?? '';
+    rest = Math.floor(rest / 32);
+  }
+  return code;
+}
+
 export function createRig(options: { maxSeats?: number; isPublic?: boolean; withLobby?: boolean } = {}): Rig {
   const net = createFakeNetwork();
   let ids = 0;
   let tokens = 0;
+  let invites = 0;
   const table = createTable({
     key: KEY,
     name: 'Friday game',
@@ -58,6 +71,7 @@ export function createRig(options: { maxSeats?: number; isPublic?: boolean; with
     randomSeed: () => 7,
     randomId: () => `id${String(++ids)}`,
     randomToken: () => (++tokens).toString(16).padStart(32, '0'),
+    randomInvite: () => inviteCode(++invites),
     ...(options.withLobby === true ? { lobby: net.transportFor('H') } : {}),
   });
   return { net, host };
@@ -70,7 +84,7 @@ export interface Joined {
 }
 
 /** Connects a client from peer `peerId`; the events are recorded from the start. */
-export function joinClient(rig: Rig, peerId: string, name: string, token?: string): Joined {
+export function joinClient(rig: Rig, peerId: string, name: string, token?: string, invite?: string): Joined {
   const events: ConnectionEvent[] = [];
   const tokens: string[] = [];
   const connection = createClient({
@@ -78,6 +92,7 @@ export function joinClient(rig: Rig, peerId: string, name: string, token?: strin
     key: KEY,
     name,
     ...(token === undefined ? {} : { token }),
+    ...(invite === undefined ? {} : { invite }),
     onToken: (t) => {
       tokens.push(t);
     },

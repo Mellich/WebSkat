@@ -33,6 +33,13 @@ A `TableView` for player P may contain card identities only for:
 Passed-in games reveal no Skat. The ouvert hand stays visible after an early Null end
 (`decisions.md` I21).
 
+**Takeover (plan 07, I125).** A replacement (`replace-player`) or an invite takes over exactly what
+the seat may see: the newcomer gets `viewFor(state, newId)`, so its own hand and, as the declarer,
+the Skat in the same phases as anyone else. Nothing of the replaced player stays in the view. The
+replaced player receives only `kicked`. Invite codes are host-only secrets, like tokens: they are
+returned to the host's own UI by `host.invite`, stored in the host snapshot and travel only in the
+invite link; they are never in a view, record or broadcast.
+
 ## 3. Where it is enforced
 
 - `src/table/view.ts` (`viewFor`) and `src/table/viewGame.ts` (`gameViewFor`) build every view

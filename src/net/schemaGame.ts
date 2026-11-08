@@ -52,6 +52,14 @@ export const TableCommandSchema: z.ZodType<TableCommand> = z.discriminatedUnion(
   z.object({ type: z.literal('ready') }),
   z.object({ type: z.literal('abort-game') }),
   z.object({ type: z.literal('kick'), playerId: z.string().min(1).max(64) }),
+  z.object({
+    type: z.literal('replace-player'),
+    playerId: z.string().min(1).max(64),
+    by: z.discriminatedUnion('kind', [
+      z.object({ kind: z.literal('pending'), playerId: z.string().min(1).max(64) }),
+      z.object({ kind: z.literal('bot'), level: z.enum(['easy', 'normal', 'strong']) }),
+    ]),
+  }),
   z.object({ type: z.literal('add-bot') }),
   z.object({ type: z.literal('set-bot-level'), playerId: z.string().min(1).max(64), level: z.enum(['easy', 'normal', 'strong']) }),
   z.object({ type: z.literal('leave') }),

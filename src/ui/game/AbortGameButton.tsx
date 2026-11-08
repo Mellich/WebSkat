@@ -6,16 +6,17 @@ import { useT } from '../i18n';
 
 export interface AbortGameButtonProps {
   readonly onAbort: () => void;
+  readonly testId?: string;
 }
 
-export function AbortGameButton({ onAbort }: AbortGameButtonProps) {
+export function AbortGameButton({ onAbort, testId = 'abort-game' }: AbortGameButtonProps) {
   const t = useT();
   const [confirming, setConfirming] = useState(false);
   return (
     <>
       <button
         type="button"
-        data-testid="abort-game"
+        data-testid={testId}
         onClick={() => {
           setConfirming(true);
         }}

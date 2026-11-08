@@ -5,9 +5,12 @@ describe('parseRoute', () => {
   it.each([
     ['', { kind: 'home' }],
     ['#/', { kind: 'home' }],
-    ['#/t/ABCD-EFGH', { kind: 'table', key: 'ABCDEFGH' }],
-    ['#/t/abcd-efgh', { kind: 'table', key: 'ABCDEFGH' }],
-    ['#/t/ABCD%2DEFGH', { kind: 'table', key: 'ABCDEFGH' }],
+    ['#/t/ABCD-EFGH', { kind: 'table', key: 'ABCDEFGH', invite: null }],
+    ['#/t/abcd-efgh', { kind: 'table', key: 'ABCDEFGH', invite: null }],
+    ['#/t/ABCD%2DEFGH', { kind: 'table', key: 'ABCDEFGH', invite: null }],
+    ['#/t/ABCD-EFGH?invite=wxyz-2345', { kind: 'table', key: 'ABCDEFGH', invite: 'WXYZ2345' }],
+    ['#/t/ABCD-EFGH?invite=WXYZ0000', { kind: 'table', key: 'ABCDEFGH', invite: null }],
+    ['#/t/ABCD-EFGH?other=1', { kind: 'table', key: 'ABCDEFGH', invite: null }],
     ['#/t/ABCD-EF0H', { kind: 'home' }],
     ['#/t/', { kind: 'home' }],
     ['#/t/ABCD-EFGH/extra', { kind: 'home' }],
@@ -22,7 +25,8 @@ describe('parseRoute', () => {
     expect(parseRoute(hash)).toEqual(route);
   });
 
-  it('builds the hash for a table key', () => {
+  it('builds the hash for a table key, with an optional invite', () => {
     expect(tableHash('abcd efgh')).toBe('#/t/ABCDEFGH');
+    expect(tableHash('abcd efgh', 'wxyz-2345')).toBe('#/t/ABCDEFGH?invite=WXYZ2345');
   });
 });

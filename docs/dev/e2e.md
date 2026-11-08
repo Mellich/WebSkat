@@ -38,6 +38,7 @@ npx playwright test -g "fits phone"    # tests whose title matches
 | `geberskat.spec.ts` (B) | Public table found in the list by a 4th player; 4 players; the dealer sits out; after Continue the next game has another dealer/sitter | ~3.5 min |
 | `reconnect.spec.ts` (C) | Client reload mid-game gets seat and hand back; start page goes back to the stored table; host reload resumes and clients reconnect to the same game; a client that leaves the lobby disappears from the host's seats | — |
 | `layout.spec.ts` (D) | Offline `#/dev/local?seed=6&bots=easy` at 7 viewports; checks every phase (§5) | — |
+| `replace.spec.ts` | Host replaces a player who is gone by a waiting player (Players dialog, `replace-with`); a disconnected player takes its seat back through the invite link from Players | ~40 s |
 
 ## 4. Helpers (`e2e/helpers.ts`, `e2e/robot.ts`)
 
@@ -78,8 +79,9 @@ viewer win the bidding.
 
 | Screen | Ids |
 |---|---|
-| Home | `create-table`, `join-key-input`, `join-submit`, `public-table`, `public-join` |
-| Table screen / TopBar | `connection-banner`, `connection-status`, `open-stats`, `open-settings`, `leave-table` |
+| Home | `create-table`, `join-key-input`, `join-invite-input`, `join-submit`, `public-table`, `public-join` |
+| Table screen / TopBar | `connection-banner`, `connection-status`, `open-stats`, `open-players`, `open-settings`, `leave-table`, `retry-join` |
+| Players dialog | `players-dialog`, `players-row-<i>`, `replace-<i>`, `replace-with`, `replace-level`, `replace-confirm`, `players-kick-<i>`, `reinvite-<i>`, `invite-code`, `invite-link`, `players-pending`, `players-abort-game` |
 | Lobby | `table-key`, `seat-<i>`, `bot-level-<i>`, `add-bot`, `start-game` |
 | Game | `opponent-seat`, `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `trick-dismiss`, `last-trick`, `status-line`, `bid-summary`, `bid-bubble-left`, `bid-bubble-right`, `bid-bubble-bottom`, `sitting-out`, `sitting-out-you`, `phase-panel`, `hand-card-<CardId>`, `abort-game` (host, player on turn disconnected) |
 | Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass`, `bid-current`, `bid-turn` |
