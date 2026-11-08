@@ -223,6 +223,11 @@
       'hand hand hand';
   }
 
+  /* Smaller trick cards so the triangle fits beside the opponents. */
+  .table {
+    --card-w-trick: calc(var(--card-w) * 0.8);
+  }
+
   /* Over the table and status rows; the panel itself says whose turn it is. */
   .phase {
     grid-area: 1 / 2 / 3 / 3;

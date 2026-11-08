@@ -8,11 +8,13 @@ under the `TopBar` and is re-mounted for each game number.
 | Area (CSS grid name) | Content | Test id |
 |---|---|---|
 | `oppL`, `oppR` | `OpponentSeat` of the two other **active** players: `oppL` = next player in clockwise seat order after the viewer, `oppR` = the one after (`seats.ts` `opponentsOf`). Role text, "· Dealer" if dealer, card count, backs or ouvert cards, glow on turn | `opponent-seat` |
-| `table` | `SkatPile` (bidding, Skat decision), `TrickArea` (3 slots), the "last trick" bubble | `trick-area`, `last-trick` |
+| `table` | `TableCenter.tsx`: `SkatPile` (bidding, Skat decision), `TrickArea` with three fixed positions (left = `oppL` player, right = `oppR` player, bottom = the viewer, or the third active player for sitting-out viewers; `game/trickPositions.ts`), each card's player name as a label on the card, the "last trick" bubble | `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `last-trick` |
 | `status` | status line (`aria-live`), "Last trick" toggle button, declared game line ("Grand Hand, declared by Anna"), sitting-out line (4+ players: "Sitting out: X, Y · Dealer: Z") | `status-line`, `sitting-out` |
 | `phase` | phase panel (§3); not rendered during `playing`/`finished` | `phase-panel` |
 | `hand` | the viewer's `Hand`; "You are sitting out this game … Dealer: X." for sitting-out viewers | `hand-card-<ID>`, `sitting-out-you` |
 | overlay | `ResultDialog` when finished (after the trick hold) | `result-dialog` |
+
+A card is drawn where its player sits, not in play order: the leader's card is not always on the left. Positions come only from player ids and `opponentsOf`, so the trick and the seat boxes always agree.
 
 Sitting-out viewers see the table like a spectator: backs, trick, status; no hand. The document
 title gets a `● ` prefix while it is the viewer's turn.
@@ -34,7 +36,7 @@ Card size tokens (`tokens.css`):
 --card-w: clamp(44px, min((100vw - 24px) / 5.2, 17dvh), 100px);   /* ≈ 61–70 px on phones, 100 px cap */
 --card-h: calc(var(--card-w) * 178 / 128);
 --card-w-opponent: calc(var(--card-w) * 0.42);
---card-w-trick: calc(var(--card-w) * 0.95);
+--card-w-trick: calc(var(--card-w) * 0.95);   /* 0.8 × in compact landscape, set on .table */
 ```
 
 Hand overlap is pure CSS: `Hand` sets `--hand-n` (card count, min 2); each card after the first

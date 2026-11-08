@@ -7,8 +7,6 @@ import type { GameConnection } from '../../net';
 import type { GameView, TableView } from '../../table';
 import { Hand } from '../components/Hand';
 import { OpponentSeat } from '../components/OpponentSeat';
-import { SkatPile } from '../components/SkatPile';
-import { TrickArea } from '../components/TrickArea';
 import { useT, type Translator } from '../i18n';
 import { useSettings } from '../store/settings';
 import { useSession } from '../store/session';
@@ -16,11 +14,11 @@ import { AbortGameButton } from './AbortGameButton';
 import { BiddingPanel } from './BiddingPanel';
 import { DeclarationPicker } from './DeclarationPicker';
 import { cardName, declarationLabel } from './labels';
-import { CardChip } from '../components/CardChip';
 import { ResultDialog } from './ResultDialog';
 import { SkatDecision, DiscardPanel } from './SkatPanels';
 import { namesById, opponentsOf, type SeatedView } from './seats';
 import { useShownTrick } from './useShownTrick';
+import { TableCenter } from './TableCenter';
 import styles from './GameScreen.module.css';
 
 export interface GameScreenProps {
@@ -113,8 +111,6 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
   }, [shown.holding]);
   const amSittingOut = view.you.role === 'sitting-out';
   const dealerName = nameOf(game.dealerId);
-  const trickSlots = shown.plays.map((p) => ({ card: p.card, name: nameOf(p.playerId), winner: p.winner }));
-  const showSkat = game.phase === 'bidding' || game.phase === 'skat-decision';
 
   const seat = (index: number) => {
     const s = opponents.active[index];
@@ -177,20 +173,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
       <div className={styles.oppL}>{seat(0)}</div>
       <div className={styles.oppR}>{seat(1)}</div>
 
-      <div className={styles.table}>
-        <SkatPile visible={showSkat} back={cardBack} label={t('skat.onTable')} />
-        <TrickArea slots={trickSlots} labelOf={label} {...(shown.holding ? { onDismiss: shown.dismiss, dismissLabel: t('trick.continue') } : {})} />
-        {showLast && game.lastTrick !== null ? (
-          <ul className={styles.lastTrick} data-testid="last-trick">
-            {game.lastTrick.plays.map((p) => (
-              <li key={p.playerId} className={p.playerId === game.lastTrick?.winnerId ? styles.trickWinner : undefined}>
-                {nameOf(p.playerId)} <CardChip card={p.card} />
-                {p.playerId === game.lastTrick?.winnerId ? ` — ${t('trick.takes', { name: nameOf(p.playerId) })}` : null}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
+      <TableCenter view={view} game={game} shown={shown} showLast={showLast} cardBack={cardBack} nameOf={nameOf} label={label} />
 
       <div className={styles.status}>
         <div className={styles.statusRow} aria-live="polite" data-testid="status-line">
