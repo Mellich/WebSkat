@@ -150,7 +150,7 @@ blocked) and the `persist/*` modules. Values are validated on read.
 | `Card` | `<button>` when clickable, else `<img>`; states `normal`/`disabled` (grey overlay over an opaque face; never lower the face opacity)/`selected` (raised, `aria-pressed`)/`highlight`; sizes `hand`/`trick`/`opponent`; `testId` prop |
 | `Hand` | sorted with `sortHand`; only `legal` cards get handlers; `paused` keeps looks but removes handlers; `showAll` (bidding) shows all cards at full brightness; `--hand-n` CSS overlap |
 | `OpponentSeat` | name, role, count badge, up to 10 backs (4 in compact layouts), ouvert cards face up, turn/declarer highlight (`opponent-seat`) |
-| `TrickArea` | three slots, winner highlight, optional dismiss button (`trick-area`, `trick-dismiss`) |
+| `TrickArea` | three fixed positions (`left`, `right`, `bottom`; `TrickPosition`), name label on each card, winner highlight, optional dismiss button (`trick-area`, `trick-dismiss`, `trick-slot-<pos>`) |
 | `SkatPile` | two backs during bidding / Skat decision |
 | `CardChip`, `CardChips` | card as text chip `♥10` with full name as `aria-label`/`title` |
 | `TopBar`, `Toasts`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog` | Dialogs close on Esc |

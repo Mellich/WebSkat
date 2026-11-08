@@ -9,16 +9,16 @@ import { CardChips } from '../components/CardChip';
 import { Hand } from '../components/Hand';
 import { OpponentSeat } from '../components/OpponentSeat';
 import { SkatPile } from '../components/SkatPile';
-import { TrickArea, type TrickSlot } from '../components/TrickArea';
+import { TrickArea, type TrickPosition, type TrickSlot } from '../components/TrickArea';
 import styles from './Gallery.module.css';
 
 const HAND: CardId[] = ['CJ', 'SJ', 'HA', 'H10', 'D9', 'C7', 'S8', 'DK', 'C10', 'H7'];
 const LEGAL: CardId[] = ['CJ', 'HA', 'D9'];
-const TRICK: TrickSlot[] = [
-  { card: 'CA', name: 'Anna' },
-  { card: 'C10', name: 'Ben' },
-  { card: 'SJ', name: 'Carl', winner: true },
-];
+const TRICK: Record<TrickPosition, TrickSlot | null> = {
+  left: { card: 'CA', name: 'Anna' },
+  right: null,
+  bottom: { card: 'SJ', name: 'Carl', winner: true },
+};
 const BACKS: BackIndex[] = [0, 1, 2, 3];
 
 export function Gallery() {

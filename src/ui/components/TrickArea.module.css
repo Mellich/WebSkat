@@ -6,22 +6,41 @@
   cursor: pointer;
 }
 
+/* Left and right cards on one row, the viewer's card centered below them: a triangle.
+   The bottom card is pulled up so the area stays about 1.55 card heights tall. */
 .trick {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    'left right'
+    'bottom bottom';
+  column-gap: calc(var(--gap) * 2);
   justify-content: center;
-  align-items: flex-end;
-  gap: calc(var(--gap) * 2);
-  min-height: calc(var(--card-w-trick) * 178 / 128 + 28px);
+  justify-items: center;
+  min-height: calc(var(--card-w-trick) * 178 / 128 * 1.55);
 }
 
 .slot {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  justify-content: center;
+}
+
+.left {
+  grid-area: left;
+}
+
+.right {
+  grid-area: right;
+}
+
+.bottom {
+  grid-area: bottom;
+  z-index: 1;
+  margin-top: calc(var(--card-w-trick) * 178 / 128 * -0.45);
 }
 
 .card {
+  position: relative;
   border-radius: 8px;
   transition: transform 300ms ease-out, box-shadow 300ms ease-out;
 }
@@ -30,13 +49,23 @@
   box-shadow: 0 0 0 3px var(--accent);
 }
 
+/* The player's name sits on the lower edge of the card. */
 .name {
-  font-size: 0.8rem;
-  color: var(--muted);
-  max-width: 12ch;
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 65%);
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  pointer-events: none;
 }
 
 .empty {

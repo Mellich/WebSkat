@@ -39,6 +39,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `screens/TableScreen.tsx` | `#/t/KEY`: name form, `openTable`, TopBar, connection banner, lobby or game |
 | `screens/TableLobby.tsx` | key + copy, seats, bot strength selects, Add bot, Start, Kick |
 | `game/GameScreen.tsx` | in-game layout, status line, phase panel switch, hand, result |
+| `game/TableCenter.tsx` | the table area: Skat pile, trick at fixed positions, last-trick bubble |
 | `game/AbortGameButton.tsx` | host's "Abort game" button in the status row, with a confirm dialog |
 | `game/BiddingPanel.tsx` | history + Bid N / Hold / Play (18) / Pass |
 | `game/SkatPanels.tsx` | `SkatDecision` (pick up / Hand), `DiscardPanel` |
@@ -46,6 +47,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `game/ResultDialog.tsx` | result sheet, score table of the selected scoring system, Continue / ready state |
 | `game/useShownTrick.ts` | holds a finished trick for `trickDisplayMs` |
 | `game/seats.ts` | `opponentsOf` (seat order relative to the viewer), `namesById` |
+| `game/trickPositions.ts` | `trickSeats` (who is left / right / bottom), `placeTrick` (plays → positions) |
 | `game/labels.ts` | `cardName`, `cardShort`, `declarationLabel`, `spitzenLabel`, `suitKey`, `suitSymbol` |
 | `components/` | `Card`, `Hand`, `OpponentSeat`, `TrickArea`, `SkatPile`, `CardChip(s)`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog` (+ `.module.css`) |
 | `stats/` | `StatsPanel`, `Standings`, `History`, `ScoreChart`, `ByType`, `chartGeometry.ts`, `gameLabel.ts` |
