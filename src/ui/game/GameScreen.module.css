@@ -26,6 +26,12 @@
   position: relative;
 }
 
+/* The status area spans the whole status row; without the area it fell into one grid column. */
+.status {
+  grid-area: status;
+  min-width: 0;
+}
+
 /* Bid bubbles are positioned here, over the seat boxes and the table (docs/ui-game-screen.md §4). */
 .bidBubble,
 .bidBubbleBottom {

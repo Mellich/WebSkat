@@ -18,8 +18,8 @@ export function StatusArea({ statusText, actions, summary, sittingOut }: StatusA
   return (
     <div className={styles.status}>
       <div className={styles.statusRow} aria-live="polite" data-testid="status-line">
-        <span>{statusText}</span>
-        {actions}
+        <span className={styles.statusText}>{statusText}</span>
+        <div className={styles.statusActions}>{actions}</div>
       </div>
       {summary === null ? null : <p className={styles.declared} data-testid="bid-summary">{summary}</p>}
       {sittingOut}
