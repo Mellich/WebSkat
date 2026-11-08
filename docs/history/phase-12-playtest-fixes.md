@@ -1,3 +1,8 @@
+> **ARCHIVED.** Detailed spec of Phase 12 (done). Kept for its reasoning. The behavior it describes
+> is now documented in `skat-rules.md` §4.1 (strict bidding), `ui-game-screen.md` §2 and §5
+> (layout, trick display) and `ui.md` §10 (card chips). Old doc numbers map to new files as listed
+> at the top of `history/implementation-plan.md`.
+
 # 13 — Playtest fixes (Phase 12)
 
 Problems found while playing with two humans and one bot. This file is the **detailed spec for

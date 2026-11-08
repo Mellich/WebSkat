@@ -27,7 +27,7 @@ export interface ScoreComputation {
   readonly declarerScore: number;
 }
 
-/** Win/loss, overbid and standard declarer score (docs/03 §10.3–§10.5). */
+/** Win/loss, overbid and standard declarer score (skat-rules §10.3–§10.5). */
 function settle(
   gameValue: number,
   roundingBase: number | null,

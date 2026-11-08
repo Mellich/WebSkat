@@ -1,103 +1,100 @@
 # AGENTS.md — WebSkat
 
-You are implementing **WebSkat**: a browser-only, peer-to-peer, multiplayer Skat card game
-(3 players, optionally 4–6 players with "Geberskat" rules).
+**WebSkat** is a browser-only, peer-to-peer multiplayer Skat game (3 players; 4–6 with
+Geberskat), written in TypeScript + React. It is fully implemented (phases 0–14) and you are
+maintaining and extending it. Bots (easy/normal/strong) can fill seats.
 
-**The complete plan is in `docs/`. Read it before writing code. Do not invent rules or
-architecture — follow the docs. If something is ambiguous, pick the simplest option, write the
-decision into `docs/12-open-questions.md`, and continue.**
+## 1. Where to read
 
-## 1. Reading order (mandatory)
+1. `docs/README.md`: map of all docs and **which files to read for your task**. Read only those.
+2. The `AGENTS.md` of every folder you touch: rules, **file map**, recipes, pitfalls.
+   `src/engine/`, `src/table/`, `src/net/`, `src/ui/`, `e2e/`.
+3. `docs/dev/workflow.md`: the step-by-step process for every change.
 
-1. `docs/00-overview.md` — goals, scope, decisions at a glance
-2. `docs/01-tech-stack.md` — exact libraries and versions
-3. `docs/02-architecture.md` — layers, folder layout, data flow, trust model
-4. `docs/03-skat-rules.md` — **single source of truth for game rules and scoring**
-5. `docs/04-game-engine.md` — types, state machine, function signatures, algorithms
-6. `docs/05-networking.md` — transport, lobby, protocol messages
-7. `docs/06-ui-ux.md` — screens, components, layout
-8. `docs/07-statistics.md` — records and statistics
-9. `docs/08-implementation-plan.md` — **the phase-by-phase task list you execute**
-10. `docs/09-testing.md`, `docs/10-assets.md`, `docs/11-deployment.md`
-11. `docs/13-playtest-fixes.md` — detailed spec for Phase 12 (strict bidding, trick display, mobile layout)
-12. `docs/14-bots.md` — detailed spec for Phase 13 (bot strength levels, bidding and card-play AI)
+Rules and scoring come only from `docs/skat-rules.md`. Do not invent rules or architecture. If
+something is ambiguous, pick the simplest option, write it into `docs/decisions.md`, and continue.
+Ask the user if a request conflicts with a hard rule or with `skat-rules.md`.
 
-Then read the `AGENTS.md` inside the folder you are working in (`src/engine`, `src/table`,
-`src/net`, `src/ui`).
-
-## 2. How to work
-
-- Work **one phase at a time** in the order of `docs/08-implementation-plan.md`. Do not start a
-  phase before the previous phase's acceptance criteria pass.
-- Tick the checkboxes in `docs/08-implementation-plan.md` as you finish tasks.
-- Write tests **first or together with** engine/table code. The engine is the part where bugs are
-  most expensive.
-- After each phase run `npm run check` (typecheck + lint + unit tests). It must be green.
-- Make small, focused files (< 300 lines each). One concept per file.
-- Do not commit or create git branches unless the user asks.
-- Never modify or delete anything in `assets/` (originals). Generated files go to `public/`.
-
-## 3. Hard rules (violating these is a bug)
-
-1. **`src/engine` and `src/table` are pure TypeScript.** No `react`, no DOM, no `window`, no
-   `localStorage`, no network, no `Date.now()`, no `Math.random()`. Time and randomness are
-   injected by the caller (see `docs/04-game-engine.md`).
-2. **All game logic lives in `src/engine` / `src/table`.** UI and network code never decide whether
-   a move is legal; they only call the engine and render what it returns.
-3. **The host browser is the only authority.** Clients send *commands*; the host validates them with
-   the engine and broadcasts per-player *views*. Clients must never receive other players' hidden
-   cards (see `docs/02-architecture.md`, "Hidden information").
-4. **Validate all incoming network data** with the zod schemas in `src/net/protocol.ts` before it
-   touches the engine.
-5. **TypeScript strict mode, no `any`, no `@ts-ignore`.** Use discriminated unions and exhaustive
-   `switch` statements (with a `never` check).
-6. **State is immutable.** Engine functions return new state objects; never mutate arguments.
-7. Rules/scoring numbers come from `docs/03-skat-rules.md`. Do not "improve" them.
-8. Keep dependencies to those listed in `docs/01-tech-stack.md`. Ask (via open-questions doc) before
-   adding another.
-
-## 4. Commands (created in Phase 0)
+## 2. Architecture in 6 lines
 
 ```
-npm install            # install deps
-npm run dev            # vite dev server
-npm run build          # production build into dist/
-npm run preview        # serve dist/
-npm run typecheck      # tsc -b --noEmit equivalent
-npm run lint           # eslint
-npm run test           # vitest run (unit tests)
-npm run check          # typecheck + lint + test   <- run before declaring a phase done
-npm run assets         # regenerate public/cards and public/backs from assets/
-npm run relay          # local ws-relay signaling server for dev/e2e (optional strategy)
-npm run e2e            # playwright multi-browser test (Phase 10)
+src/ui      React screens, stores (zustand), i18n, localStorage      impure
+src/net     Trystero WebRTC transport, zod protocol, host/client      impure
+src/table   seats, dealer rotation, commands, records, views, bots   PURE
+src/engine  one Skat game: cards, bidding, play, scoring             PURE
+```
+Imports point down only. The **host** browser runs `src/table` + `src/engine`; clients send
+commands and receive per-player redacted views (`docs/architecture.md`).
+
+## 3. Hard rules (violating one is a bug)
+
+1. **`src/engine` and `src/table` are pure TypeScript.** No `react`, DOM, `window`,
+   `localStorage`, network, timers, `console`, `Date`, `Math.random`. Time and randomness are
+   parameters (`ctx.now`, `ctx.seed`, `rand`). ESLint and `tsconfig.core.json` enforce this.
+2. **All game logic lives in `src/engine` / `src/table`.** UI and net code never decide whether a
+   move is legal; the UI enables exactly what `view.game.legal` allows.
+3. **The host is the only authority.** Clients must never receive other players' hidden cards
+   (`docs/hidden-information.md`). Views are built from an allow-list in `src/table/view*.ts`.
+4. **Validate all incoming data with zod**: network messages (`src/net/protocol.ts`,
+   `schema*.ts`) and `localStorage` reads (`src/ui/persist/`).
+5. **TypeScript strict, no `any`, no `@ts-ignore`, no eslint-disable.** Discriminated unions and
+   exhaustive `switch` with `assertNever`.
+6. **State is immutable.** Return new objects; never mutate arguments. Engine/table functions
+   return `Result` and never throw for bad input.
+7. Rule and scoring numbers come from `docs/skat-rules.md`. Do not "improve" them.
+8. No new dependencies without the user's agreement (`docs/tech-stack.md` §2).
+9. Every visible string goes through `t()`, with the key in **both** `en.ts` and `de.ts`.
+10. Files < 300 lines, one concept per file, tests next to the code.
+11. Never modify or delete anything in `assets/`. Generated images go to `public/`.
+12. Do not commit, push or create branches unless the user asks.
+
+## 4. How to work (summary of `docs/dev/workflow.md`)
+
+1. Read the docs for your task (§1). Find the lowest layer the change belongs to.
+2. Write or change a test first; see it fail (`npx vitest run path/to/file.test.ts`).
+3. Implement bottom-up: engine → table → net → ui.
+4. `npm run check` must be green. Run `npm run e2e` when UI flows, layout, test ids or networking
+   changed.
+5. Update the docs in the same change (`docs/dev/docs-maintenance.md`) and log decisions in
+   `docs/decisions.md`.
+6. Report what you changed, which files, and which checks ran with which result. Never claim
+   "done" without a green `npm run check`.
+
+## 5. Commands
+
+```
+npm install                          install deps (needs Node >= 22.12; check `node -v`)
+npm run dev                          dev server http://localhost:5173
+npm run check                        typecheck + lint + unit tests   <- before you finish
+npx vitest run src/engine/x.test.ts  one test file  (-t "name" filters by test name)
+npm run e2e                          Playwright (starts relay + dev server; see docs/dev/e2e.md)
+npx playwright test e2e/game.spec.ts one e2e spec
+npm run build / npm run preview      production build into dist/ / serve it
+npm run assets                       regenerate public/cards and public/backs
+npm run relay                        local signaling relay (port 8787)
 ```
 
-Environment note: the planning machine had **no Node.js installed**. Verify `node -v` is
-`>= 22.12` (Vite 8 / Vitest 5 requirement) before starting. If Node is missing, tell the user.
+Dev pages (DEV builds): `#/dev/local?seed=N&players=3..6&bots=easy|normal|strong` (offline game
+against bots, no network) and `#/dev/gallery` (all cards and components).
 
-## 5. Glossary (German Skat terms used in code and docs)
+## 6. Skills (task checklists)
 
-| Term | Meaning |
+`.claude/skills/<name>/SKILL.md`. Other agents can read them as plain Markdown.
+
+| Skill | Use for |
 |---|---|
-| Vorhand / Mittelhand / Hinterhand | 1st / 2nd / 3rd active player after the dealer (`forehand`, `middlehand`, `hindhand` in code) |
-| Reizen | bidding |
-| Alleinspieler / declarer | the bidding winner, plays alone against the two defenders |
-| Skat | the 2 face-down cards on the table |
-| Drücken | discard 2 cards after picking up the Skat |
-| Hand | declarer does not pick up the Skat |
-| Ouvert | declarer plays with open cards |
-| Schneider / Schwarz | loser has ≤ 30 points / loser took no trick |
-| Grand | only the four Jacks (Buben) are trump |
-| Null | declarer must take no trick |
-| Spitzen | "with/without N" — count of consecutive top trumps |
-| Eingepasst | everybody passed, game is not played |
-| Geberskat | 4+ players: dealer (and others) sit out |
+| `implement-change` | any feature or behavior change, across layers |
+| `fix-bug` | reproducing and fixing a bug with a regression test |
+| `write-tests` | choosing and writing unit/component tests, helpers per layer |
+| `run-checks` | running `npm run check` / e2e and fixing typical failures |
+| `e2e-tests` | running, writing and debugging Playwright tests |
+| `change-protocol` | adding/changing a command, action, view field or message |
+| `update-docs` | bringing the docs in sync after a change |
 
-## 6. When you finish a phase
+## 7. Glossary (short; full list in `docs/overview.md` §6)
 
-State briefly: what you built, which files, which tests pass. Do not claim "done" without running
-`npm run check`.
-
-## 7. Extending the Project
-
-The user may ask to change or add functionality to this app. In that case, update the documentation accordingly to always keep it in sync.
+Vorhand/Mittelhand/Hinterhand = `forehand`/`middlehand`/`hindhand` · Geber = dealer ·
+Reizen = bidding (`bid`/`hold`/`pass`) · Alleinspieler = declarer · Skat = the 2 hidden cards ·
+Drücken = `discard` · Hand = no Skat pickup · Ouvert = open cards · Schneider ≤ 30 points ·
+Schwarz = no trick · Grand = only Jacks trump · Null = declarer takes no trick ·
+Spitzen = mit/ohne N top trumps · Eingepasst = `passed-in` · Geberskat = 4+ players, some sit out.

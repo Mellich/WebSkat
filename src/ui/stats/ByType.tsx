@@ -1,4 +1,4 @@
-// Bars of the games by type (docs/07 §3): how often each game was played and won.
+// Bars of the games by type (docs/statistics.md §3): how often each game was played and won.
 
 import type { GameKindLabel, TableStats } from '../../table';
 import { useT } from '../i18n';

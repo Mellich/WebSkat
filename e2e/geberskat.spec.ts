@@ -1,4 +1,4 @@
-// Scenario B (docs/09-testing.md §5): a public table with four players (Geberskat). The fourth
+// Scenario B (docs/dev/e2e.md): a public table with four players (Geberskat). The fourth
 // player finds the table in the public list. The dealer sits out, and the seat rotates.
 
 import { expect, test } from '@playwright/test';

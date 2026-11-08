@@ -6,7 +6,7 @@ const JACKS: readonly CardId[] = ['CJ', 'SJ', 'HJ', 'DJ'];
 const TRUMP_SUIT_RANKS: readonly Rank[] = ['A', '10', 'K', 'Q', '9', '8', '7'];
 
 /**
- * Counts Spitzen from the declarer's 12 cards (docs/03 §7).
+ * Counts Spitzen from the declarer's 12 cards (skat-rules §7).
  * "mit n" when CJ is held (n consecutive top trumps held), otherwise "ohne n"
  * (n consecutive top trumps not held). Returns null for Null.
  */

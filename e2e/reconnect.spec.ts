@@ -1,4 +1,4 @@
-// Reloading a tab during a game (docs/09-testing.md §5, scenario C; docs/05-networking.md §10).
+// Reloading a tab during a game (docs/dev/e2e.md, scenario C; docs/networking.md §9).
 
 import { expect, test } from '@playwright/test';
 import {

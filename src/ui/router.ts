@@ -1,4 +1,4 @@
-// Hash routing without a router library (docs/06-ui-ux.md §1).
+// Hash routing without a router library (docs/ui.md §1).
 
 import { useSyncExternalStore } from 'react';
 import { isValidKey, normalizeKey } from '../net';

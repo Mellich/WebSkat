@@ -1,18 +1,19 @@
-# 14 — Bots with selectable strength (Phase 13)
+# Bots (`src/table/bot/`, `src/table/bot.ts`)
 
-Detailed spec for **Phase 13** in `08-implementation-plan.md`. Start it only after Phase 12 (the strict
-bidding of `03` §4.1 is assumed). Everything in this file is **pure TypeScript in `src/table/bot/`**
-(rules of `AGENTS.md` §3 apply: no `Math.random`, no `Date.now`, randomness via the injected
-`rand: () => number`, immutable data).
+Bots fill seats at a table and run inside the host's browser. This file describes the current
+implementation (built in Phases 13–14). All bot code is **pure TypeScript** (no `Math.random`, no
+`Date.now`; randomness only from the injected `rand: () => number`; immutable data). Every numeric
+constant lives in `src/table/bot/tuning.ts`; if you change one, change it there and update this
+file. Measured strength results: `decisions.md` I101.
 
 ## 1. Goals and levels
 
-The host sets the strength **for every bot individually in the lobby** (Phase 14). A new bot starts
-at *Normal*. The strength can be changed at any time; it applies from the bot's next action.
+The host sets the strength **for every bot individually in the lobby**. A new bot starts at
+*Normal*. The strength can be changed at any time; it applies from the bot's next action.
 
 | Level | id | Bidding / Skat / declaring | Card play |
 |---|---|---|---|
-| Easy | `easy` | today's random bot (pass with p = 0.6, otherwise bid/hold/claim) | uniformly random legal card |
+| Easy | `easy` | random: pass with p = 0.6 when passing is allowed, otherwise a random legal bid/hold/claim | uniformly random legal action |
 | Normal (default) | `normal` | hand evaluation (§4): bids up to the value of its best playable game | rule-based heuristics (§5) for its team |
 | Strong | `strong` | like Normal, but the Skat is estimated by sampling (§6.3) | Monte-Carlo sampling of the hidden cards + rollouts with the Normal heuristics (§6) |
 
@@ -66,7 +67,7 @@ export function botViewOf(game: GameState, role: Role): BotView;
 | `index.ts` | `botAction(game, role, level, rand): GameAction` dispatcher. Builds the `BotView`, calls the level's strategy, **checks the result against `enumerateActions(game, role)`**, and falls back to a random legal action if it is not there (tests assert the fallback never happens) |
 | `knowledge.ts` | `PlayView` (what card play needs; also built by `simulate.ts`), `BotView extends PlayView` (+ phase, bid, bidding, Skat, counts, `legal`, `actions`), `botViewOf`, `voidsOf` |
 | `cardsLeft.ts` | helpers on a `BotView`: `unknownCards(view)`, `remainingTrumps(view)`, `isTopRemaining(card, view)` (no higher card of the same effective suit is unplayed and outside own hand), `teamOf(role, view)`, `partnerOf(role, view)` |
-| `easy.ts` | the current random logic (moved from `bot.ts`) |
+| `easy.ts` | random legal action (`easyAction`, `pickOne`) |
 | `evaluate.ts` | hand evaluation, best game, maximum bid (§4) |
 | `auction.ts` | Normal/Strong decisions for `bid`/`hold`/`pass`/`claim`, Skat decision, discard, declare (§4) |
 | `heuristics.ts` | Normal card play (§5) |
@@ -93,7 +94,7 @@ Export anything missing from `src/engine/index.ts`. Do not copy rule logic into 
     with the ace of its suit 1.0. Side ten with one other card of its suit 0.5. Each side-suit void
     +0.5 when `trumps ≥ 5`.
   - `playable = trumps ≥ 5 && score ≥ SUIT_MIN` (`SUIT_MIN = 8` with Skat pickup,
-    `SUIT_MIN_HAND = 9.5`; tuned, see `12` I101). With only 4 trumps: playable when
+    `SUIT_MIN_HAND = 9.5`; tuned, see `decisions.md` I101). With only 4 trumps: playable when
     `score ≥ SUIT_MIN + 2`.
 - **Grand**. `jacks` = Jacks held. Score: CJ 3, SJ 2.5, HJ 2, DJ 1.5, each ace 1.5, ten with its ace
   1.0, ten with one other card of its suit 0.5.
@@ -217,36 +218,34 @@ evaluation). The Skats are drawn with a seed derived from the 10 cards, so the e
 function of the hand and is memoized (64 entries) across the bids of one auction; `strongMaxBid`
 therefore takes no `rand`. Skat decision, discard and declare as in §4.4. Card play as §6.2.
 
-## 7. Table, protocol and UI changes
+## 7. Integration with table, protocol and UI
 
-*(Phase 13 first stored one strength per table, chosen in the create form. Phase 14 replaced that
-with one strength per bot, as described here.)*
+(Phase 13 first stored one strength per table; Phase 14 replaced it with one strength per bot.)
 
 - `src/table/types.ts`: `export type BotLevel = 'easy' | 'normal' | 'strong'`;
   `Player.botLevel?: BotLevel` (bots only; absent is read as `'normal'`). `add-bot` creates bots
   with `'normal'`. New command `{ type: 'set-bot-level', playerId, level }`: host only, any time,
   for seated or pending bots; errors `UNKNOWN_PLAYER`, `NOT_A_BOT`, `NOT_HOST`.
 - `src/table/bot.ts`: `botStep(s, ctx, rand)` calls `botAction(game.engine, role, bot.botLevel ??
-  'normal', rand)`. `runBots` is unchanged. The host runs bots synchronously (Phase 12), so a strong
+  'normal', rand)`. `runBots` loops it. The host runs bots synchronously, so a strong
   decision (≈ 50 ms) briefly blocks the host tab; acceptable, see §9 for the Web Worker option.
 - View: `PlayerPublic.botLevel: BotLevel | null` (`null` for humans; `viewTypes.ts`, `view.ts`),
   zod in `src/net/schemaView.ts`; `TableCommandSchema` gets `set-bot-level`. `PROTOCOL_VERSION` is
-  3 (`src/net/constants.ts`, `05` §1).
+  3 (`src/net/constants.ts`, `networking.md` §1).
 - Host snapshots (`src/ui/persist/hosted.ts`): a snapshot from version 2 had `table.botLevel`; on
   load every bot without its own level gets that value (or `'normal'`) and the table field is
   dropped (tests in `hosted.test.ts`).
 - `src/ui/dev/localTable.ts`: `?bots=easy|normal|strong` (default normal) sets every practice bot
   to that level via `set-bot-level`.
-- `Home.tsx` create form: no bot strength and no seat count (06 §1).
+- `Home.tsx` create form: no bot strength and no seat count (`ui.md` §2).
 - `TableLobby.tsx`: the host gets a `<select>` per bot (`data-testid="bot-level-<seat>"`, label
   `lobby.botLevel` "Strength of {name}" / "Stärke von {name}"); other players see the level as text
   (`TableLobby.test.tsx`).
 - i18n `en`/`de`: `botLevel.easy` ("Easy" / "Leicht"), `botLevel.normal` ("Normal"),
   `botLevel.strong` ("Strong" / "Stark"), `lobby.botLevel`, `error.NOT_A_BOT`.
-- Statistics: no change. Records already mark bots via the player list. Showing the level in records
-  is out of scope.
+- Statistics do not show bot levels (out of scope).
 
-## 8. Tests (`09` §3 lists them)
+## 8. Tests
 
 1. `knowledge.test.ts`: the fairness property from §2; void detection cases.
 2. `evaluate.test.ts`, table-driven with hands from `src/engine/testing.ts` helpers:
@@ -265,8 +264,8 @@ with one strength per bot, as described here.)*
    is ever dealt to someone else.
 6. `strong.test.ts`: deterministic for a seed; returns a legal card; a single legal card returns
    without sampling.
-7. `levels.test.ts`: 300 seeded games for `easy` and `normal`, 6 for `strong` (slow), three bots of
-   that level, calling `chooseBotAction` directly and asserting every choice is legal
+7. `levels.test.ts`: 300 seeded games each for `easy` and `normal`, 6 for `strong` (slow), three
+   bots of that level, calling `chooseBotAction` directly and asserting every choice is legal
    (`isLegalChoice`), so the fallback in `botAction` is never needed; normal/strong bids always equal
    `nextBidValue`.
 8. **Strength check** (in `levels.test.ts`, via `arena.ts` `match`), kept in `npm run check`. Use 200 seeded deals; each deal
@@ -276,7 +275,8 @@ with one strength per bot, as described here.)*
      of the games where it is the declarer.
    - `strong` vs `normal`: only behind `BOT_BENCH=1` (`it.skipIf`) because it is slow. It reports the
      totals with `console.table` and expects `strong ≥ normal`.
-   - Document the measured results in `12` (I101) when tuning.
+   - Record new measured results in `decisions.md` (I101) when tuning.
+   - Run: `BOT_BENCH=1 npx vitest run src/table/bot`.
 9. Performance (`strong.test.ts`, only with `BOT_BENCH=1` because wall-clock limits are flaky while
    the whole suite runs in parallel): one `strong` card decision < 100 ms (median of 20); one full
    game with three strong bots < 5 s.
@@ -288,3 +288,15 @@ with one strength per bot, as described here.)*
 - Bots learning across games, or opening-book tables.
 - Running bots in a Web Worker. Revisit only if the perf budget in §6.2 cannot be met with
   `SAMPLES ≥ 16`.
+
+## 10. How to change bot behavior
+
+1. Find the decision: auction → `evaluate.ts` / `auction.ts`; card play → `heuristics.ts` (normal)
+   or `strong.ts` / `simulate.ts` / `sample.ts` (strong); easy → `easy.ts`.
+2. Add a scenario test with a hand-built `BotView` (see `heuristics.test.ts`) that fails today.
+3. Change the code or a constant in `tuning.ts`. Never read `GameState` outside
+   `botViewOf`; never copy rule logic from the engine (import it from `src/engine`).
+4. Run `npx vitest run src/table/bot src/table/bot.test.ts`, then `npm run check`
+   (includes "normal beats easy"). For strength changes also run `BOT_BENCH=1` and log results in
+   `decisions.md`.
+5. Update this file.

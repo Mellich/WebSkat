@@ -1,5 +1,5 @@
 // Crops the provided sprite sheets in assets/ into public/cards/*.webp and public/backs/*.webp
-// (docs/10-assets.md). The originals are read only. Idempotent: outputs are overwritten.
+// (docs/assets.md). The originals are read only. Idempotent: outputs are overwritten.
 // `--if-missing` skips the work when the outputs already exist (used by predev/prebuild).
 
 import { existsSync } from 'node:fs';

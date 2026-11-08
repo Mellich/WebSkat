@@ -4,7 +4,7 @@ import type { Announce, Declaration } from './types';
 
 const ANNOUNCES: readonly Announce[] = ['none', 'schneider', 'schwarz'];
 
-/** Expected validity, written from the table in docs/03 §5.1. */
+/** Expected validity, written from the table in skat-rules §5.1. */
 function expectedValid(d: Declaration, hand: boolean): boolean {
   if (d.hand !== hand) return false;
   if (d.kind === 'null') return true;
@@ -13,7 +13,7 @@ function expectedValid(d: Declaration, hand: boolean): boolean {
   return true;
 }
 
-describe('validateDeclaration (docs/03 §5.1)', () => {
+describe('validateDeclaration (skat-rules §5.1)', () => {
   it.each([
     ['suit without Hand', { kind: 'suit', trump: 'H', hand: false, announce: 'none', ouvert: false }, false, true],
     ['grand without Hand', { kind: 'grand', hand: false, announce: 'none', ouvert: false }, false, true],

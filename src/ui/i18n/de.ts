@@ -1,4 +1,4 @@
-// German strings (docs/06-ui-ux.md §6). Typed against the English dictionary.
+// German strings (docs/ui.md §9). Typed against the English dictionary.
 
 import type { Dict } from './en';
 

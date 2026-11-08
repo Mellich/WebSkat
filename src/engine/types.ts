@@ -1,4 +1,4 @@
-// Core types of one Skat game (docs/04-game-engine.md, A1). Everything here is JSON-serializable.
+// Core types of one Skat game (docs/engine.md). Everything here is JSON-serializable.
 
 export type Suit = 'C' | 'S' | 'H' | 'D';
 export type Rank = '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K' | 'A';
@@ -112,7 +112,7 @@ export type GameResult =
       readonly overbid: boolean;
       readonly won: boolean;
       readonly loseValue: number | null; // value that is doubled when lost; null when won
-      readonly declarerScore: number; // standard counting, see 03 §10.5
+      readonly declarerScore: number; // standard counting, see skat-rules §10.5
     };
 
 export type GameErrorCode =

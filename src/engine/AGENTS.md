@@ -1,41 +1,65 @@
 # AGENTS.md — `src/engine` (one Skat game, pure)
 
-Read first: `docs/03-skat-rules.md` (rules + scoring vectors) and `docs/04-game-engine.md` Part A.
+Read first: `docs/skat-rules.md` (rules, scoring vectors) and `docs/engine.md` (types, reducer,
+API). Tests: `docs/dev/testing.md`.
 
 ## Rules for this folder
 
 - **Pure TypeScript.** No `react`, DOM, `window`, `localStorage`, network, `Date`, `Math.random`,
-  `console` (except in tests). No module-level mutable state. Randomness only via `rng.ts` with an
-  explicit seed.
-- Imports: only from inside `src/engine`. Never import from `src/table`, `src/net`, `src/ui`.
-- **Immutable**: every function returns new objects; never `push`/`splice`/assign on inputs. Use
-  `readonly` types, spread, `filter`, `map`. Do not use `Object.freeze` tricks to "enforce" it.
-- **Never throw** for bad input — return `Result` (`{ ok:false, error:{ code, message } }`).
-  Throw only from `assertNever` in unreachable `switch` branches.
-- Discriminated unions + exhaustive `switch` with a `default: return assertNever(x)`.
-- JSON-serializable data only (no `Map`/`Set`/classes) so states can be stored and sent.
-- Card ids are strings like `'CJ'`, `'S10'`, `'HA'`. `'10'` has two characters — use
-  `id.slice(1)` for the rank, `id[0]` for the suit.
-- Files < 300 lines, one concept per file, public API re-exported from `index.ts` only.
-- **Numbers and formulas come from `docs/03-skat-rules.md`.** If your test disagrees with the
-  doc, fix the code (or, if you believe the doc is wrong, write it in
-  `docs/12-open-questions.md` and ask) — never silently change the doc's numbers.
+  `console`, timers, module-level mutable state. Randomness only via `rng.ts` with an explicit
+  seed. (`tsconfig.core.json` has no DOM types; ESLint forbids the globals.)
+- Imports only from inside `src/engine`. Never from `src/table`, `src/net`, `src/ui`, or `zod`.
+- **Immutable**: return new objects; never `push`/`splice`/assign on inputs. Use `readonly`,
+  spread, `map`, `filter`.
+- **Never throw** for bad input: return `err(code, message)` (`types.ts`). Throw only in
+  `assertNever`.
+- Exhaustive `switch` on unions with `default: return assertNever(x)`.
+- JSON-serializable data only (no `Map`, `Set`, classes, `Date`).
+- Card ids are strings: suit = `id[0]`, rank = `id.slice(1)` (`'10'` has two characters).
+- The public API is what `index.ts` re-exports. `testing.ts` is test-only; never export it.
+- **Numbers and formulas come from `docs/skat-rules.md`.** If a test disagrees with the doc, fix
+  the code. If you believe the doc is wrong, ask the user; never change the doc's numbers silently.
 
-## Test-first checklist
+## File map
 
-1. Copy the relevant table from `docs/03-skat-rules.md` into an `it.each` table.
-2. Make it fail, then implement, then make it pass.
-3. Every exported function has at least one test; reducers have an immutability test
-   (`structuredClone` the input, run, expect input to deep-equal the clone).
-4. Phase 2 ends with the fuzz test (`docs/09-testing.md` §2).
+| File | Contents |
+|---|---|
+| `types.ts` | `Suit`, `Rank`, `CardId`, `Role`/`ROLES`, `Declaration`, `GamePhase`, `BiddingState`, `GameAction`, `GameState`, `GameResult`, `GameErrorCode`, `Result`, `ok`, `err`, `assertNever` |
+| `cards.ts` | `SUITS`, `RANKS`, `ALL_CARDS`, `card`, `suitOf`, `rankOf`, `isCardId`, `cardPoints`, `sumPoints`, `sortHand` |
+| `rng.ts` | `mulberry32(seed)`, `shuffle(items, seed)` |
+| `deck.ts` | `deal(seed)` → hands + Skat |
+| `trump.ts` | `PlayMode`, `modeOf`, `isTrump`, `effectiveSuit`, `cardStrength`, `trickWinner`, `legalCards` |
+| `spitzen.ts` | `countSpitzen(twelve, mode)` |
+| `values.ts` | `SUIT_BASE`, `GRAND_BASE`, `nullValue`, `baseValue`, `BID_VALUES`, `gameMultiplier`, `declarationFloorValue` |
+| `declaration.ts` | `validateDeclaration`, `declarationOptions` |
+| `bidding.ts` | `initialBidding`, `nextBidValue`, `applyBid`, `legalBidValues`, `biddingOutcome` |
+| `play.ts` | `playCard`, `nextRole` |
+| `scoring.ts` | `computeScore` (numbers in, for tests), `scoreGame`, `skatPointsForDeclarer` |
+| `game.ts` | `Legal`, `newGame`, `applyAction` (the reducer), `getLegal`, `enumerateActions`, `isFinished` |
+| `index.ts` | public re-exports |
+| `testing.ts` | test helpers (`hand`, `stateWith`, `apply`, `run`, `afterBidding`, …) |
+| `*.test.ts` | one test file per module; `game.fuzz.test.ts` (2000 random games), `game.scripted.test.ts` (a full game as living documentation), `game.legal.test.ts` |
+
+## Recipes
+
+- **Change a rule:** update the table-driven test from `docs/skat-rules.md` first, then the code.
+  Run `npx vitest run src/engine` (fuzz included), then `npm run check`.
+- **New action or phase:** `types.ts` → `game.ts` (`applyAction` branch, `getLegal`,
+  `enumerateActions`) → tests (flow, errors, immutability) → follow the cross-layer checklist in
+  `docs/dev/workflow.md` §4 (zod schema, `PROTOCOL_VERSION`, bots, UI).
+- **New helper for other layers:** export it from its module and make sure `index.ts` re-exports
+  it. Bots and the UI import rule helpers from here instead of copying logic.
 
 ## Pitfalls
 
-- Jacks are **not** part of their printed suit in suit games and Grand (`DJ` is trump, not a
-  diamond). In **Null** they are ordinary cards between 10 and Q.
-- The first bidder is the **middlehand** (caller), the forehand is the listener.
+- Jacks are **not** part of their printed suit in suit games and Grand (`DJ` is trump). In Null
+  they are ordinary cards between 10 and Q.
+- The first bidder is the **middlehand** (caller); the forehand is the listener. `newGame` sets
+  `turn = 'middlehand'`.
+- Bids go strictly up one step (`nextBidValue`); jumps are `ILLEGAL_BID`.
 - Spitzen use the declarer's original 10 cards + the 2 Skat cards, even after discarding.
-- `declarerPoints` includes the Skat/discarded cards; tricks count does not.
-- Schneider/Schwarz flags for the multiplier are computed for **both** won and lost games.
-- Declarer winning requires ≥ 61 (not 60). Schneider = `≥ 90` or `≤ 30`.
-- Overbid: `gameValue < bid` ⇒ lost, loss uses `ceil(bid/base)*base` (suit/grand).
+- `declarerPoints` includes the Skat/discard; the trick count does not.
+- Schneider/Schwarz flags count for **both** won and lost games.
+- The declarer needs ≥ 61 (not 60). Schneider = `≥ 90` or `≤ 30`.
+- Overbid: `gameValue < bid` ⇒ lost; loss uses `ceil(bid / base) × base` (suit/grand); Null uses
+  its own value.

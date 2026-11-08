@@ -1,4 +1,4 @@
-// The table reducer: applyCommand(state, actor, command, ctx) (docs/04-game-engine.md Part B2).
+// The table reducer: applyCommand(state, actor, command, ctx) (docs/table.md §3).
 
 import {
   applyAction,

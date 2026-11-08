@@ -1,37 +1,69 @@
-# AGENTS.md — `src/table` (many games at one table, pure)
+# AGENTS.md — `src/table` (one table, many games, bots; pure)
 
-Read first: `docs/04-game-engine.md` Part B, `docs/07-statistics.md`, `docs/02-architecture.md` §3.
+Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.md` (visibility),
+`docs/statistics.md` (records, stats), `docs/bots.md` (bots). Tests: `docs/dev/testing.md`.
 
 ## Rules for this folder
 
-- **Pure TypeScript**, same purity rules as `src/engine` (no DOM, storage, network, `Date`,
-  `Math.random`). Time and randomness arrive through `ctx: { now, seed }` or an injected `rand`.
-- Imports: `src/engine` (via its `index.ts`) and `src/table` only.
+- **Pure TypeScript**, same rules as `src/engine` (no DOM, storage, network, `Date`,
+  `Math.random`, `console`, timers). Time and randomness arrive as `ctx: { now, seed }` or an
+  injected `rand`.
+- Imports: `../engine` (its `index.ts`) and files in `src/table`. Never `src/net` or `src/ui`.
 - Everything is a **reducer**: `applyCommand(state, actorId, command, ctx)` returns
   `Result<{ state, record }>`. Never throw for invalid commands.
-- The table maps **PlayerId ↔ Role** per game; the engine knows only roles. The actor of a
-  `game` command must be one of `game.roles` values — otherwise `NOT_ACTIVE_PLAYER`.
-- State is JSON-serializable and immutable.
+- The engine knows only roles; the table maps player ids ↔ roles per game. The actor of a `game`
+  command must be in `game.roles`, otherwise `NOT_ACTIVE_PLAYER`.
+- State is JSON-serializable and immutable. Every change goes through `touch()` (`seq + 1`).
+- Test helpers (`testing.ts`, `fixtures.ts`, `bot/arena.ts`) are never exported from `index.ts`.
 
-## `view.ts` is the security boundary
+## File map
 
-- Build every `GameView` from an **allow-list**: start with empty fields and add only what the
-  viewer may see (table in `docs/02-architecture.md` §3). Never copy the whole `ActiveGame` and
-  delete fields.
-- Never include `seed`, `initialHands`, other players' `hands`, or the Skat before it is public.
-- The redaction property test (`docs/09-testing.md` §3) must exist and pass before you move on.
+| File | Contents |
+|---|---|
+| `types.ts` | `PlayerId`, `BotLevel`, `Player`, `TableStatus`, `ActiveGame`, `TableState`, `TableCommand`, `Ctx`, `TableErrorCode`, `GameKindLabel`, `ScoreDeltas`, `GameRecord`, `SUIT_LABELS` |
+| `table.ts` | `createTable`, `applyCommand` (the reducer), `dealNext`, `tryDeal`, `CommandResult` |
+| `seating.ts` | `MIN_SEATS`, `MAX_SEATS`, `MAX_NAME_LENGTH`, `allPlayers`, `touch`, `uniqueName`, `addPlayer`, `removePlayer`, `setConnected` |
+| `rotation.ts` | `pickFirstDealer`, `sittingOutSeats`, `rolesForDealer`, `roleOf` (Geberskat) |
+| `records.ts` | `seegerBonus`, `gameKindOf`, `makeRecord` |
+| `stats.ts` | `PlayerStats`, `TableStats`, `computeStats` |
+| `viewTypes.ts` | `TableView`, `GameView`, `PlayerPublic`, `ViewTrick`, `ViewLastTrick`, `ViewResult`, `ViewBidEvent`, `DeclarerSpitzen` |
+| `view.ts` | `viewFor(state, viewer)` (table part, `you`) |
+| `viewGame.ts` | `gameViewFor` (game part; the **allow-list** of visible cards) |
+| `bot.ts` | `botStep`, `runBots` (lets the bot on turn act at its own level) |
+| `bot/` | bot strategies, see `docs/bots.md` §3 for each file (`index.ts` dispatcher, `knowledge.ts` `BotView`, `easy.ts`, `evaluate.ts`, `auction.ts`, `heuristics.ts`, `cardsLeft.ts`, `sample.ts`, `simulate.ts`, `strong.ts`, `tuning.ts`, `arena.ts`) |
+| `index.ts` | public re-exports (also `BotView` type) |
+| `testing.ts` | `tableWith`, `ctxFor`, `randomStep`, `playUntilRecords`, `pickRandom` |
+| `fixtures.ts` | `finishedGame`, `GRAND_144`, `DIAMONDS_LOST`, `NULL_OUVERT_WON` |
+| `*.test.ts` | `table`, `seating`, `rotation`, `records`, `stats`, `view`, `view.redaction`, `bot`, `bot/*` |
+
+## `view.ts` / `viewGame.ts` are the security boundary
+
+- Build every view from an **allow-list**: set each field explicitly. Never spread `ActiveGame` or
+  `GameState` into a view and never "copy then delete".
+- Never include `seed`, `initialHands`, other players' `hands`, or the Skat before it is public
+  (table in `docs/hidden-information.md` §2).
+- `view.redaction.test.ts` must stay green. Extend its oracle when a new field can hold cards.
+- `viewFor` for an unknown id must not throw: `you.role = 'lobby'`, public table data only.
 
 ## Behavior reminders
 
-- Dealer pointer (`nextDealerIdx`) advances **at deal time**, also for games that end passed-in
-  or are aborted.
-- `pending` players join the seat list only in `dealNext` (before computing roles).
+- The dealer pointer (`nextDealerIdx`) moves **at deal time**, also for passed-in and aborted
+  games. `removePlayer` keeps it on the same upcoming dealer.
+- `pending` players are seated only in `dealNext`, before roles are computed.
 - Records are created exactly once per finished game (`ActiveGame.recorded`).
-- Score deltas: standard and Seeger both stored; Seeger lost-game bonus goes to **every other
-  seated player** including sitting-out ones (`bonus(N)`: 40/30/24/20).
-- Disconnected humans do not block `ready`; bots are always ready.
-- `viewFor` for a stranger id (not seated, not pending) must not throw — return a minimal view
-  with `you.role = 'lobby'` and no game info beyond public table data.
-- Bots (`bot/`, Phase 13, `docs/14-bots.md`): strategies take a `BotView` only, never `GameState`.
-  `botViewOf` is the single place that reads the game for a bot. Every bot action is checked against
-  `enumerateActions`. Tuning constants live in `bot/tuning.ts`.
+- Seeger lost-game bonus goes to **every other seated player** incl. sitting-out ones
+  (`seegerBonus`: 40/30/24/20 for 3/4/5/6 seats).
+- Bots are always ready; disconnected humans do not block `ready`.
+- Bots: strategies take a `BotView`, never `GameState`. `botViewOf` is the only bot function that
+  reads the game. Every bot action is checked against `enumerateActions`. Constants live in
+  `bot/tuning.ts`.
+
+## Recipes
+
+- **New command:** follow `docs/dev/workflow.md` §4 / skill `change-protocol`. Add a `case` to
+  `applyCommand`, return specific `TableErrorCode`s, test success + every error +
+  state-unchanged-on-error in `table.test.ts`.
+- **New view field:** `viewTypes.ts` → `view.ts`/`viewGame.ts` → `view.test.ts` → zod schema in
+  `src/net/schemaView.ts` → `PROTOCOL_VERSION` +1.
+- **Changing `TableState`:** host snapshots in `localStorage` hold the old shape; add a migration in
+  `src/ui/persist/hosted.ts` with a test.

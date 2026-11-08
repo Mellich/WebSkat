@@ -1,4 +1,4 @@
-// Property test (docs/09-testing.md §3): views never reveal a card the viewer may not see.
+// Property test (docs/dev/testing.md §4): views never reveal a card the viewer may not see.
 
 import { describe, expect, it } from 'vitest';
 import { ROLES, mulberry32, type CardId } from '../engine';

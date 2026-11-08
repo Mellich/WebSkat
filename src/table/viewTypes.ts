@@ -1,5 +1,5 @@
-// What a client may see. Other players' hands never appear here (docs/02-architecture.md §3,
-// docs/04-game-engine.md Part B4). Built only by view.ts / viewGame.ts.
+// What a client may see. Other players' hands never appear here (docs/hidden-information.md,
+// docs/table.md §6). Built only by view.ts / viewGame.ts.
 
 import type {
   BiddingStage,

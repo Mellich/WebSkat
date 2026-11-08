@@ -1,4 +1,4 @@
-// A hosted table survives a restart of its host (docs/05-networking.md §9). The snapshot goes
+// A hosted table survives a restart of its host (docs/networking.md §8). The snapshot goes
 // through JSON, as it does in localStorage; the host is started again from it with every human
 // disconnected, and the clients rejoin with their tokens and carry on with the same game.
 

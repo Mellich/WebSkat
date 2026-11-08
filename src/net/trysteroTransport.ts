@@ -1,4 +1,4 @@
-// Trystero binding of the Transport interface (docs/05-networking.md §2). Only the signaling
+// Trystero binding of the Transport interface (docs/networking.md §2). Only the signaling
 // strategy named in the config is imported, so the other one is not bundled.
 
 import type * as NostrLib from 'trystero';

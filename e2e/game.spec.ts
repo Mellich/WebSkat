@@ -1,4 +1,4 @@
-// Scenario A (docs/09-testing.md §5): three browsers play one complete game.
+// Scenario A (docs/dev/e2e.md): three browsers play one complete game.
 
 import { expect, test } from '@playwright/test';
 import { closeAll, createTable, joinTable, newPlayer, startGame, waitForHand, type Player } from './helpers';

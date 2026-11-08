@@ -1,4 +1,4 @@
-// Seats and names: joining, leaving, dealer-pointer maintenance (docs/04 Part B2).
+// Seats and names: joining, leaving, dealer-pointer maintenance (docs/table.md §2).
 
 import { err, ok, type Result } from '../engine';
 import type { BotLevel, Player, PlayerId, TableState } from './types';

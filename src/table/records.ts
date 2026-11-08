@@ -1,4 +1,4 @@
-// Builds the GameRecord of a finished game with both scoring systems (docs/07 §1, docs/03 §10.5–10.6).
+// Builds the GameRecord of a finished game with both scoring systems (docs/statistics.md §1, skat-rules §10.5–10.6).
 
 import { assertNever, type Declaration, type GameResult } from '../engine';
 import {

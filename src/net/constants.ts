@@ -1,4 +1,4 @@
-// Network constants (docs/05-networking.md §1). Changing APP_ID or the protocol version
+// Network constants (docs/networking.md §1). Changing APP_ID or the protocol version
 // makes old and new browsers unable to find each other, which is intended.
 
 import { normalizeKey } from './keys';

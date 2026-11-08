@@ -1,5 +1,5 @@
 // Transport abstraction: everything above this file is independent of Trystero, which makes it
-// testable with an in-memory network (fake.ts). docs/05-networking.md §2.
+// testable with an in-memory network (fake.ts). docs/networking.md §2
 
 /** Action names are short on purpose (≤ 12 bytes). */
 export type Channel = 'cmd' | 'msg' | 'ad';

@@ -11,7 +11,7 @@ import {
   type Role,
 } from './types';
 
-/** Value of a game won by a forehand claim (docs/03 §4.2). */
+/** Value of a game won by a forehand claim (skat-rules §4.2). */
 const CLAIM_VALUE = 18;
 
 export type BiddingOutcome =

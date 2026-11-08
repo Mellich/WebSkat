@@ -1,4 +1,4 @@
-// Standings: one row per player, sorted by the chosen total (docs/07 §3).
+// Standings: one row per player, sorted by the chosen total (docs/statistics.md §3).
 
 import type { PlayerStats, TableStats } from '../../table';
 import { useT } from '../i18n';

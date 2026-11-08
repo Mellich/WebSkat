@@ -1,4 +1,4 @@
-// Table statistics in a modal with three tabs: standings, history and charts (docs/07 §3).
+// Table statistics in a modal with three tabs: standings, history and charts (docs/statistics.md §3).
 
 import { useEffect, useMemo, useState } from 'react';
 import { computeStats, type GameRecord, type PlayerId } from '../../table';

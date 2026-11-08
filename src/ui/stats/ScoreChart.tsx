@@ -1,4 +1,4 @@
-// Cumulative score per player over the games, as a plain SVG line chart (docs/07 §3).
+// Cumulative score per player over the games, as a plain SVG line chart (docs/statistics.md §3).
 
 import type { PlayerId, TableStats } from '../../table';
 import { useT } from '../i18n';

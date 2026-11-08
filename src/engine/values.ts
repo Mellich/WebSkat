@@ -35,7 +35,7 @@ function computeBidValues(): number[] {
   return [...values].sort((a, b) => a - b);
 }
 
-/** All legal bid values, ascending (docs/03 §4.1). */
+/** All legal bid values, ascending (skat-rules §4.1). */
 export const BID_VALUES: readonly number[] = computeBidValues();
 
 function announceSteps(announce: Announce): number {
@@ -51,7 +51,7 @@ function announceSteps(announce: Announce): number {
   }
 }
 
-/** Multiplier for suit and grand games (docs/03 §10.2). */
+/** Multiplier for suit and grand games (skat-rules §10.2). */
 export function gameMultiplier(
   d: TrumpDeclaration,
   spitzen: number,

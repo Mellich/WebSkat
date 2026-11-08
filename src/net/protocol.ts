@@ -1,4 +1,4 @@
-// Wire messages (docs/05-networking.md §3). Every incoming message is parsed with these schemas
+// Wire messages (docs/networking.md §3). Every incoming message is parsed with these schemas
 // before it is used; anything else is dropped.
 
 import { z } from 'zod';

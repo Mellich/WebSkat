@@ -1,3 +1,14 @@
+> **ARCHIVED.** This is the original phase-by-phase plan (phases 0–14, all done). It records what
+> was built and in which order. It is **not** a to-do list and its file references use the old doc
+> names (`00-overview.md` … `14-bots.md`). For the current state read `docs/README.md`. New work
+> follows `docs/dev/workflow.md`; it is not added here.
+>
+> Old doc name → new file: 00 → `overview.md`, 01 → `tech-stack.md`, 02 → `architecture.md` +
+> `hidden-information.md`, 03 → `skat-rules.md`, 04 → `engine.md` + `table.md`, 05 →
+> `networking.md`, 06 → `ui.md` + `ui-game-screen.md`, 07 → `statistics.md`, 08 → this file,
+> 09 → `dev/testing.md` + `dev/e2e.md`, 10 → `assets.md`, 11 → `deployment.md`, 12 →
+> `decisions.md`, 13 → `history/phase-12-playtest-fixes.md`, 14 → `bots.md`.
+
 # 08 — Implementation Plan
 
 Execute **in order**. Tick `[x]` when done. Do not start a phase before the previous phase's

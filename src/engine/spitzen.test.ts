@@ -7,7 +7,7 @@ const HEARTS: PlayMode = { kind: 'suit', trump: 'H' };
 const CLUBS: PlayMode = { kind: 'suit', trump: 'C' };
 const GRAND: PlayMode = { kind: 'grand' };
 
-describe('countSpitzen (docs/03 §7 examples)', () => {
+describe('countSpitzen (skat-rules §7 examples)', () => {
   it.each([
     ['holds CJ SJ DJ, not HJ → mit 2', HEARTS, 'CJ SJ DJ', { with: true, count: 2 }],
     ['holds HJ DJ only → ohne 2', HEARTS, 'HJ DJ', { with: false, count: 2 }],

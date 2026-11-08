@@ -1,4 +1,4 @@
-// Public table list: collects advertisements from the lobby room (docs/05-networking.md §6).
+// Public table list: collects advertisements from the lobby room (docs/networking.md §7).
 // An advertisement only says where a table is; joining always goes through the table room.
 
 import { AD_TTL_MS, LOBBY_ROOM } from './constants';

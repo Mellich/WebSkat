@@ -3,7 +3,7 @@ import { err, ok, type Announce, type Declaration, type Result } from './types';
 
 const ANNOUNCES: readonly Announce[] = ['none', 'schneider', 'schwarz'];
 
-/** Validity matrix of docs/03-skat-rules.md §5.1. `hand` = the Skat was not picked up. */
+/** Validity matrix of skat-rules §5.1. `hand` = the Skat was not picked up. */
 export function validateDeclaration(
   d: Declaration,
   hand: boolean,

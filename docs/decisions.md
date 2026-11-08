@@ -1,7 +1,16 @@
-# 12 — Open Questions and Decisions
+# Decision log
 
-Planning-time decisions where the sources were ambiguous or silent. **Append new entries when you
-decide something while implementing** (date, decision, reason). Format: `ID — Decision — Why`.
+Every decision taken where the rules, the user or the docs were ambiguous or silent, and every
+deliberate deviation from the plan. **Append a new row** to "Decided during implementation" when
+you decide something: next free `I` number, topic (with the context, e.g. the feature), decision,
+why. Never renumber or delete rows; mark old ones *Superseded by I…* instead.
+
+Older rows cite the old doc names (`03 §4`, `05`, `09` …): 00 = `overview.md`, 01 =
+`tech-stack.md`, 02 = `architecture.md` / `hidden-information.md`, 03 = `skat-rules.md`, 04 =
+`engine.md` / `table.md`, 05 = `networking.md`, 06 = `ui.md` / `ui-game-screen.md`, 07 =
+`statistics.md`, 08 = `history/implementation-plan.md`, 09 = `dev/testing.md` / `dev/e2e.md`, 10 =
+`assets.md`, 11 = `deployment.md`, 12 = this file, 13 = `history/phase-12-playtest-fixes.md`, 14 =
+`bots.md`.
 
 ## Decided during planning
 
@@ -40,7 +49,7 @@ decide something while implementing** (date, decision, reason). Format: `ID — 
 | Q3 | Host migration if the host leaves? | No; host snapshot resume only (Phase 9) |
 | Q4 | Optional turn timer / auto-play for AFK players? | No |
 | Q5 | Sound effects? | None |
-| Q6 | Strong AI opponents? | No, random bots only |
+| Q6 | Strong AI opponents? | *Answered:* bots with easy/normal/strong levels (I99, I105) |
 
 ## Decided during implementation
 
@@ -137,7 +146,7 @@ decide something while implementing** (date, decision, reason). Format: `ID — 
 | I89 | e2e scope (Phase 10) | Three specs: one full game with three players (A), a public table of four with a rotation check (B), reloads of a client and of the host (C, plus the start-page rejoin). The game specs take about 1.5 and 3.5 minutes on this machine | 09 §5 |
 | I90 | e2e files and tooling (Phase 10) | `playwright.config.ts`, `e2e/` and `tsconfig.e2e.json` (type-aware lint for them). Test ids follow 09 §5 and are listed in the components | Keeps the e2e code typed and linted like the rest |
 | I91 | About dialog (Phase 11) | The About dialog opens from the Home footer and gives the short how-it-works, trust and privacy notes from 11 §4, in both languages. It is not reachable from a table screen | Phase 8 deferred the text to this phase; the table screen already has Settings and Stats |
-| I92 | Pages workflow (Phase 11) | `.github/workflows/pages.yml` deploys on pushes to `main` and runs `npm run check` first. The e2e suite is not in CI (it needs a browser install) | The project's current branch is `haiku-5.5`; change the trigger if the default branch differs |
+| I92 | Pages workflow (Phase 11) | *Superseded:* the workflow ("Validate") now only checks and builds `main`; publishing is `npm run publish:pages` (`deployment.md` §2). Originally: `.github/workflows/pages.yml` deployed on pushes to `main` and ran `npm run check` first. The e2e suite is not in CI (it needs a browser install) | The project's current branch is `haiku-5.5`; change the trigger if the default branch differs |
 | I93 | Dev screens in production (Phase 11) | The production bundle contains no dev screen code (checked for the `DevLocal`/`Gallery` components). It does contain the route names `#/dev/local` and `#/dev/gallery` as strings, which fall back to Home there | The routes are two small strings; removing them would only change the fallback |
 | I94 | Final checks not run (Phase 11) | No a11y audit tool (axe) and no Lighthouse run: both need packages or network that are not installed here. Checked by hand instead: real buttons, labels, `aria-live` status line, focus in dialogs. The two-device test (11 §5) also needs real devices | Open for the user to run before release |
 | I95 | Bid order (Phase 12, playtest) | House rule: bids go up strictly one step at a time through `BID_VALUES` (18, 20, 22, 23, …); no jump bids for humans or bots. `legalBidValues` keeps returning an array (with one entry) so the protocol does not change | User request after playtest (a bot opened above 18). Official Skat allows jumps; deliberately not supported |
@@ -151,3 +160,4 @@ decide something while implementing** (date, decision, reason). Format: `ID — 
 | I103 | Cards in text (Phase 12) | Cards mentioned in text are shown as small inline chips (white mini card face, coloured suit symbol, short translated rank: en J/Q/K/A, de B/D/K/A), with the full name as `aria-label`/`title`. Not mini card images | User request: "small symbols instead of writing out the cards". Text chips stay sharp at any size, wrap with text, and need no extra image loads |
 | I104 | Phase 12 review (after implementation) | F1, F2 and F4 were implemented together in one commit and reviewed afterwards against `13-playtest-fixes.md`. Deviations, all kept: no `bidUpTo` test helper (the one test that needed it spells out the bids); `TrickArea` takes a `dismissLabel` prop instead of translating itself; bot-bid checks live in `src/table/bot/levels.test.ts`. Tests added in the review: `Hand` paused + `--hand-n`, `useShownTrick` batched update and restart, host runs bots without pauses, card symbols in `#/dev/gallery`. Existing `Hand` tests used the selector `.disabled`, which never matches CSS-module class names; they now use `[class*="disabled"]` | Keeps the plan and the code in sync |
 | I105 | Bot strength per bot, no table size (Phase 14) | The create form asks only for the table name and the public flag. Every table has 6 seats (`createTable` default) and can start with 3 players or bots. Each bot has its own `botLevel` (new bots: normal); the host changes it in the lobby with `set-bot-level`. The command is accepted at any time (it applies from the bot's next action), but the UI offers it only in the lobby. `PROTOCOL_VERSION` 3; old host snapshots give each bot the former table level. `maxSeats` stays in the state, view and lobby advertisement (always 6 for UI tables) | User request. Keeping `maxSeats` avoids changing the directory protocol and the table tests that use small tables |
+| I106 | Documentation layout | The docs were restructured for small models: one topic per file (`docs/README.md` is the map), current state instead of plan, file maps in each folder's `AGENTS.md`, developer guides in `docs/dev/`, task checklists as skills in `.claude/skills/`. The plan and the Phase 12 spec moved to `docs/history/`. Code comments now cite the new file names; `skat-rules.md` kept its section numbers | User request: help smaller models understand the current state and the development rules |

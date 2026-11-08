@@ -44,7 +44,7 @@ describe('initialBidding', () => {
   });
 });
 
-describe('example table (docs/03 §4.2)', () => {
+describe('example table (skat-rules §4.2)', () => {
   it.each([
     [
       'M:18, F:hold, M:20, F:pass → H:pass',

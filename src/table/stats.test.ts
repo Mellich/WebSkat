@@ -20,14 +20,14 @@ function record(
 
 const passedIn = (number: number): GameRecord => record({ kind: 'passed-in' }, number);
 
-/** The three games of docs/03 §10.7: A declares games 1 and 2 (lost), C declares game 3. */
+/** The three games of skat-rules §10.7: A declares games 1 and 2 (lost), C declares game 3. */
 const threeGames = (): GameRecord[] => [
   record(GRAND_144, 1),
   record(DIAMONDS_LOST, 2),
   record(NULL_OUVERT_WON, 3, { forehand: C, middlehand: A, hindhand: B }),
 ];
 
-describe('computeStats series (docs/07 §5 Seeger vectors)', () => {
+describe('computeStats series (docs/statistics.md §2 Seeger vectors)', () => {
   it('ends at Seeger totals A=90, B=40, C=136 and standard totals A=90, B=0, C=46', () => {
     const last = computeStats(threeGames(), known).series.at(-1)?.cumulative;
     expect(last).toEqual({

@@ -1,4 +1,4 @@
-/* Game screen layouts (docs/06-ui-ux.md §5): portrait (default), compact landscape, large screens.
+/* Game screen layouts (docs/ui-game-screen.md §2): portrait (default), compact landscape, large screens.
    The screen fills the remaining viewport height and never scrolls; see TableScreen. */
 
 .screen {

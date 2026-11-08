@@ -1,4 +1,4 @@
-// The only networking surface the UI sees (docs/05-networking.md §5).
+// The only networking surface the UI sees (docs/networking.md §6).
 
 import type { GameRecord, TableCommand, TableView } from '../table';
 

@@ -1,4 +1,4 @@
-// Geberskat seating (docs/03-skat-rules.md §9): forehand, middlehand and hindhand follow the
+// Geberskat seating (skat-rules §9): forehand, middlehand and hindhand follow the
 // dealer; everybody else sits out. With 3 players nobody sits out.
 
 import { ROLES, type Role } from '../engine';

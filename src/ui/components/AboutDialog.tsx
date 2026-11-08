@@ -1,4 +1,4 @@
-// About WebSkat: how it works, whom you trust, and what this browser stores (docs/11 §4).
+// About WebSkat: how it works, whom you trust, and what this browser stores (docs/deployment.md §4).
 
 import { useEffect } from 'react';
 import { useT } from '../i18n';

@@ -1,4 +1,4 @@
-// User settings in localStorage, validated with zod on every load (docs/06-ui-ux.md §7).
+// User settings in localStorage, validated with zod on every load (docs/ui.md §6).
 
 import { z } from 'zod';
 import type { Language } from '../i18n';

@@ -1,5 +1,5 @@
 // Declaring the game, step by step: the game first, then the announcements that exist for it.
-// Only entries of `options` (from `legal.declarations`) can be sent (docs/06-ui-ux.md §1).
+// Only entries of `options` (from `legal.declarations`) can be sent (docs/ui-game-screen.md §4).
 
 import { useState } from 'react';
 import { declarationFloorValue, type Declaration, type Suit } from '../../engine';

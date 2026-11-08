@@ -1,4 +1,4 @@
-// The client controller (docs/05-networking.md §5). Sends commands to the host and renders the
+// The client controller (docs/networking.md §6). Sends commands to the host and renders the
 // views it receives. It never changes game state itself.
 
 import type { TableCommand } from '../table';

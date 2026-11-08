@@ -24,7 +24,7 @@ const nul = (hand = false, ouvert = false): Declaration => ({ kind: 'null', hand
 
 type Expected = Pick<ScoreComputation, 'multiplier' | 'gameValue' | 'won' | 'overbid' | 'declarerScore'>;
 
-/** The 20 worked examples of docs/03-skat-rules.md §10.7. */
+/** The 20 worked examples of skat-rules §10.7. */
 const VECTORS: ReadonlyArray<{ name: string; input: ScoreInput; expected: Expected }> = [
   {
     name: '#1 Grand mit 4, Schneider, won',
@@ -128,7 +128,7 @@ const VECTORS: ReadonlyArray<{ name: string; input: ScoreInput; expected: Expect
   },
 ];
 
-describe('computeScore against the worked examples (docs/03 §10.7)', () => {
+describe('computeScore against the worked examples (skat-rules §10.7)', () => {
   it.each(VECTORS)('$name', ({ input, expected }) => {
     const result = computeScore(input);
     expect({
@@ -187,7 +187,7 @@ describe('Schneider and Schwarz thresholds', () => {
   });
 });
 
-describe('overbid rounding (docs/03 §10.5)', () => {
+describe('overbid rounding (skat-rules §10.5)', () => {
   it('rounds the lost value up to the next multiple of the base', () => {
     const result = computeScore({
       declaration: suit('C', false),

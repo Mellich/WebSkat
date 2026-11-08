@@ -1,4 +1,4 @@
-// Shared test fixtures: the three worked games of docs/03 §10.7 (Seeger vectors). Not in index.ts.
+// Shared test fixtures: the three worked games of skat-rules §10.7 (Seeger vectors). Not in index.ts.
 
 import { newGame, type GameResult, type GameState, type Role } from '../engine';
 import type { ActiveGame, TableState } from './types';

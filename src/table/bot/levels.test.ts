@@ -1,4 +1,4 @@
-// Legality at every level and the strength check (docs/14-bots.md §8, items 7–8).
+// Legality at every level and the strength check (docs/bots.md §8, items 7–8).
 
 import { describe, expect, it } from 'vitest';
 import { applyAction, mulberry32, newGame, nextBidValue, type GameState } from '../../engine';

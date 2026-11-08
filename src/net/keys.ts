@@ -1,4 +1,4 @@
-// Table keys: 8 symbols of a 32-symbol alphabet without 0/O/1/I, i.e. 40 bits (docs/05 §7).
+// Table keys: 8 symbols of a 32-symbol alphabet without 0/O/1/I, i.e. 40 bits (docs/networking.md §7).
 
 export const KEY_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const KEY_LENGTH = 8;

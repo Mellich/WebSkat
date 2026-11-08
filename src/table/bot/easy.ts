@@ -1,4 +1,4 @@
-// Easy level: the original random bot (docs/14-bots.md §1).
+// Easy level: the original random bot (docs/bots.md §1).
 
 import type { GameAction } from '../../engine';
 import type { BotView } from './knowledge';

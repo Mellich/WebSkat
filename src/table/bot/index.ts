@@ -1,4 +1,4 @@
-// Bot dispatcher (docs/14-bots.md §3): builds the seat-limited view, asks the level's strategy
+// Bot dispatcher (docs/bots.md §3): builds the seat-limited view, asks the level's strategy
 // and makes sure the answer is a legal action.
 
 import type { GameAction, GameState, Role } from '../../engine';

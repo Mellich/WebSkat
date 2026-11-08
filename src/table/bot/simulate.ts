@@ -1,5 +1,5 @@
 // Light play-out of a full-information deal with the Normal heuristics for every seat
-// (docs/14-bots.md §6.2). Each simulated player only sees its own PlayView of the sampled world.
+// (docs/bots.md §6.2). Each simulated player only sees its own PlayView of the sampled world.
 
 import {
   cardPoints,

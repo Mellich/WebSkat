@@ -1,4 +1,4 @@
-// The cards of the current trick, in three fixed slots (docs/06-ui-ux.md §2).
+// The cards of the current trick, in three fixed slots (docs/ui.md §10).
 
 import type { CardId } from '../../engine';
 import { cls } from '../classNames';

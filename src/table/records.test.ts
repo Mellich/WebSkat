@@ -14,7 +14,7 @@ describe('seegerBonus', () => {
   });
 });
 
-describe('makeRecord scores (docs/03 §10.6 vectors)', () => {
+describe('makeRecord scores (skat-rules §10.6 vectors)', () => {
   const table = tableWith(3);
   const [a, b, c] = table.players.map((p) => p.id) as [string, string, string];
   const roles = { forehand: a, middlehand: b, hindhand: c };

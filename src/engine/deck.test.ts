@@ -19,7 +19,7 @@ describe('deal', () => {
     expect(deal(77)).toEqual(deal(77));
   });
 
-  it('deals in the documented index order (docs/03 §3)', () => {
+  it('deals in the documented index order (skat-rules §3)', () => {
     const deck = shuffle(ALL_CARDS, 2024);
     const { hands, skat } = deal(2024);
     expect(skat).toEqual(deck.slice(9, 11));

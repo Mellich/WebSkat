@@ -1,4 +1,4 @@
-// Strong level (docs/14-bots.md §6): Perfect-Information Monte-Carlo card play with heuristic
+// Strong level (docs/bots.md §6): Perfect-Information Monte-Carlo card play with heuristic
 // rollouts, and a Skat-sampling estimate of the maximum bid.
 
 import { ALL_CARDS, isTrump, mulberry32, rankOf, suitOf, type CardId } from '../../engine';

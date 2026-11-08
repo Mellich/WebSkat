@@ -1,5 +1,5 @@
 // Cache of the game records of a table on the client, so that the statistics show at once after
-// a reload (docs/07 §4). Capped at 500 records; validated with zod on load.
+// a reload (docs/statistics.md §4). Capped at 500 records; validated with zod on load.
 
 import { z } from 'zod';
 import { GameRecordSchema } from '../../net';

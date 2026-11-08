@@ -1,4 +1,4 @@
-// What a bot in one seat may know (docs/14-bots.md §2). `botViewOf` is the only bot function that
+// What a bot in one seat may know (docs/bots.md §2). `botViewOf` is the only bot function that
 // reads a GameState; every strategy works on these views, so bots cannot use hidden cards.
 
 import {

@@ -8,7 +8,7 @@ import { createTable, type TableCommand, type TableView } from '../table';
 
 export const KEY = 'ABCD-EFGH';
 
-/** Matches the card ids that may appear in a view (docs/09 §3). */
+/** Matches the card ids that may appear in a view (docs/dev/testing.md §4). */
 export const CARD_PATTERN = /\b[CSHD](?:7|8|9|10|J|Q|K|A)\b/g;
 
 /** The next action the player offered by this view should send; null when the view offers none. */

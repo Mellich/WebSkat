@@ -10,7 +10,7 @@ describe('pickFirstDealer', () => {
   });
 });
 
-describe('sittingOutSeats (docs/03 §9)', () => {
+describe('sittingOutSeats (skat-rules §9)', () => {
   it.each([
     [3, 0, []],
     [4, 2, [2]],

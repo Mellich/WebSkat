@@ -1,4 +1,4 @@
-// Hand evaluation for bidding, Skat and declaring (docs/14-bots.md §4.1–4.2).
+// Hand evaluation for bidding, Skat and declaring (docs/bots.md §4.1–4.2).
 
 import {
   countSpitzen,

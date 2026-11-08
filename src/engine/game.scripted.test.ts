@@ -3,7 +3,7 @@ import { HOLD, PASS, PICKUP, apply, bid, run, stateWith, hand, type Step } from 
 import type { CardId, Role } from './types';
 
 /**
- * Hand-written full game (living documentation, docs/09-testing.md §2).
+ * Hand-written full game (living documentation, docs/dev/testing.md §4).
  * Null, declared by the forehand after a bid of 23. The middlehand takes every trick, so the
  * declarer takes none and wins the Null. The Skat (D9, D10) is picked up and discarded again.
  */

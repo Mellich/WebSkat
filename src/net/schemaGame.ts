@@ -1,4 +1,4 @@
-// zod schemas for cards, declarations, game actions and table commands (docs/05-networking.md §3).
+// zod schemas for cards, declarations, game actions and table commands (docs/networking.md §3).
 // Typed against the engine/table types, so drift between schema and type is a compile error.
 
 import { z } from 'zod';

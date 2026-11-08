@@ -1,4 +1,4 @@
-// The host controller: the one browser that owns the TableState (docs/05-networking.md §4–5).
+// The host controller: the one browser that owns the TableState (docs/networking.md §4–5).
 // Clients send commands; the host validates them with the table reducer and broadcasts
 // redacted views. Callbacks from the transport run one at a time, so `state` is only replaced
 // synchronously inside a handler.

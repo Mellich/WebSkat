@@ -1,4 +1,4 @@
-// Normal card play (docs/14-bots.md §5): rule-based, maximizes the team's card points;
+// Normal card play (docs/bots.md §5): rule-based, maximizes the team's card points;
 // in Null the declarer avoids tricks and the defenders try to force one on the declarer.
 
 import {

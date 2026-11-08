@@ -1,5 +1,5 @@
 // Bidding (Reizen): the caller bids or passes, the listener holds or passes, the forehand may
-// claim 18 (docs/06-ui-ux.md §1). Only the options from `legal` are offered.
+// claim 18 (docs/ui-game-screen.md §3). Only the options from `legal` are offered.
 
 
 import type { GameAction, Legal } from '../../engine';

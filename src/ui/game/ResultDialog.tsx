@@ -1,4 +1,4 @@
-// The end of a game: result, breakdown, revealed Skat, and "Continue" (docs/06-ui-ux.md §1).
+// The end of a game: result, breakdown, revealed Skat, and "Continue" (docs/ui-game-screen.md §7).
 
 import type { ReactNode } from 'react';
 

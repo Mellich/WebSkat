@@ -1,4 +1,4 @@
-// viewFor(state, viewer): the only thing that leaves the host towards a client (docs/02 §3).
+// viewFor(state, viewer): the only thing that leaves the host towards a client (docs/hidden-information.md).
 
 import { roleOf } from './rotation';
 import type { PlayerId, TableState } from './types';

@@ -1,4 +1,4 @@
-// Card image URLs (docs/10-assets.md). Always relative to BASE_URL so a sub-path deployment works.
+// Card image URLs (docs/assets.md). Always relative to BASE_URL so a sub-path deployment works.
 
 import type { CardId } from '../engine';
 

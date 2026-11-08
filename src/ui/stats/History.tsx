@@ -1,4 +1,4 @@
-// One row per game, newest first, with the score change of every player (docs/07 §3).
+// One row per game, newest first, with the score change of every player (docs/statistics.md §3).
 
 import type { GameRecord, PlayerId, PlayerStats } from '../../table';
 import { useT, type Translator } from '../i18n';

@@ -1,5 +1,5 @@
 // Table state: seats, dealer rotation, the running game and the records of finished games
-// (docs/04-game-engine.md Part B1, docs/07-statistics.md §1).
+// (docs/table.md §1, docs/statistics.md §1).
 
 import type { GameAction, GameErrorCode, GameState, Role, Suit } from '../engine';
 
@@ -12,7 +12,7 @@ export interface Player {
   readonly name: string; // 1..20 chars, trimmed, unique at the table
   readonly connected: boolean;
   readonly isBot: boolean;
-  /** Strength of a bot (docs/14-bots.md); absent for humans and read as 'normal' for bots. */
+  /** Strength of a bot (docs/bots.md); absent for humans and read as 'normal' for bots. */
   readonly botLevel?: BotLevel;
 }
 
@@ -80,7 +80,7 @@ export type TableErrorCode =
 
 export type GameKindLabel = 'clubs' | 'spades' | 'hearts' | 'diamonds' | 'grand' | 'null';
 
-/** Score deltas per seated player id, for both scoring systems (docs/03 §10.5, §10.6). */
+/** Score deltas per seated player id, for both scoring systems (skat-rules §10.5, §10.6). */
 export interface ScoreDeltas {
   readonly standard: Readonly<Record<PlayerId, number>>;
   readonly seeger: Readonly<Record<PlayerId, number>>;

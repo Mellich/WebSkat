@@ -1,4 +1,4 @@
-// Self-hosted signaling relay (docs/05-networking.md §8). Forwards WebRTC signaling messages only;
+// Self-hosted signaling relay (docs/networking.md §10). Forwards WebRTC signaling messages only;
 // it contains no game logic and sees no game data. Run with `npm run relay`.
 
 import { createWsRelayServer } from '@trystero-p2p/ws-relay/server';

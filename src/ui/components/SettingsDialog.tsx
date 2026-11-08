@@ -1,4 +1,4 @@
-// Settings: language, card back (with previews), two-tap play and the scoring system.
+// Settings: language, card back (with previews), two-tap play, trick display time and scoring.
 
 import { useEffect } from 'react';
 import type { BackIndex } from '../assets';

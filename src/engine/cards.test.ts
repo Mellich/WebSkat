@@ -46,7 +46,7 @@ describe('card parsing', () => {
   });
 });
 
-describe('card points (docs/03 §1)', () => {
+describe('card points (skat-rules §1)', () => {
   it.each([
     ['CA', 11],
     ['C10', 10],

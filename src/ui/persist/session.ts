@@ -1,4 +1,4 @@
-// The client's seat session for reconnecting after a reload (docs/05-networking.md §4).
+// The client's seat session for reconnecting after a reload (docs/networking.md §4).
 
 import { z } from 'zod';
 

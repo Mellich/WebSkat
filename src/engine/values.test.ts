@@ -8,7 +8,7 @@ import {
 } from './values';
 import type { Declaration, TrumpDeclaration } from './types';
 
-describe('BID_VALUES (docs/03 §4.1)', () => {
+describe('BID_VALUES (skat-rules §4.1)', () => {
   it('starts with the documented first 20 values', () => {
     expect(BID_VALUES.slice(0, 20)).toEqual([18, 20, 22, 23, 24, 27, 30, 33, 35, 36, 40, 44, 45, 46, 48, 50, 54, 55, 59, 60]);
   });
@@ -33,7 +33,7 @@ describe('BID_VALUES (docs/03 §4.1)', () => {
   });
 });
 
-describe('base values (docs/03 §10.1)', () => {
+describe('base values (skat-rules §10.1)', () => {
   const base = { hand: false, announce: 'none', ouvert: false } as const;
 
   it.each([
@@ -48,7 +48,7 @@ describe('base values (docs/03 §10.1)', () => {
   });
 });
 
-describe('nullValue (docs/03 §10.1)', () => {
+describe('nullValue (skat-rules §10.1)', () => {
   it.each([
     [false, false, 23],
     [true, false, 35],
@@ -59,7 +59,7 @@ describe('nullValue (docs/03 §10.1)', () => {
   });
 });
 
-describe('gameMultiplier (docs/03 §10.2 and §10.7 vectors)', () => {
+describe('gameMultiplier (skat-rules §10.2 and §10.7 vectors)', () => {
   const grand = (hand: boolean, announce: TrumpDeclaration['announce'], ouvert: boolean): TrumpDeclaration => ({
     kind: 'grand',
     hand,

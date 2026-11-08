@@ -1,6 +1,6 @@
 // A "robot clicker" that plays a game through the UI, one browser page per player. It takes the
 // first option the page offers, so it needs no knowledge of the rules; the engine decides what is
-// legal and the test checks what the players see (docs/09-testing.md §5).
+// legal and the test checks what the players see (docs/dev/e2e.md).
 
 import type { Locator, Page } from '@playwright/test';
 

@@ -1,4 +1,5 @@
-// English card names for labels and alt texts. Phase 6 moves these into the i18n dictionaries.
+// English card names: fallback labels and alt texts for components used without a translator
+// (default props, the dev gallery). Translated names come from `cardName` in game/labels.ts.
 
 import { rankOf, suitOf, type CardId, type Rank, type Suit } from '../engine';
 

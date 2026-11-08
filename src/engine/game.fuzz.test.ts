@@ -4,7 +4,7 @@ import { applyAction, enumerateActions, getLegal, isFinished, newGame } from './
 import { mulberry32 } from './rng';
 import { ROLES, type CardId, type GameAction, type GameResult, type GameState } from './types';
 
-/** Property test (docs/09-testing.md §2): random legal games played to the end. */
+/** Property test (docs/dev/testing.md §4): random legal games played to the end. */
 
 const GAMES = 2000;
 const MAX_STEPS = 300;

@@ -1,4 +1,4 @@
-// Scenario D (docs/09-testing.md §5, docs/13-playtest-fixes.md F3): the game screen fits phones in
+// Scenario D (docs/dev/e2e.md, docs/history/phase-12-playtest-fixes.md F3): the game screen fits phones in
 // portrait and landscape without scrolling, and cards stay readable but not oversized.
 
 import { expect, test, type Browser, type Page } from '@playwright/test';

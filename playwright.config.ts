@@ -1,4 +1,4 @@
-// End-to-end tests (docs/09-testing.md §5). Every browser context is one player with its own
+// End-to-end tests (docs/dev/e2e.md). Every browser context is one player with its own
 // storage. The signaling relay and the dev server are started here, so no public Nostr relay is used.
 // Set WEBSKAT_CHROMIUM to a Chromium binary to use an installed browser instead of Playwright's.
 

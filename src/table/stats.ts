@@ -1,4 +1,4 @@
-// Pure aggregations over the game records of one table (docs/07-statistics.md §2).
+// Pure aggregations over the game records of one table (docs/statistics.md §2).
 
 import type { GameKindLabel, GameRecord, PlayerId } from './types';
 

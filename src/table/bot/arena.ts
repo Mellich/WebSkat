@@ -1,4 +1,4 @@
-// Test support: plays engine-only games between bot levels (docs/14-bots.md §8).
+// Test support: plays engine-only games between bot levels (docs/bots.md §8).
 // Not exported from the table index.
 
 import { applyAction, mulberry32, newGame, ROLES, type GameState, type Role } from '../../engine';

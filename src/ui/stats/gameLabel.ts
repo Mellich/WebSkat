@@ -1,4 +1,4 @@
-// Labels of finished games, shared by the history and the result dialog (docs/07-statistics.md §3).
+// Labels of finished games, shared by the history and the result dialog (docs/statistics.md §3).
 
 import type { GameKindLabel, GameRecord } from '../../table';
 import type { Translator } from '../i18n';

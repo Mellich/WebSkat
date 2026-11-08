@@ -1,4 +1,4 @@
-// zod schemas for views and game records sent from the host (docs/05-networking.md §3).
+// zod schemas for views and game records sent from the host (docs/networking.md §3).
 
 import { z } from 'zod';
 import type { GameRecord, GameView, TableView, ViewResult } from '../table';

@@ -1,5 +1,5 @@
 // The viewer's own cards, sorted for display. Only `legal` cards are clickable; the UI never
-// decides legality itself (docs/06-ui-ux.md §2).
+// decides legality itself (docs/ui.md §10).
 
 import { sortHand, type CardId, type Declaration } from '../../engine';
 import { cardLabel } from '../cardNames';

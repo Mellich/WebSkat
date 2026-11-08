@@ -1,4 +1,4 @@
-// All numeric bot constants in one place (docs/14-bots.md). Results of tuning: docs/12 I101.
+// All numeric bot constants in one place (docs/bots.md). Results of tuning: docs/decisions.md I101.
 
 /** Easy level: probability to pass when passing is allowed in the auction. */
 export const EASY_PASS_PROBABILITY = 0.6;

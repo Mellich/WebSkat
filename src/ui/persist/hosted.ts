@@ -1,4 +1,4 @@
-// Snapshots of the tables this browser hosts, so that a reload can resume them (docs/05 §9).
+// Snapshots of the tables this browser hosts, so that a reload can resume them (docs/networking.md §8).
 // A snapshot is our own data: it is checked for the parts the app reads (a shape guard), not for
 // every field of the engine state, which would duplicate the engine's types.
 

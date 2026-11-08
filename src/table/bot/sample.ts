@@ -1,4 +1,4 @@
-// Random hidden-card deals consistent with what a bot knows (docs/14-bots.md §6.1).
+// Random hidden-card deals consistent with what a bot knows (docs/bots.md §6.1).
 
 import { effectiveSuit, modeOf, type CardId, type Role } from '../../engine';
 import { outstanding } from './cardsLeft';

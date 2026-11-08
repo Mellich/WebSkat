@@ -1,5 +1,5 @@
 // Integration: three participants (host + two clients) play a complete game over the fake
-// network, using only the views they receive (docs/09-testing.md §4).
+// network, using only the views they receive (docs/dev/testing.md §4).
 
 import { describe, expect, it } from 'vitest';
 import { ROLES, type CardId } from '../engine';

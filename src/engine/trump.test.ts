@@ -24,7 +24,7 @@ describe('modeOf', () => {
   });
 });
 
-describe('isTrump and effectiveSuit (docs/03 §6.1, §6.3)', () => {
+describe('isTrump and effectiveSuit (skat-rules §6.1, §6.3)', () => {
   it.each([
     ['DJ', HEARTS, true],
     ['HA', HEARTS, true],
@@ -48,7 +48,7 @@ describe('isTrump and effectiveSuit (docs/03 §6.1, §6.3)', () => {
   });
 });
 
-describe('trump strength order (docs/03 §6.2)', () => {
+describe('trump strength order (skat-rules §6.2)', () => {
   function strictlyDecreasing(cards: readonly CardId[], mode: PlayMode): boolean {
     const values = cards.map((c) => cardStrength(c, mode));
     return values.every((v, i) => i === 0 || (values[i - 1] ?? Infinity) > v);
@@ -67,7 +67,7 @@ describe('trump strength order (docs/03 §6.2)', () => {
   });
 });
 
-describe('legalCards (docs/03 §6.4)', () => {
+describe('legalCards (skat-rules §6.4)', () => {
   it.each([
     ['Hearts: follow the diamond lead, DJ is trump', HEARTS, 'D10', 'DJ D9 C7', 'D9'],
     ['Hearts: trump lead must be followed with trump', HEARTS, 'HJ', 'SJ H7 C7 D7', 'SJ H7'],
@@ -87,7 +87,7 @@ describe('legalCards (docs/03 §6.4)', () => {
   });
 });
 
-describe('trickWinner (docs/03 §6.5)', () => {
+describe('trickWinner (skat-rules §6.5)', () => {
   it.each([
     ['Hearts: trump jack beats the led ace', HEARTS, trick(['forehand', 'CA'], ['middlehand', 'H7'], ['hindhand', 'SJ']), 'hindhand'],
     ['Hearts: off-suit ace cannot win', HEARTS, trick(['forehand', 'CA'], ['middlehand', 'C10'], ['hindhand', 'DA']), 'forehand'],

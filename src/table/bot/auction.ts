@@ -1,4 +1,4 @@
-// Normal/Strong auction, Skat decision, discard and declaration (docs/14-bots.md §4.3–4.4).
+// Normal/Strong auction, Skat decision, discard and declaration (docs/bots.md §4.3–4.4).
 
 import {
   declarationFloorValue,

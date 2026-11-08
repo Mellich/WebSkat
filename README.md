@@ -4,8 +4,9 @@ Skat in the browser, peer to peer. Three players, or four to six with Geberskat 
 extra players sit out, and the seat rotates after each game). No accounts, no server of our own:
 the browsers talk to each other over WebRTC, and only the signaling step uses a relay.
 
-The plan and the rules live in `docs/`. Start with `docs/00-overview.md`; `AGENTS.md` lists the
-reading order and the hard rules.
+Documentation lives in `docs/`: start with `docs/README.md` (map of all docs). The Skat rules
+implemented are in `docs/skat-rules.md`. Contributors and coding agents read `AGENTS.md` first
+(hard rules, commands, workflow).
 
 ## How to play
 
@@ -102,5 +103,7 @@ can. Any TURN server works (a hosted service or coturn); game data stays end-to-
 
 - `src/engine` (rules, pure), `src/table` (table, scoring, statistics, views, bots; pure),
   `src/net` (protocol, host and client controllers, transports), `src/ui` (React screens).
-- `docs/` holds the specification and the decision log (`docs/12-open-questions.md`).
+- `docs/` describes the current implementation (`docs/README.md`), the development workflow
+  (`docs/dev/`) and the decision log (`docs/decisions.md`).
 - `e2e/` holds the Playwright tests.
+- `.claude/skills/` holds task checklists for coding agents.

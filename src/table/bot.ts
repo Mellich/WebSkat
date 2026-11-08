@@ -1,5 +1,5 @@
-// Bot orchestration on a table (docs/04-game-engine.md B3). The strategies live in ./bot/ and
-// only receive the seat-limited BotView (docs/14-bots.md).
+// Bot orchestration on a table (docs/bots.md). The strategies live in ./bot/ and
+// only receive the seat-limited BotView (docs/bots.md).
 
 import { botAction } from './bot/index';
 import { applyCommand } from './table';

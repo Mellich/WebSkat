@@ -1,8 +1,12 @@
-# 03 — Skat Rules and Scoring (single source of truth)
+# Skat rules and scoring (single source of truth)
 
 Based on the International Skat Order (ISkO) and the German Wikipedia articles *Skat* and
-*Skatabrechnung*. **Implement exactly this. Do not add house rules.** If a case is not covered,
-choose the simplest behavior and record it in `12-open-questions.md`.
+*Skatabrechnung*. **Implement exactly this.** The only house rule is the strictly ascending
+bidding of §4.1 (user request); do not add others. If a case is not covered, choose the simplest
+behavior and record it in `decisions.md`. Never change a number here unless the user asks.
+
+Code comments and tests cite this file as `skat-rules §N` (e.g. `skat-rules §10.7`). **Do not
+renumber sections.** Implementation: `engine.md`.
 
 ## 1. Cards
 
@@ -37,7 +41,7 @@ For 4+ players see §9 (Geberskat).
 
 ## 3. Deal
 
-Shuffled 32 cards (seeded Fisher–Yates, see `04-game-engine.md`). Deal order: 3 to each active
+Shuffled 32 cards (seeded Fisher–Yates, see `engine.md` §6). Deal order: 3 to each active
 player (forehand, middlehand, hindhand), then 2 face-down to the **Skat**, then 4 each, then 3 each.
 Result: 10 cards per active player + 2 Skat cards. (Cutting is skipped.) Sitting-out players
 receive no cards.
@@ -58,8 +62,8 @@ sorted ascending, de-duplicated, max 264. Begins:
 
 **House rule — strictly ascending bids (no jumps).** The caller can only bid the *next* value of
 `BID_VALUES`: `18` when `currentBid` is `null`, otherwise the smallest value `> currentBid`
-(`nextBidValue` in `04`). This applies to humans and bots equally. After `264` the caller can only
-pass. (Official Skat allows jump bids; WebSkat deliberately does not, see `12` I95.)
+(`nextBidValue` in `src/engine/bidding.ts`). This applies to humans and bots equally. After `264` the caller can only
+pass. (Official Skat allows jump bids; WebSkat deliberately does not, see `decisions.md` I95.)
 
 ### 4.2 Procedure
 
@@ -244,7 +248,7 @@ defenderTricks = 10 - declarerTricks   (suit/grand; Null may end early)
 - For a game with dealer seat `d`: `forehand = (d+1) mod N`, `middlehand = (d+2) mod N`,
   `hindhand = (d+3) mod N`. Everybody else sits out (for N=3 nobody sits out; for N=4 only the
   dealer; for N=5 the dealer and seat `d+4`; for N=6 dealer, `d+4`, `d+5`).
-  *(Simplification of the official 5/6-player seating; recorded in `12-open-questions.md`.)*
+  *(Simplification of the official 5/6-player seating; recorded in `decisions.md` D7.)*
 - Sitting-out players see the public table (backs, trick area) but no hands, and take part in
   Seeger bonus scoring when the declarer loses (§10.6).
 - New players are seated **between games only** (appended as last seat). Players can be removed
@@ -340,7 +344,7 @@ bonus(N): N=3 → 40, N=4 → 30, N=5 → 24, N=6 → 20          // 6 is our ow
 where `loseValue` is as in 10.5 (`gameValue` if not overbid).
 "Every other seated player" = both defenders **and** all sitting-out players.
 
-Both systems are computed and stored for every game (`07-statistics.md`); the UI chooses which
+Both systems are computed and stored for every game (`statistics.md`); the UI chooses which
 one to display (default: Seeger–Fabian).
 
 ### 10.7 Worked examples = test vectors

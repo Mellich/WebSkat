@@ -9,7 +9,7 @@ export interface Deal {
 
 type IndexRange = readonly [from: number, to: number];
 
-/** Deal order per docs/03-skat-rules.md §3: 3-3-3, Skat (2), 4-4-4, 3-3-3. */
+/** Deal order per skat-rules §3: 3-3-3, Skat (2), 4-4-4, 3-3-3. */
 export function deal(seed: number): Deal {
   const deck = shuffle(ALL_CARDS, seed);
   const pick = (ranges: readonly IndexRange[]): CardId[] =>

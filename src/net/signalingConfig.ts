@@ -1,4 +1,4 @@
-// Build-time signaling configuration from VITE_* variables (docs/11-deployment.md §3).
+// Build-time signaling configuration from VITE_* variables (docs/deployment.md §3).
 // Pure: the UI passes `import.meta.env`, tests pass plain objects.
 
 export interface TurnConfig {
