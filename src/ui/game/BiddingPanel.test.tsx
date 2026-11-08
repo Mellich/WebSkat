@@ -72,13 +72,15 @@ describe('BiddingPanel', () => {
     expect(send.mock.calls).toEqual([[{ type: 'claim' }], [{ type: 'pass' }]]);
   });
 
-  it('lists the bidding so far with names', () => {
+  it('shows only the current bid and who bids to whom', () => {
     render(
       <BiddingPanel
         bidding={bidding({
+          currentBid: 20,
           history: [
             { playerId: 'a', type: 'bid', value: 18 },
-            { playerId: 'b', type: 'pass' },
+            { playerId: 'b', type: 'hold' },
+            { playerId: 'a', type: 'bid', value: 20 },
           ],
         })}
         legal={{}}
@@ -86,6 +88,18 @@ describe('BiddingPanel', () => {
         send={() => undefined}
       />,
     );
-    expect(document.body.textContent).toContain('Anna 18 · Ben passes');
+    expect(screen.getByTestId('bid-current').textContent).toBe('Current bid: 20 (Anna)');
+    expect(screen.getByTestId('bid-turn').textContent).toBe('Anna bids, Ben answers');
+    expect(document.querySelector('.bidding')?.textContent).not.toContain('18');
+  });
+
+  it('says that no bid has been made yet', () => {
+    render(<BiddingPanel bidding={bidding()} legal={{}} nameOf={names} send={() => undefined} />);
+    expect(screen.getByTestId('bid-current').textContent).toBe('No bid yet.');
+  });
+
+  it('tells the forehand that it may play 18 or pass in the claim stage', () => {
+    render(<BiddingPanel bidding={bidding({ stage: 'claim', currentBid: 18 })} legal={{}} nameOf={names} send={() => undefined} />);
+    expect(screen.getByTestId('bid-turn').textContent).toBe('Anna may play (18) or pass');
   });
 });

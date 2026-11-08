@@ -27,7 +27,7 @@
 | `tsc`: `Object is possibly 'undefined'` | `noUncheckedIndexedAccess` | handle `undefined` (`?? fallback`, early return) |
 | `tsc`: type `undefined` not assignable with an optional field | `exactOptionalPropertyTypes` | conditional spread `...(x === undefined ? {} : { x })`, or type the field `?: T \| undefined` (needed for zod-inferred types) |
 | `tsc`: `Cannot find name 'window'/'console'` in engine/table | `tsconfig.core.json` has no DOM | move the code to `src/ui`/`src/net`, or pass the value in |
-| `tsc`: missing property in `de.ts` | key added only to `en.ts` | add the German text |
+| `tsc`: missing property in a `de*.ts` part | key added only to the `en*.ts` part (`i18n/parts/`) | add the German text to the matching `de*.ts` part |
 | `tsc`: schema not assignable to `ZodType<…>` | zod schema and TS type drifted | update `src/net/schema*.ts` |
 | ESLint `no-restricted-globals` / `no-restricted-imports` | impure code or wrong layer import | inject the value / move the code |
 | ESLint `switch-exhaustiveness-check` | new union member | add the `case` |

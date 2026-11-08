@@ -7,16 +7,21 @@ import type { GameConnection } from '../../net';
 import type { GameView, TableView } from '../../table';
 import { Hand } from '../components/Hand';
 import { OpponentSeat } from '../components/OpponentSeat';
+import { SpeechBubble } from '../components/SpeechBubble';
 import { useT, type Translator } from '../i18n';
 import { useSettings } from '../store/settings';
 import { useSession } from '../store/session';
 import { AbortGameButton } from './AbortGameButton';
 import { BiddingPanel } from './BiddingPanel';
 import { DeclarationPicker } from './DeclarationPicker';
-import { cardName, declarationLabel } from './labels';
+import { bubbleText, type BidBubble } from './bidBubbles';
+import { cardName } from './labels';
+import { declarerSummary } from './declarerSummary';
+import { StatusArea } from './StatusArea';
 import { ResultDialog } from './ResultDialog';
 import { SkatDecision, DiscardPanel } from './SkatPanels';
 import { namesById, opponentsOf, type SeatedView } from './seats';
+import { useBidBubbles } from './useBidBubbles';
 import { useShownTrick } from './useShownTrick';
 import { TableCenter } from './TableCenter';
 import styles from './GameScreen.module.css';
@@ -62,6 +67,8 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
   const trickDisplayMs = useSettings((s) => s.trickDisplayMs);
   const shown = useShownTrick(game, trickDisplayMs);
   const opponents = opponentsOf(view);
+  const bidBubbleMs = useSettings((s) => s.bidBubbleMs);
+  const bubbles = useBidBubbles(game.bidding.history, bidBubbleMs);
   const label = (c: CardId): string => cardName(c, t);
   const send = (action: GameAction): void => {
     connection.send({ type: 'game', action });
@@ -103,7 +110,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
   })();
 
   const declarer = game.declarerId === null ? '' : nameOf(game.declarerId);
-  const declared = game.declaration === null ? null : declarationLabel(game.declaration, t);
+  const summary = declarerSummary(game, nameOf, t);
   useEffect(() => {
     if (!shown.holding) return;
     const timer = window.setTimeout(() => { setPending(null); }, 0);
@@ -111,6 +118,18 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
   }, [shown.holding]);
   const amSittingOut = view.you.role === 'sitting-out';
   const dealerName = nameOf(game.dealerId);
+  // Bubbles sit at the seat boxes (left, right) and at the bottom: the viewer, or the third active player when the viewer sits out.
+  const leftId = opponents.active[0]?.player.id;
+  const rightId = opponents.active[1]?.player.id;
+  const bottomId = myRole !== null ? viewer : opponents.active[2]?.player.id;
+  const bubbleAt = (id: string | undefined, placement: 'below' | 'above', testId: string, className: string | undefined) => {
+    const b: BidBubble | undefined = id === undefined ? undefined : bubbles[id];
+    return b === undefined ? null : (
+      <div className={className}>
+        <SpeechBubble text={bubbleText(b.event, t)} placement={placement} testId={testId} />
+      </div>
+    );
+  };
 
   const seat = (index: number) => {
     const s = opponents.active[index];
@@ -170,30 +189,41 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
 
   return (
     <div className={styles.screen}>
-      <div className={styles.oppL}>{seat(0)}</div>
-      <div className={styles.oppR}>{seat(1)}</div>
+      <div className={styles.oppL}>{seat(0)}{bubbleAt(leftId, 'below', 'bid-bubble-left', styles.bidBubble)}</div>
+      <div className={styles.oppR}>{seat(1)}{bubbleAt(rightId, 'below', 'bid-bubble-right', styles.bidBubble)}</div>
 
-      <TableCenter view={view} game={game} shown={shown} showLast={showLast} cardBack={cardBack} nameOf={nameOf} label={label} />
+      <TableCenter
+        view={view}
+        game={game}
+        shown={shown}
+        showLast={showLast}
+        cardBack={cardBack}
+        nameOf={nameOf}
+        label={label}
+        bottomBubble={bubbleAt(bottomId, 'above', 'bid-bubble-bottom', styles.bidBubbleBottom)}
+      />
 
       <div className={styles.status}>
-        <div className={styles.statusRow} aria-live="polite" data-testid="status-line">
-          <span>{statusLine}</span>
-          {view.you.id === view.table.hostId && game.phase !== 'finished' && game.waitingFor !== null ? (
-            <AbortGameButton onAbort={() => { connection.send({ type: 'abort-game' }); }} />
-          ) : null}
-          {game.lastTrick === null ? null : (
-            <button type="button" aria-pressed={showLast} onClick={() => { setShowLast((v) => !v); }}>{t('trick.last')}</button>
+        <StatusArea
+          statusText={statusLine}
+          actions={(
+            <>
+              {view.you.id === view.table.hostId && game.phase !== 'finished' && game.waitingFor !== null ? (
+                <AbortGameButton onAbort={() => { connection.send({ type: 'abort-game' }); }} />
+              ) : null}
+              {game.lastTrick === null ? null : (
+                <button type="button" aria-pressed={showLast} onClick={() => { setShowLast((v) => !v); }}>{t('trick.last')}</button>
+              )}
+            </>
           )}
-        </div>
-        {declared === null ? null : (
-          <p className={styles.declared}>{t('status.declared', { game: declared, name: declarer })}</p>
-        )}
-        {opponents.sittingOut.length > 0 ? (
-          <p className={styles.sittingOut} aria-label={t('sitOut.bar')} data-testid="sitting-out">
-            {t('sitOut.bar')}: {opponents.sittingOut.map((o) => o.player.name).join(', ')}
-            {' · '}{t('role.dealer')}: {dealerName}
-          </p>
-        ) : null}
+          summary={summary}
+          sittingOut={opponents.sittingOut.length === 0 ? null : (
+            <p className={styles.sittingOut} aria-label={t('sitOut.bar')} data-testid="sitting-out">
+              {t('sitOut.bar')}: {opponents.sittingOut.map((o) => o.player.name).join(', ')}
+              {' · '}{t('role.dealer')}: {dealerName}
+            </p>
+          )}
+        />
       </div>
 
       {phaseContent === null ? null : (

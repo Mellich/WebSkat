@@ -1,0 +1,49 @@
+/* Status area under the table: status line, declarer summary, sitting-out line (docs/ui-game-screen.md §6). */
+
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.statusRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.statusRow button {
+  min-height: 36px;
+  font-size: 0.9rem;
+  padding: 0 10px;
+}
+
+.declared,
+.sittingOut {
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Phones held sideways: the same rows, a little smaller. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .statusRow {
+    min-height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .statusRow button {
+    min-height: 30px;
+  }
+}

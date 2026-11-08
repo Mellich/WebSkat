@@ -1,10 +1,10 @@
 // Bidding (Reizen): the caller bids or passes, the listener holds or passes, the forehand may
-// claim 18 (docs/ui-game-screen.md §3). Only the options from `legal` are offered.
-
+// claim 18 (docs/ui-game-screen.md §3). Only the options from `legal` are offered. The panel shows
+// the current bid and whose turn it is; the bubbles over the seats show every single bid.
 
 import type { GameAction, Legal } from '../../engine';
 import type { GameView, ViewBidEvent } from '../../table';
-import { useT, type Translator } from '../i18n';
+import { useT } from '../i18n';
 
 export interface BiddingPanelProps {
   readonly bidding: GameView['bidding'];
@@ -13,41 +13,45 @@ export interface BiddingPanelProps {
   readonly send: (action: GameAction) => void;
 }
 
-function historyText(ev: ViewBidEvent, name: string, t: Translator): string {
-  switch (ev.type) {
-    case 'bid':
-      return `${name} ${String(ev.value ?? '')}`;
-    case 'hold':
-      return `${name} ${t('bid.holdWord')}`;
-    case 'pass':
-      return `${name} ${t('bid.passWord')}`;
-    case 'claim':
-      return `${name} ${t('bid.claimWord')}`;
-    default: {
-      const unused: never = ev.type;
-      return unused;
-    }
+/** The player who made the current bid: the last `bid` or `claim` event. */
+function bidderOf(history: readonly ViewBidEvent[]): string | null {
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    const ev = history[i];
+    if (ev !== undefined && (ev.type === 'bid' || ev.type === 'claim')) return ev.playerId;
   }
+  return null;
 }
 
 export function BiddingPanel({ bidding, legal, nameOf, send }: BiddingPanelProps) {
   const t = useT();
   const values = legal.bidValues ?? [];
   const selected = values[0] ?? null;
+  const bidder = bidderOf(bidding.history);
+  const currentText = bidding.currentBid === null || bidder === null
+    ? t('bid.none')
+    : t('bid.current', { value: bidding.currentBid, name: nameOf(bidder) });
+  const turnText = (() => {
+    switch (bidding.stage) {
+      case 1:
+      case 2:
+        return t('bid.turn', { caller: nameOf(bidding.callerId), listener: nameOf(bidding.listenerId) });
+      case 'claim':
+        return t('bid.claimTurn', { name: nameOf(bidding.callerId) });
+      case 'done':
+      case 'passed-in':
+        return null;
+      default: {
+        const unused: never = bidding.stage;
+        return unused;
+      }
+    }
+  })();
 
   return (
     <section className="bidding" aria-label={t('bid.title')}>
       <h3>{t('bid.title')}</h3>
-      {bidding.history.length === 0 ? (
-        <p>{t('bid.none')}</p>
-      ) : (
-        <p>
-          <span>{t('bid.history')}: </span>
-          {bidding.history.map((ev, i) => (
-            <span key={i}>{i > 0 ? ' · ' : ''}{historyText(ev, nameOf(ev.playerId), t)}</span>
-          ))}
-        </p>
-      )}
+      <p data-testid="bid-current" aria-live="polite">{currentText}</p>
+      {turnText === null ? null : <p data-testid="bid-turn">{turnText}</p>}
       <div className="bidding-actions">
         {values.length > 0 ? (
           <button

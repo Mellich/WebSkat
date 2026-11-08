@@ -25,7 +25,7 @@ Run long commands in the background if your tool allows it, and read only the ta
 | `Object is possibly 'undefined'` | `noUncheckedIndexedAccess`: handle `undefined` (`?? x`, guard, early return) |
 | optional property / `undefined` not assignable | `exactOptionalPropertyTypes`: `...(v === undefined ? {} : { k: v })` or type `k?: T \| undefined` |
 | `Cannot find name 'window'` / `'console'` in engine/table | pure layer: pass the value in or move the code to `src/ui`/`src/net` |
-| property missing in `de.ts` | add the German string for the new key |
+| property missing in a `de*.ts` part (`i18n/parts/`) | add the German string for the new key to the matching part |
 | zod schema not assignable to `ZodType<…>` | update `src/net/schemaGame.ts` / `schemaView.ts` to match the type |
 | `no-restricted-globals` / `no-restricted-properties` (`Math.random`, `Date`) | inject `ctx.now`, `ctx.seed`, `rand` |
 | `no-restricted-imports` | wrong layer import; imports go ui → net → table → engine only |

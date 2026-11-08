@@ -3,6 +3,9 @@ import type { GameErrorCode } from '../../engine';
 import type { TableErrorCode } from '../../table';
 import { de } from './de';
 import { en } from './en';
+import { enApp } from './parts/enApp';
+import { enGame } from './parts/enGame';
+import { enPanels } from './parts/enPanels';
 import { translate } from './index';
 
 /** Every error code the engine, the table and the network can send to the UI (typed, so a new code must be listed). */
@@ -49,6 +52,10 @@ describe('translate', () => {
 });
 
 describe('dictionaries', () => {
+  it('has no key in two parts', () => {
+    expect(Object.keys(enApp).length + Object.keys(enGame).length + Object.keys(enPanels).length).toBe(Object.keys(en).length);
+  });
+
   it('have the same keys and no empty strings', () => {
     expect(Object.keys(de).sort()).toEqual(Object.keys(en).sort());
     for (const value of Object.values(de)) {

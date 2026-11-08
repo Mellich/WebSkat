@@ -1,0 +1,46 @@
+/* Bid bubbles (docs/ui-game-screen.md §4). Pointer events are off: a bubble never blocks a click. */
+
+.bubble {
+  position: relative;
+  padding: 2px 10px;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  background: rgb(10 30 16 / 94%);
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
+  animation: pop 150ms ease-out;
+}
+
+.bubble::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+}
+
+.below::before {
+  bottom: 100%;
+  border-bottom-color: var(--accent);
+}
+
+.above::before {
+  top: 100%;
+  border-top-color: var(--accent);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

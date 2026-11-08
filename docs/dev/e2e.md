@@ -81,11 +81,11 @@ viewer win the bidding.
 | Home | `create-table`, `join-key-input`, `join-submit`, `public-table`, `public-join` |
 | Table screen / TopBar | `connection-banner`, `connection-status`, `open-stats`, `open-settings`, `leave-table` |
 | Lobby | `table-key`, `seat-<i>`, `bot-level-<i>`, `add-bot`, `start-game` |
-| Game | `opponent-seat`, `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `trick-dismiss`, `last-trick`, `status-line`, `sitting-out`, `sitting-out-you`, `phase-panel`, `hand-card-<CardId>`, `abort-game` (host, player on turn disconnected) |
-| Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass` |
+| Game | `opponent-seat`, `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `trick-dismiss`, `last-trick`, `status-line`, `bid-summary`, `bid-bubble-left`, `bid-bubble-right`, `bid-bubble-bottom`, `sitting-out`, `sitting-out-you`, `phase-panel`, `hand-card-<CardId>`, `abort-game` (host, player on turn disconnected) |
+| Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass`, `bid-current`, `bid-turn` |
 | Skat / declare | `pickup`, `play-hand`, `discard-submit`, `declare-option-0..5` (♣ ♠ ♥ ♦ Grand Null), `declare-submit` |
 | Result | `result-dialog`, `continue` |
-| Stats / settings | `stats-tab-standings`, `stats-tab-history`, `stats-tab-charts`, `history-row`, `setting-trick-display` |
+| Stats / settings | `stats-tab-standings`, `stats-tab-history`, `stats-tab-charts`, `history-row`, `setting-trick-display`, `setting-bid-bubble` |
 
 Find them all: `grep -rhoE 'data-testid=(\{`[^`]*`\}|"[^"]*")' src | sort -u`.
 

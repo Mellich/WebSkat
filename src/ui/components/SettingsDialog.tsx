@@ -1,4 +1,4 @@
-// Settings: language, card back (with previews), two-tap play, trick display time and scoring.
+// Settings: language, card back (with previews), two-tap play, trick display time, bid bubbles and scoring.
 
 import { useEffect } from 'react';
 import type { BackIndex } from '../assets';
@@ -97,6 +97,21 @@ export function SettingsDialog({ onClose }: SettingsDialogProps) {
             <option value={600}>{t('settings.trickDisplayDefault')}</option>
             <option value={1000}>{t('settings.trickDisplayLong')}</option>
             <option value={2000}>{t('settings.trickDisplayVeryLong')}</option>
+          </select>
+        </label>
+
+        <label className={styles.field}>
+          <span>{t('settings.bidBubble')}</span>
+          <select
+            data-testid="setting-bid-bubble"
+            value={settings.bidBubbleMs}
+            onChange={(e) => { update({ bidBubbleMs: Number(e.target.value) as 0 | 500 | 1000 | 2000 | 3000 }); }}
+          >
+            <option value={0}>{t('settings.bidBubbleOff')}</option>
+            <option value={500}>{t('settings.bidBubbleShort')}</option>
+            <option value={1000}>{t('settings.bidBubbleDefault')}</option>
+            <option value={2000}>{t('settings.bidBubbleLong')}</option>
+            <option value={3000}>{t('settings.bidBubbleVeryLong')}</option>
           </select>
         </label>
 

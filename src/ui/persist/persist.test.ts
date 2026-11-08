@@ -35,6 +35,15 @@ describe('settings persistence', () => {
     expect(loadSettings(memoryStorage({ 'webskat.settings': JSON.stringify(withoutValue) }), 'en').trickDisplayMs).toBe(600);
   });
 
+  it('defaults the bid bubble time to 1 s and keeps a stored choice', () => {
+    expect(defaultSettings('en').bidBubbleMs).toBe(1000);
+    const old = { ...defaultSettings('en'), bidBubbleMs: undefined };
+    expect(loadSettings(memoryStorage({ 'webskat.settings': JSON.stringify(old) }), 'en').bidBubbleMs).toBe(1000);
+    const storage = memoryStorage();
+    saveSettings(storage, { ...defaultSettings('en'), bidBubbleMs: 2000 });
+    expect(loadSettings(storage, 'en').bidBubbleMs).toBe(2000);
+  });
+
   it('uses standard scoring by default', () => {
     expect(defaultSettings('en').scoring).toBe('standard');
   });

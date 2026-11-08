@@ -31,7 +31,7 @@ engine → table → net → ui. For cross-layer changes use the checklists in
 `docs/dev/workflow.md` §4. The most common ones:
 
 - New/changed command, action, view field or message → use skill `change-protocol`.
-- New visible text → key in `src/ui/i18n/en.ts` **and** `de.ts`; use `t('key')`.
+- New visible text → key in `src/ui/i18n/parts/enApp|enGame|enPanels.ts` **and** the matching `de*.ts` part; use `t('key')`.
 - New setting → `src/ui/persist/settings.ts` (`.default()`), `SettingsDialog.tsx`, i18n, test.
 - New clickable element → enable it only from `view.game.legal` / view data; add `data-testid`.
 - `TableState` shape change → migrate old host snapshots in `src/ui/persist/hosted.ts`.

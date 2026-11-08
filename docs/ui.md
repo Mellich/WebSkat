@@ -105,6 +105,7 @@ table (`closed` to everyone) and forgets its snapshot.
 | `confirmPlay` | `auto` (two taps on touch) \| `always` \| `never` (`auto`) | yes |
 | `trickDisplayMs` | 0, 300, 600, 1000, 2000 (600) | yes (`setting-trick-display`, "Show finished trick") |
 | `scoring` | `seeger` \| `standard` (`standard`) | yes (also the toggle in Stats; the result dialog reads it) |
+| `bidBubbleMs` | 0, 500, 1000, 2000, 3000 (1000) | yes (`setting-bid-bubble`, "Show bids as speech bubbles"); each viewer's own, no host pacing |
 Stored under `webskat.settings`, parsed with zod; invalid data → defaults. Migration: an old
 `botDelayMs` value is copied to `trickDisplayMs`.
 
@@ -134,6 +135,10 @@ blocked) and the `persist/*` modules. Values are validated on read.
 - `en.ts` is the source dictionary (`as const`); `de.ts` is typed against it, so a missing or extra
   key is a compile error. Keys are flat with prefixes (`home.*`, `lobby.*`, `bid.*`, `declare.*`,
   `result.*`, `stats.*`, `settings.*`, `error.<CODE>`, `rank.*`, `rankShort.*`, `suit.*`, …).
+- The dictionaries are split into `i18n/parts/`: `enApp.ts` / `deApp.ts` (app, common, home, about,
+  table, lobby, topbar, error), `enGame.ts` / `deGame.ts` (cards, bidding, declarations, results,
+  tricks, Skat, sitting out, bubbles, summary), `enPanels.ts` / `dePanels.ts` (stats, settings, bot
+  strengths). `en.ts` and `de.ts` only merge them. A key belongs to exactly one part (tested).
 - `useT()` returns `t(key, params)` bound to the current language; `{name}` placeholders.
   `translateNow` for non-React code.
 - **Every visible string goes through `t`.** Add each key to both files.
@@ -149,6 +154,7 @@ blocked) and the `persist/*` modules. Values are validated on read.
 | `Hand` | sorted with `sortHand`; in an interactive hand every card is a button, non-`legal` cards (and all while `paused`) are `disabled`, looks unchanged for paused cards; `showAll` (bidding) shows all cards at full brightness; `--hand-n` CSS overlap |
 | `OpponentSeat` | name, role, count badge, up to 10 backs (4 in compact layouts), ouvert cards face up, turn/declarer highlight (`opponent-seat`) |
 | `TrickArea` | three fixed positions (`left`, `right`, `bottom`; `TrickPosition`), name label on each card, winner highlight, optional dismiss button (`trick-area`, `trick-dismiss`, `trick-slot-<pos>`) |
+| `SpeechBubble` | bid bubble with a tail toward the speaker; positioned by `GameScreen` (`bid-bubble-*`), `aria-hidden` |
 | `SkatPile` | two backs during bidding / Skat decision |
 | `CardChip`, `CardChips` | card as text chip `♥10` with full name as `aria-label`/`title` |
 | `TopBar`, `Toasts`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog` | Dialogs close on Esc |

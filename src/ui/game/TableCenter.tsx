@@ -1,5 +1,6 @@
-// The middle of the game screen: the Skat pile, the trick at fixed positions and the last-trick bubble.
+// The middle of the game screen: the Skat pile, the trick at fixed positions, the bottom bid bubble and the last-trick list.
 
+import type { ReactNode } from 'react';
 import type { CardId } from '../../engine';
 import type { GameView, TableView } from '../../table';
 import { SkatPile } from '../components/SkatPile';
@@ -19,9 +20,11 @@ export interface TableCenterProps {
   readonly cardBack: BackIndex;
   readonly nameOf: (id: string) => string;
   readonly label: (card: CardId) => string;
+  /** The bid bubble of the bottom seat; it sits in the table area. */
+  readonly bottomBubble: ReactNode;
 }
 
-export function TableCenter({ view, game, shown, showLast, cardBack, nameOf, label }: TableCenterProps) {
+export function TableCenter({ view, game, shown, showLast, cardBack, nameOf, label, bottomBubble }: TableCenterProps) {
   const t = useT();
   const placed = placeTrick(shown.plays, trickSeats(view));
   const toSlot = (p: { readonly playerId: string; readonly card: CardId; readonly winner: boolean } | null): TrickSlot | null =>
@@ -32,6 +35,7 @@ export function TableCenter({ view, game, shown, showLast, cardBack, nameOf, lab
   return (
     <div className={styles.table}>
       <SkatPile visible={showSkat} back={cardBack} label={t('skat.onTable')} />
+      {bottomBubble}
       <TrickArea slots={slots} labelOf={label} {...(shown.holding ? { onDismiss: shown.dismiss, dismissLabel: t('trick.continue') } : {})} />
       {showLast && game.lastTrick !== null ? (
         <ul className={styles.lastTrick} data-testid="last-trick">

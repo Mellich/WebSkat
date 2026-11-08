@@ -5,6 +5,9 @@ self-contained plans. Each plan can be implemented by a smaller model **on its o
 the other, in the order below. When a plan is done, its file stays here as a record; the
 `docs/*.md` layer docs describe the new current state.
 
+**Status:** plans 01–06 are implemented and merged into `main`. Plans 07–10 are still open. The
+"Lines now" and "baseline" figures below are from before plan 01 and are kept as a record.
+
 ## 1. Order (do not reorder)
 
 | # | Plan | Kind | Layers touched | Protocol change |
@@ -76,7 +79,7 @@ graph TD
    old caches still load.
 9. **Decisions.** Each plan lists the decisions it implements. Append each as a new row to
    `docs/decisions.md` ("Decided during implementation") with the **next free `I` number** (the
-   last one today is I106). Copy the suggested text and adapt it to what you actually did.
+   last one is I124 after plan 06). Copy the suggested text and adapt it to what you actually did.
 10. **Docs.** Each plan lists the docs to update. Also run the checklist in
     `docs/dev/docs-maintenance.md` §3 (file maps in folder `AGENTS.md`, test ids in
     `docs/dev/e2e.md` §6, test inventory in `docs/dev/testing.md` §4, `docs/overview.md` §2/§3/§4).
