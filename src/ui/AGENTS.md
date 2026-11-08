@@ -33,6 +33,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 |---|---|
 | `router.ts` | `Route`, `parseRoute`, `useRoute`, `navigate`, `tableHash` |
 | `assets.ts` | `cardUrl`, `backUrl`, `logoUrl`, `BackIndex`, `DEFAULT_BACK` |
+| `preload.ts` | `cardImageUrls(back)`, `preloadImages(urls)`: loads card faces and back once per page |
 | `cardNames.ts` | `cardLabel` (English fallback card name, default prop of components) |
 | `classNames.ts` | `cls(...)` joins class names |
 | `screens/Home.tsx` | start page: name, rejoin/resume, create, join by key, public list, About |
@@ -47,7 +48,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `game/useShownTrick.ts` | holds a finished trick for `trickDisplayMs` |
 | `game/seats.ts` | `opponentsOf` (seat order relative to the viewer), `namesById` |
 | `game/labels.ts` | `cardName`, `cardShort`, `declarationLabel`, `spitzenLabel`, `suitKey`, `suitSymbol` |
-| `components/` | `Card`, `Hand`, `OpponentSeat`, `TrickArea`, `SkatPile`, `CardChip(s)`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog` (+ `.module.css`) |
+| `components/` | `Card` (`disabled` = button that cannot be clicked), `Hand` (interactive hands are all buttons), `OpponentSeat`, `TrickArea`, `SkatPile`, `CardChip(s)`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog` (+ `.module.css`) |
 | `stats/` | `StatsPanel`, `Standings`, `History`, `ScoreChart`, `ByType`, `chartGeometry.ts`, `gameLabel.ts` |
 | `store/session.ts` | `useSession` (connection, host, status, view, records, toasts), `errorText` |
 | `store/settings.ts` | `useSettings` (settings + `update`) |

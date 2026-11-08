@@ -57,7 +57,7 @@ Slow tests inside the normal run: `game.fuzz.test.ts` (~9 s, 2000 games), `level
 | Views | `view.test.ts`, `view.redaction.test.ts` | fields per viewer; **redaction property test** (`hidden-information.md` §4) |
 | Bots | `bot.test.ts`, `bot/{knowledge,evaluate,auction,heuristics,sample,strong,levels}.test.ts` | bot-only tables, fairness property, evaluation/auction/card-play scenarios, sampling, legality at all levels, normal beats easy (`bots.md` §8) |
 | Net | `protocol`, `keys`, `signalingConfig`, `directory`, `host`, `integration`, `resume` `.test.ts` | schemas accept/reject, join/welcome/rejected flows, no foreign cards on the wire, actor from peer id, reconnect with token, timeout, host stop, leave sends the command and closes after the delay, bots run at once, host resume |
-| UI | `Hand`, `CardChip`, `BiddingPanel`, `DeclarationPicker`, `ResultDialog`, `AbortGameButton`, `useShownTrick`, `Home`, `TableLobby` (`.test.tsx`); `labels`, `i18n`, `router`, `stats`, `session` (incl. leave), `persist`, `hosted`, `records` (`.test.ts`) | only legal cards clickable, single "Bid N" button, picker emits a legal declaration, trick hold timing, key validation, bot strength select, settings migration, snapshot migration |
+| UI | `Hand`, `CardChip`, `BiddingPanel`, `DeclarationPicker`, `ResultDialog`, `AbortGameButton`, `useShownTrick`, `Home`, `TableLobby` (`.test.tsx`); `labels`, `i18n`, `router`, `preload`, `stats`, `session` (incl. leave), `persist`, `hosted`, `records` (`.test.ts`) | only legal cards enabled (illegal ones `disabled` + `aria-disabled`), single "Bid N" button, picker emits a legal declaration, trick hold timing, key validation, bot strength select, settings migration, snapshot migration |
 
 ## 5. Which tests to add for a change
 

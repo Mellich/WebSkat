@@ -8,6 +8,7 @@ import { useT, type Translator } from '../i18n';
 import type { TranslationKey } from '../i18n/en';
 import { leaveTable, openTable } from '../net/actions';
 import { navigate } from '../router';
+import { cardImageUrls, preloadImages } from '../preload';
 import { useSession } from '../store/session';
 import { useSettings } from '../store/settings';
 import { GameScreen } from '../game/GameScreen';
@@ -22,6 +23,11 @@ export function TableScreen({ tableKey }: { readonly tableKey: string }) {
   const reason = useSession((s) => s.reason);
   const view = useSession((s) => s.view);
   const name = useSettings((s) => s.name).trim();
+  const cardBack = useSettings((s) => s.cardBack);
+
+  useEffect(() => {
+    preloadImages(cardImageUrls(cardBack));
+  }, [cardBack]);
 
   const attached = attachedKey === tableKey && connection !== null;
   useEffect(() => {

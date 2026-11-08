@@ -14,15 +14,28 @@ describe('Hand', () => {
   it('enables only the cards that are passed as legal', () => {
     render(<Hand cards={HAND} declaration={null} legal={['CJ', 'D9']} onPlay={() => undefined} />);
     const buttons = screen.getAllByRole('button');
-    expect(buttons.map((b) => b.getAttribute('aria-label'))).toEqual(['Jack of clubs', 'Nine of diamonds']);
-
-    expect(screen.queryByRole('button', { name: 'Ace of hearts' })).toBeNull();
+    expect(buttons).toHaveLength(HAND.length);
+    const enabled = buttons.filter((b) => !b.hasAttribute('disabled'));
+    expect(enabled.map((b) => b.getAttribute('aria-label'))).toEqual(['Jack of clubs', 'Nine of diamonds']);
+    const disabled = buttons.filter((b) => b.hasAttribute('disabled'));
+    expect(disabled.map((b) => b.getAttribute('aria-disabled'))).toEqual(['true', 'true']);
   });
 
-  it('shows the illegal cards without making them focusable', () => {
-    render(<Hand cards={HAND} declaration={null} legal={[]} onPlay={() => undefined} />);
+  it('renders illegal cards as disabled buttons with the grey style', () => {
+    const { container } = render(<Hand cards={HAND} declaration={null} legal={[]} onPlay={() => undefined} />);
+    const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(HAND.length);
+    buttons.forEach((b) => {
+      expect(b.hasAttribute('disabled')).toBe(true);
+      expect(b.getAttribute('aria-disabled')).toBe('true');
+    });
+    expect(container.querySelectorAll('[class*="disabled"]')).toHaveLength(HAND.length);
+  });
+
+  it('renders images when no handler is given', () => {
+    render(<Hand cards={HAND} declaration={null} legal={['HA']} />);
     expect(screen.queryAllByRole('button')).toHaveLength(0);
-    expect(screen.getByRole('img', { name: 'Ace of hearts' }).tagName).toBe('IMG');
+    expect(screen.getAllByRole('img')).toHaveLength(HAND.length);
   });
 
   it('shows all cards at full brightness when legality is irrelevant', () => {
@@ -53,8 +66,9 @@ describe('Hand', () => {
   it('keeps legal cards bright but not clickable while paused', () => {
     const onPlay = vi.fn<(card: CardId) => void>();
     const { container } = render(<Hand cards={HAND} declaration={null} legal={['HA']} paused onPlay={onPlay} />);
-    expect(screen.queryAllByRole('button')).toHaveLength(0);
-    fireEvent.click(screen.getByRole('img', { name: 'Ace of hearts' }));
+    const ace = screen.getByRole('button', { name: 'Ace of hearts' });
+    expect(ace.hasAttribute('disabled')).toBe(true);
+    fireEvent.click(ace);
     expect(onPlay).not.toHaveBeenCalled();
     expect(container.querySelectorAll('[class*="disabled"]')).toHaveLength(HAND.length - 1);
   });

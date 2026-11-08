@@ -38,6 +38,12 @@ button.card {
   cursor: pointer;
 }
 
+/* The global button:disabled rule would fade the face; the grey .disabled overlay does the dimming. */
+button.card:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
 button.card:focus-visible {
   transform: translateY(-4px);
 }

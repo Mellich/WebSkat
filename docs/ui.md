@@ -140,15 +140,13 @@ blocked) and the `persist/*` modules. Values are validated on read.
 - Card names: `cardName(card, t)` (full name, for `aria-label`/`title`), `cardShort` (chip text;
   German ranks B/D for Bube/Dame), `declarationLabel`, `spitzenLabel`, `suitSymbol`
   (`game/labels.ts`). `cardLabel` in `cardNames.ts` is an English fallback used as default prop.
-- Unused keys exist (`announce.played`, `announce.yourTurn`): there are no spoken play
-  announcements yet; the status line is the `aria-live` region.
 
 ## 10. Components and styling
 
 | Component | Notes |
 |---|---|
-| `Card` | `<button>` when clickable, else `<img>`; states `normal`/`disabled` (grey overlay over an opaque face; never lower the face opacity)/`selected` (raised, `aria-pressed`)/`highlight`; sizes `hand`/`trick`/`opponent`; `testId` prop |
-| `Hand` | sorted with `sortHand`; only `legal` cards get handlers; `paused` keeps looks but removes handlers; `showAll` (bidding) shows all cards at full brightness; `--hand-n` CSS overlap |
+| `Card` | `<button>` when clickable or `disabled` (`disabled` prop: not clickable, `aria-disabled`), else `<img>`; states `normal`/`disabled` (grey overlay over an opaque face; never lower the face opacity)/`selected` (raised, `aria-pressed`)/`highlight`; sizes `hand`/`trick`/`opponent`; `testId` prop |
+| `Hand` | sorted with `sortHand`; in an interactive hand every card is a button, non-`legal` cards (and all while `paused`) are `disabled`, looks unchanged for paused cards; `showAll` (bidding) shows all cards at full brightness; `--hand-n` CSS overlap |
 | `OpponentSeat` | name, role, count badge, up to 10 backs (4 in compact layouts), ouvert cards face up, turn/declarer highlight (`opponent-seat`) |
 | `TrickArea` | three slots, winner highlight, optional dismiss button (`trick-area`, `trick-dismiss`) |
 | `SkatPile` | two backs during bidding / Skat decision |
@@ -159,4 +157,5 @@ blocked) and the `persist/*` modules. Values are validated on read.
 Styling: `styles/tokens.css` (colors, `--card-w` etc.), `styles/global.css` (includes a
 `prefers-reduced-motion` rule), one `X.module.css` per component. Dark green felt theme only.
 Buttons are ≥ 44 px tap targets. Image URLs come from `assets.ts` (`cardUrl`, `backUrl`,
-`logoUrl`, based on `import.meta.env.BASE_URL`). Card images are not preloaded.
+`logoUrl`, based on `import.meta.env.BASE_URL`). Card images are preloaded once per page when a
+table opens (`preload.ts`), so tricks and open hands show without delay.

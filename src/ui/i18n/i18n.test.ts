@@ -44,7 +44,7 @@ describe('translate', () => {
   });
 
   it('leaves a placeholder without a value visible', () => {
-    expect(translate('en', 'table.waitingFor')).toBe('Waiting for {name}…');
+    expect(translate('en', 'status.waitingFor')).toBe('Waiting for {name}…');
   });
 });
 

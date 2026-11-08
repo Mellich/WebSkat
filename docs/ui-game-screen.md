@@ -75,7 +75,8 @@ During bidding the hand is shown at full brightness but not clickable (`showAll`
 
 - Clicking a card in `legal.playableCards` sends `play`. Two-tap mode (setting `confirmPlay`:
   `auto` on coarse pointers, or `always`): the first tap raises the card, the second plays it.
-  Illegal cards are images, not buttons: not focusable, not clickable, grey overlay.
+  Illegal cards are disabled buttons (`disabled`, `aria-disabled="true"`, grey overlay). While a
+  trick is held the legal cards are disabled too, but keep their normal look.
 - The engine clears the trick when the third card is played. `useShownTrick(game, trickDisplayMs)`
   holds a **newly completed** `lastTrick` on the table for the viewer's `trickDisplayMs`
   (default 600 ms; 0 = off). While holding:
@@ -120,7 +121,7 @@ A bottom sheet whose backdrop lets clicks through, so TopBar (Stats, Settings) s
 
 ## 8. Accessibility notes
 
-Real buttons; `aria-pressed` on toggles and selected cards; illegal cards are plain `<img>`s
-with a grey overlay (not buttons, so not focusable; there is no `aria-disabled`); status line
+Real buttons; `aria-pressed` on toggles and selected cards; illegal cards are disabled buttons
+(`disabled` and `aria-disabled="true"`, grey overlay, skipped by Tab); status line
 `aria-live="polite"`; dialogs close on Esc; suits have symbols and colors (♥ ♦ red). Hand cards
 are buttons, so Tab + Enter/Space plays them.

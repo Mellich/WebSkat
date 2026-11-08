@@ -1,5 +1,6 @@
-// The viewer's own cards, sorted for display. Only `legal` cards are clickable; the UI never
-// decides legality itself (docs/ui.md §10).
+// The viewer's own cards, sorted for display. Interactive hands render every card as a button;
+// cards that are not `legal` (or all cards while `paused`) are disabled. The UI never decides
+// legality itself (docs/ui.md §10).
 
 import { sortHand, type CardId, type Declaration } from '../../engine';
 import { cardLabel } from '../cardNames';
@@ -32,6 +33,8 @@ function stateOf(card: CardId, props: HandProps): CardState {
 
 export function Hand(props: HandProps) {
   const { cards, declaration, legal, mode = 'play', onPlay, onToggle, label = cardLabel } = props;
+  const handlerFor = mode === 'discard' ? onToggle : onPlay;
+  const interactive = handlerFor !== undefined && props.showAll !== true;
   return (
     <div
       className={styles.hand}
@@ -40,14 +43,16 @@ export function Hand(props: HandProps) {
       style={{ '--hand-n': Math.max(2, cards.length) } as React.CSSProperties & Record<'--hand-n', number>}
     >
       {sortHand(cards, declaration).map((card) => {
-        const enabled = legal.includes(card);
-        const handler = enabled && props.paused !== true ? (mode === 'discard' ? onToggle : onPlay) : undefined;
+        const enabled = legal.includes(card) && props.paused !== true;
         const state = stateOf(card, props);
         const testId = `hand-card-${card}`;
-        return handler === undefined ? (
-          <Card key={card} id={card} label={label(card)} state={state} size="hand" testId={testId} />
+        if (!interactive) {
+          return <Card key={card} id={card} label={label(card)} state={state} size="hand" testId={testId} />;
+        }
+        return enabled ? (
+          <Card key={card} id={card} label={label(card)} state={state} size="hand" testId={testId} onClick={() => { handlerFor(card); }} />
         ) : (
-          <Card key={card} id={card} label={label(card)} state={state} size="hand" testId={testId} onClick={() => { handler(card); }} />
+          <Card key={card} id={card} label={label(card)} state={state} size="hand" testId={testId} disabled />
         );
       })}
     </div>

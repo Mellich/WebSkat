@@ -103,7 +103,7 @@ for (const target of TARGETS) {
     await expect(page.locator('[data-testid^="hand-card-"]')).toHaveCount(12);
     await checkLayout(page, target, 'discarding');
 
-    const cards = page.locator('button[data-testid^="hand-card-"]');
+    const cards = page.locator('button[data-testid^="hand-card-"]:enabled');
     await cards.nth(10).click({ position: { x: 6, y: 30 } });
     await cards.nth(11).click({ position: { x: 6, y: 30 } });
     await page.getByTestId('discard-submit').click();

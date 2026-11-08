@@ -48,7 +48,8 @@ npx playwright test -g "fits phone"    # tests whose title matches
 - Robot clicker `robotStep(page)`: takes the first option the page offers, in this order:
   Continue (if allowed), `pickup`, `play-hand`, discard (select two cards, then
   `discard-submit`), declare (first enabled `declare-option-*`, then `declare-submit`),
-  `bid-submit` / `bid-hold` / `bid-claim` / `bid-pass`, else the first clickable `hand-card-*`.
+  `bid-submit` / `bid-hold` / `bid-claim` / `bid-pass`, else the first **enabled** `hand-card-*`
+  (illegal cards are disabled buttons).
   It needs no rule knowledge: the engine decides what is enabled.
 - `playUntilResult(pages)` loops the robots until every page shows `result-dialog`;
   `continueAfterResult(pages)` presses Continue everywhere.

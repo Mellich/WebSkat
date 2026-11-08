@@ -27,9 +27,9 @@ async function clickIfEnabled(target: Locator, position?: { x: number; y: number
 }
 
 async function selectTwoDiscards(page: Page): Promise<boolean> {
-  const unselected = page.locator('button[data-testid^="hand-card-"]:not([aria-pressed="true"])');
+  const unselected = page.locator('button[data-testid^="hand-card-"]:enabled:not([aria-pressed="true"])');
   let clicked = false;
-  const selected = await page.locator('button[data-testid^="hand-card-"][aria-pressed="true"]').count();
+  const selected = await page.locator('button[data-testid^="hand-card-"]:enabled[aria-pressed="true"]').count();
   for (let i = selected; i < 2; i++) {
     if (!(await clickIfEnabled(unselected, VISIBLE_PART))) break;
     clicked = true;
@@ -59,7 +59,7 @@ export async function robotStep(page: Page, options: { continueAfterResult: bool
   for (const id of ['bid-submit', 'bid-hold', 'bid-claim', 'bid-pass']) {
     if (await clickIfEnabled(page.getByTestId(id))) return true;
   }
-  return clickIfEnabled(page.locator('button[data-testid^="hand-card-"]'), VISIBLE_PART);
+  return clickIfEnabled(page.locator('button[data-testid^="hand-card-"]:enabled'), VISIBLE_PART);
 }
 
 async function everyPageShowsResult(pages: readonly Page[]): Promise<boolean> {
