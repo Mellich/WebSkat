@@ -74,14 +74,6 @@
   color: var(--accent);
 }
 
-.online {
-  color: #7fd67f;
-}
-
-.offline {
-  color: #888;
-}
-
 .controls {
   display: flex;
   flex-wrap: wrap;

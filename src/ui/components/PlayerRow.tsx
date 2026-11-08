@@ -1,8 +1,9 @@
-// One seated player in the Players dialog: name, badges, role in the running game, online dot.
+// One seated player in the Players dialog: name, badges, role in the running game, connection dot.
 
 import type { ReactNode } from 'react';
 import type { PlayerPublic } from '../../table';
 import { useT } from '../i18n';
+import { ConnectionDot } from './ConnectionDot';
 import styles from './PlayersDialog.module.css';
 
 export interface PlayerRowProps {
@@ -17,7 +18,6 @@ export interface PlayerRowProps {
 
 export function PlayerRow({ seat, player, isHost, roleText, children }: PlayerRowProps) {
   const t = useT();
-  const online = player.connected ? t('lobby.connected') : t('lobby.offline');
   return (
     <div className={styles.row} data-testid={`players-row-${String(seat)}`}>
       <span className={styles.name}>
@@ -26,13 +26,7 @@ export function PlayerRow({ seat, player, isHost, roleText, children }: PlayerRo
         {player.isBot ? <span className={styles.badge}> {t('lobby.bot')}</span> : null}
       </span>
       {roleText === null ? null : <span className={styles.role}>{roleText}</span>}
-      <span
-        className={player.connected ? styles.online : styles.offline}
-        title={online}
-        aria-label={online}
-      >
-        ●
-      </span>
+      <ConnectionDot connected={player.connected} />
       {children === undefined ? null : <span className={styles.controls}>{children}</span>}
     </div>
   );

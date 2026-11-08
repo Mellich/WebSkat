@@ -79,14 +79,6 @@
   font-size: 0.85rem;
 }
 
-.online {
-  color: #4ade80;
-}
-
-.offline {
-  color: var(--danger);
-}
-
 .pending {
   color: var(--muted);
   margin: 0;

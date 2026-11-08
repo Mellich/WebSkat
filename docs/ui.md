@@ -172,7 +172,8 @@ blocked) and the `persist/*` modules. Values are validated on read.
 |---|---|
 | `Card` | `<button>` when clickable or `disabled` (`disabled` prop: not clickable, `aria-disabled`), else `<img>`; states `normal`/`disabled` (grey overlay over an opaque face; never lower the face opacity)/`selected` (raised, `aria-pressed`)/`highlight`; sizes `hand`/`trick`/`opponent`; `testId` prop |
 | `Hand` | sorted with `sortHand`; in an interactive hand every card is a button, non-`legal` cards (and all while `paused`) are `disabled`, looks unchanged for paused cards; `showAll` (bidding) shows all cards at full brightness; `--hand-n` CSS overlap |
-| `OpponentSeat` | name, role, count badge, up to 10 backs (4 in compact layouts), ouvert cards face up, turn/declarer highlight (`opponent-seat`) |
+| `ConnectionDot` | green dot (connected) or red dot (offline) with `aria-label` `connected`/`offline`; used by opponent seats, the lobby seat and pending lists, and the Players dialog |
+| `OpponentSeat` | name, connection dot (`connected` prop), role, count badge, up to 10 backs (4 in compact layouts), ouvert cards face up, turn/declarer highlight (`opponent-seat`) |
 | `TrickArea` | three fixed positions (`left`, `right`, `bottom`; `TrickPosition`), name label on each card, winner highlight, optional dismiss button (`trick-area`, `trick-dismiss`, `trick-slot-<pos>`) |
 | `SpeechBubble` | bid bubble with a tail toward the speaker; positioned by `GameScreen` (`bid-bubble-*`), `aria-hidden` |
 | `SkatPile` | two backs during bidding / Skat decision |

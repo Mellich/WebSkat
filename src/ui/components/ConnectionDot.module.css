@@ -1,0 +1,7 @@
+.online {
+  color: #4ade80;
+}
+
+.offline {
+  color: var(--danger);
+}

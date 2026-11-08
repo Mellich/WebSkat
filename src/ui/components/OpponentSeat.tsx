@@ -5,10 +5,13 @@ import type { BackIndex } from '../assets';
 import { cls } from '../classNames';
 import { cardLabel } from '../cardNames';
 import { Card } from './Card';
+import { ConnectionDot } from './ConnectionDot';
 import styles from './OpponentSeat.module.css';
 
 export interface OpponentSeatProps {
   readonly name: string;
+  /** Green or red dot next to the name. */
+  readonly connected?: boolean;
   readonly role?: string;
   readonly count: number;
   readonly isTurn?: boolean;
@@ -38,7 +41,7 @@ function shownCards(count: number, openCards: readonly CardId[], labelOf: (card:
 }
 
 export function OpponentSeat(props: OpponentSeatProps) {
-  const { name, role, count, isTurn = false, isDeclarer = false, openCards = [], back, labelOf = cardLabel } = props;
+  const { name, connected = true, role, count, isTurn = false, isDeclarer = false, openCards = [], back, labelOf = cardLabel } = props;
   return (
     <section
       className={cls(styles.seat, isTurn && styles.turn, isDeclarer && styles.declarer)}
@@ -47,6 +50,7 @@ export function OpponentSeat(props: OpponentSeatProps) {
     >
       <header className={styles.header}>
         <span className={styles.name}>{name}</span>
+        <ConnectionDot connected={connected} />
         {role === undefined ? null : <span className={styles.role}>{role}</span>}
         <span className={styles.count} aria-hidden="true">×{count}</span>
       </header>

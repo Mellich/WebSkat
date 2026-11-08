@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { formatKey, joinLink, type GameConnection } from '../../net';
 import type { BotLevel, TableView } from '../../table';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { ConnectionDot } from '../components/ConnectionDot';
 import { useT } from '../i18n';
 import styles from './TableLobby.module.css';
 
@@ -88,13 +89,7 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
             ) : (
               <span className={styles.badge}>{p.isBot ? t(LEVEL_KEYS[p.botLevel ?? 'normal']) : ''}</span>
             )}
-            <span
-              className={p.connected ? styles.online : styles.offline}
-              title={p.connected ? t('lobby.connected') : t('lobby.offline')}
-              aria-label={p.connected ? t('lobby.connected') : t('lobby.offline')}
-            >
-              ●
-            </span>
+            <ConnectionDot connected={p.connected} />
             {isHost && p.id !== table.hostId ? (
               <button
                 type="button"
@@ -112,7 +107,9 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
       {table.pending.length > 0 ? (
         <ul className={styles.pending}>
           {table.pending.map((p) => (
-            <li key={p.id}>{p.name}</li>
+            <li key={p.id}>
+              {p.name} <ConnectionDot connected={p.connected} />
+            </li>
           ))}
         </ul>
       ) : null}

@@ -136,6 +136,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
     return s === undefined ? null : (
       <OpponentSeat
         name={s.player.name}
+        connected={s.player.connected}
         role={roleText(s, t)}
         count={game.handCounts[s.player.id] ?? 0}
         isTurn={game.turnId === s.player.id}
