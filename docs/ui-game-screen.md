@@ -7,9 +7,9 @@ under the `TopBar` and is re-mounted for each game number.
 
 | Area (CSS grid name) | Content | Test id |
 |---|---|---|
-| `oppL`, `oppR` | `OpponentSeat` of the two other **active** players: `oppL` = next player in clockwise seat order after the viewer, `oppR` = the one after (`seats.ts` `opponentsOf`). Role text, "· Dealer" if dealer, card count, backs or ouvert cards, glow on turn | `opponent-seat` |
-| `table` | `SkatPile` (bidding, Skat decision), `TrickArea` (3 slots), the "last trick" bubble | `trick-area`, `last-trick` |
-| `status` | status line (`aria-live`), "Last trick" toggle button, declared game line ("Grand Hand, declared by Anna"), sitting-out line (4+ players: "Sitting out: X, Y · Dealer: Z") | `status-line`, `sitting-out` |
+| `oppL`, `oppR` | `OpponentSeat` of the two other **active** players: `oppL` = next player in clockwise seat order after the viewer, `oppR` = the one after (`seats.ts` `opponentsOf`). Role text, "· Dealer" if dealer, card count, backs or ouvert cards, glow on turn; bid bubble below the box (§9) | `opponent-seat`, `bid-bubble-left`, `bid-bubble-right` |
+| `table` | `SkatPile` (bidding, Skat decision), `TrickArea` (3 slots), the "last trick" bubble, the bid bubble of the bottom seat (§9) | `trick-area`, `last-trick`, `bid-bubble-bottom` |
+| `status` | `StatusArea.tsx`: status line (`aria-live`), "Last trick" toggle button, declarer summary line ("Anna won the bidding at 23 · took the Skat", §9), sitting-out line (4+ players: "Sitting out: X, Y · Dealer: Z") | `status-line`, `bid-summary`, `sitting-out` |
 | `phase` | phase panel (§3); not rendered during `playing`/`finished` | `phase-panel` |
 | `hand` | the viewer's `Hand`; "You are sitting out this game … Dealer: X." for sitting-out viewers | `hand-card-<ID>`, `sitting-out-you` |
 | overlay | `ResultDialog` when finished (after the trick hold) | `result-dialog` |
@@ -44,13 +44,13 @@ edge. Hover raise only under `@media (hover: hover)`.
 
 Compact parts (`max-width: 600px` or compact landscape): TopBar icon-only buttons; opponent seats
 show at most 4 backs (the count badge shows the real number); ouvert cards wrap; the bidding
-history is one line with ellipsis; `DeclarationPicker` tiles are 3 × 2.
+bidding panel is two short lines; `DeclarationPicker` tiles are 3 × 2.
 
 ## 3. Phase panel by `game.phase`
 
 | Phase | Viewer on turn | Others |
 |---|---|---|
-| `bidding` | `BiddingPanel`: history line ("Anna 18 · Ben yes · …"), then buttons from `legal`: **Bid N** (`bid-submit`, N = the single `legal.bidValues` entry), **Hold at N** (`bid-hold`), **Play (18)** (`bid-claim`, claim stage), **Pass** (`bid-pass`) | the same panel with history, no buttons |
+| `bidding` | `BiddingPanel`: only the current bid ("Current bid: 20 (Anna)" or "No bid yet.", `bid-current`) and who bids to whom ("Anna bids, Ben answers", `bid-turn`), then buttons from `legal`: **Bid N** (`bid-submit`, N = the single `legal.bidValues` entry), **Hold at N** (`bid-hold`), **Play (18)** (`bid-claim`, claim stage), **Pass** (`bid-pass`). Every single bid is shown as a bubble at its player (§9) | the same panel without buttons |
 | `skat-decision` | `SkatDecision`: **Pick up Skat** (`pickup`), **Play Hand** (`play-hand`) | "X won the bidding with N" |
 | `discarding` | `DiscardPanel`: "n of 2 selected" + **Discard** (`discard-submit`, enabled with exactly 2). The hand shows 12 cards, the two Skat cards highlighted; tapping toggles selection (max 2) | "Waiting for X" |
 | `declaring` | `DeclarationPicker` (§4) | "Waiting for X to declare the game…" |
@@ -124,3 +124,31 @@ Real buttons; `aria-pressed` on toggles and selected cards; illegal cards are pl
 with a grey overlay (not buttons, so not focusable; there is no `aria-disabled`); status line
 `aria-live="polite"`; dialogs close on Esc; suits have symbols and colors (♥ ♦ red). Hand cards
 are buttons, so Tab + Enter/Space plays them.
+
+## 9. Bid bubbles and the declarer summary
+
+**Bid bubbles** (`useBidBubbles.ts`, `bidBubbles.ts`, `components/SpeechBubble.tsx`):
+
+- Every new bidding event shows a bubble at the player who made it, for the viewer's
+  `bidBubbleMs` (setting, `ui.md` §6: Off, 0.5, 1 (default), 2 or 3 s). Text: the bid value
+  ("20"), "Yes" for `hold`, "Pass" for `pass`, "Play" for `claim`.
+- Position: the left and right seat boxes (`bid-bubble-left`, `bid-bubble-right`) and the bottom
+  position (`bid-bubble-bottom`): the viewer, or the third active player while the viewer sits out.
+  On compact landscape the side bubbles sit inside the seat box.
+- A newer event of the same player replaces its bubble and restarts its time; other players'
+  events do not extend it. Several events in one update (bots) give one bubble per player, the latest.
+- The bubbles are derived from the growth of `bidding.history` on the client. Events already in the
+  history when the screen opens (reload) show no bubble. `GameScreen` is keyed by the game number,
+  so bubbles reset per game. Bubbles never block clicks and do not change the grid.
+
+**Declarer summary** (`declarerSummary.ts`, line `bid-summary` in `StatusArea`), shown to everyone
+once somebody has won the bidding:
+
+| Phase | Text |
+|---|---|
+| `skat-decision` | "Anna won the bidding at 23" |
+| `discarding` | "… · took the Skat" |
+| `declaring` | "… · took the Skat" or "… · plays Hand" |
+| `playing`, `finished` | "Grand Hand by Anna (bid 23)", plus "· took the Skat" when the Skat was taken |
+
+Nothing is shown during the bidding and for a round that was passed in.

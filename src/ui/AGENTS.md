@@ -16,7 +16,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 - The UI talks to the game **only** through the `GameConnection` in the session store
   (`connection.send(command)`). Network setup lives in `net/actions.ts` only.
 - All user-visible text through `useT()` / `t('key', params)`; add keys to **both**
-  `i18n/en.ts` and `i18n/de.ts`. Error toasts use `error.<CODE>`.
+  `i18n/parts/enApp|enGame|enPanels.ts` and the matching `de*.ts` part (`en.ts`/`de.ts` only merge). Error toasts use `error.<CODE>`.
 - Image URLs only via `assets.ts` (`import.meta.env.BASE_URL`).
 - `localStorage` only through `persist/storage.ts` and `persist/*`; zod-validate on read; wrap in
   try/catch.
@@ -38,16 +38,20 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `screens/Home.tsx` | start page: name, rejoin/resume, create, join by key, public list, About |
 | `screens/TableScreen.tsx` | `#/t/KEY`: name form, `openTable`, TopBar, connection banner, lobby or game |
 | `screens/TableLobby.tsx` | key + copy, seats, bot strength selects, Add bot, Start, Kick |
-| `game/GameScreen.tsx` | in-game layout, status line, phase panel switch, hand, result |
+| `game/GameScreen.tsx` | in-game layout, bid bubbles, phase panel switch, hand, result |
+| `game/StatusArea.tsx` (+ `.module.css`) | status line row, declarer summary (`bid-summary`), sitting-out line |
 | `game/AbortGameButton.tsx` | host's "Abort game" button in the status row, with a confirm dialog |
-| `game/BiddingPanel.tsx` | history + Bid N / Hold / Play (18) / Pass |
+| `game/BiddingPanel.tsx` | current bid, whose turn, Bid N / Hold / Play (18) / Pass |
+| `game/bidBubbles.ts` | `latestPerPlayer`, `bubbleText` (pure) for the bid bubbles |
+| `game/useBidBubbles.ts` | bubbles per player from the growth of `bidding.history`, timers per bubble |
+| `game/declarerSummary.ts` | the declarer line per phase (`declarerSummary`, pure) |
 | `game/SkatPanels.tsx` | `SkatDecision` (pick up / Hand), `DiscardPanel` |
 | `game/DeclarationPicker.tsx` | game tiles, extras, floor-value hint, Declare |
 | `game/ResultDialog.tsx` | result sheet, score table of the selected scoring system, Continue / ready state |
 | `game/useShownTrick.ts` | holds a finished trick for `trickDisplayMs` |
 | `game/seats.ts` | `opponentsOf` (seat order relative to the viewer), `namesById` |
 | `game/labels.ts` | `cardName`, `cardShort`, `declarationLabel`, `spitzenLabel`, `suitKey`, `suitSymbol` |
-| `components/` | `Card`, `Hand`, `OpponentSeat`, `TrickArea`, `SkatPile`, `CardChip(s)`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog` (+ `.module.css`) |
+| `components/` | `Card`, `Hand`, `OpponentSeat`, `TrickArea`, `SkatPile`, `SpeechBubble`, `CardChip(s)`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog` (+ `.module.css`) |
 | `stats/` | `StatsPanel`, `Standings`, `History`, `ScoreChart`, `ByType`, `chartGeometry.ts`, `gameLabel.ts` |
 | `store/session.ts` | `useSession` (connection, host, status, view, records, toasts), `errorText` |
 | `store/settings.ts` | `useSettings` (settings + `update`) |
@@ -55,6 +59,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `net/actions.ts` | `hostTable`, `openTable`, `resumeHostedTable`, `leaveTable` |
 | `net/transport.ts` | `getTransport()` (one Trystero transport per page) |
 | `i18n/` | `en.ts` (source, `TranslationKey`), `de.ts`, `index.ts` (`translate`, `useT`, `translateNow`, `Language`) |
+| `i18n/parts/` | `enApp`, `enGame`, `enPanels` and their `de*` twins: the dictionary split (each key in one part) |
 | `styles/` | `tokens.css` (colors, `--card-w`…), `global.css` |
 | `dev/` | `DevLocal.tsx` + `localTable.ts` (`#/dev/local`), `Gallery.tsx` (`#/dev/gallery`) |
 | `*.test.ts(x)` | component/hook tests (jsdom pragma) and pure UI helper tests |

@@ -10,6 +10,7 @@ export const SettingsSchema = z.object({
   confirmPlay: z.enum(['auto', 'always', 'never']),
   trickDisplayMs: z.union([z.literal(0), z.literal(300), z.literal(600), z.literal(1000), z.literal(2000)]).default(600),
   scoring: z.enum(['seeger', 'standard']),
+  bidBubbleMs: z.union([z.literal(0), z.literal(500), z.literal(1000), z.literal(2000), z.literal(3000)]).default(1000),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -24,6 +25,7 @@ export function defaultSettings(browserLanguage: string): Settings {
     confirmPlay: 'auto',
     trickDisplayMs: 600,
     scoring: 'standard',
+    bidBubbleMs: 1000,
   };
 }
 

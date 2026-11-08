@@ -71,7 +71,7 @@ steps as short checklists (`implement-change`, `fix-bug`, `write-tests`, `run-ch
 fields a `.default()` so old stored settings still parse) → control in `SettingsDialog.tsx` →
 i18n → `persist.test.ts` → `ui.md` §6.
 
-**New visible text**: key in `src/ui/i18n/en.ts` **and** `de.ts` (typecheck fails otherwise),
+**New visible text**: key in `src/ui/i18n/parts/enApp|enGame|enPanels.ts` **and** the matching `de*.ts` part (typecheck fails otherwise),
 use `t('key', {param})`. Game terms: German names in `de.ts` (Reizen, Weg, Drücken, …).
 
 **New interactive element used by tests**: stable `data-testid` (kebab-case) → list in
