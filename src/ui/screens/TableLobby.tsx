@@ -118,7 +118,7 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
         <h3 className={styles.label}>{t('lobby.rules')}</h3>
         {isHost ? (
           <>
-            <label>
+            <label className={styles.rule}>
               <input
                 type="checkbox"
                 data-testid="rule-ramsch"
@@ -130,7 +130,7 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
               />{' '}
               {t('lobby.ruleRamsch')}
             </label>
-            <label>
+            <label className={styles.rule}>
               <input
                 type="checkbox"
                 data-testid="rule-bock"

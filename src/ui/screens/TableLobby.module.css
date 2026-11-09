@@ -103,3 +103,10 @@
   background: rgb(0 0 0 / 30%);
   color: var(--ink);
 }
+
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
