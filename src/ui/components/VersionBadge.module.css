@@ -1,0 +1,27 @@
+/* Small and unobtrusive: it sits over the screen without taking layout space (docs/ui.md §1). */
+.badge {
+  position: fixed;
+  z-index: 50;
+  left: calc(env(safe-area-inset-left) + 2px);
+  bottom: calc(env(safe-area-inset-bottom) + 2px);
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 35%);
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.badge:hover,
+.badge:focus-visible {
+  opacity: 1;
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.badge:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}

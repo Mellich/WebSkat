@@ -2,6 +2,17 @@
 
 export const enApp = {
   'app.name': 'WebSkat',
+  'version.label': 'v{version}',
+  'version.open': 'Version {version}: open the changelog in a new tab',
+  'changelog.title': 'WebSkat changelog',
+  'changelog.current': 'You are using version {version}.',
+  'changelog.release': 'Version {version}',
+  'changelog.section.Added': 'Added',
+  'changelog.section.Changed': 'Changed',
+  'changelog.section.Deprecated': 'Deprecated',
+  'changelog.section.Removed': 'Removed',
+  'changelog.section.Fixed': 'Fixed',
+  'changelog.section.Security': 'Security',
   'common.cancel': 'Cancel',
   'common.close': 'Close',
   'common.copied': 'Copied',

@@ -33,7 +33,9 @@ redaction break. Background: `docs/networking.md` §3, `docs/hidden-information.
    Schemas are `z.ZodType<T>`: `npm run typecheck` shows drift. Optional fields in types that zod
    produces need `?: T | undefined`.
 2. `src/net/constants.ts`: `PROTOCOL_VERSION` + 1. Note the new version in
-   `docs/networking.md` §1.
+   `docs/networking.md` §1. A protocol change is breaking: bump the **minor** app version (major
+   from 1.0.0 on) and write "(protocol version N)" in the `CHANGELOG.md` item
+   (`docs/dev/versioning.md`).
 3. `src/net/protocol.test.ts`: a valid sample parses; malformed samples are rejected.
 4. Host behavior beyond `applyCommand` (e.g. sending a message)? `src/net/host.ts` +
    `host.test.ts` with `createRig`/`joinClient`/`settle`.

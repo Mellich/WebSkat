@@ -4,6 +4,17 @@ import type { enApp } from './enApp';
 
 export const deApp: Record<keyof typeof enApp, string> = {
   'app.name': 'WebSkat',
+  'version.label': 'v{version}',
+  'version.open': 'Version {version}: Änderungsprotokoll in neuem Tab öffnen',
+  'changelog.title': 'WebSkat-Änderungsprotokoll',
+  'changelog.current': 'Du benutzt Version {version}.',
+  'changelog.release': 'Version {version}',
+  'changelog.section.Added': 'Neu',
+  'changelog.section.Changed': 'Geändert',
+  'changelog.section.Deprecated': 'Veraltet',
+  'changelog.section.Removed': 'Entfernt',
+  'changelog.section.Fixed': 'Behoben',
+  'changelog.section.Security': 'Sicherheit',
   'common.cancel': 'Abbrechen',
   'common.close': 'Schließen',
   'common.copied': 'Kopiert',

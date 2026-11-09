@@ -28,6 +28,7 @@ Run long commands in the background if your tool allows it, and read only the ta
 | property missing in a `de*.ts` part (`i18n/parts/`) | add the German string for the new key to the matching part |
 | zod schema not assignable to `ZodType<…>` | update `src/net/schemaGame.ts` / `schemaView.ts` to match the type |
 | `no-restricted-globals` / `no-restricted-properties` (`Math.random`, `Date`) | inject `ctx.now`, `ctx.seed`, `rand` |
+| `src/ui/changelog/changelog.test.ts` fails | `package.json` version and the newest `CHANGELOG.md` release differ, or a release lacks a date/item: fix per `docs/dev/versioning.md` §3 (never edit the test) |
 | `no-restricted-imports` | wrong layer import; imports go ui → net → table → engine only |
 | `switch-exhaustiveness-check` | add the missing `case` |
 | `restrict-template-expressions` | wrap numbers: `` `${String(n)}` `` |

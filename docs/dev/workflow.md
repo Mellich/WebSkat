@@ -85,7 +85,13 @@ use `t('key', {param})`. Game terms: German names in `de.ts` (Reizen, Weg, Drüc
 
 1. Update the docs (`dev/docs-maintenance.md`): every fact you changed, in the file that owns it.
 2. Append decisions to `docs/decisions.md` (next `I` number).
-3. `npm run check` once more after the doc edits if you touched code comments.
-4. Report: what changed, which files, which tests ran (and their result), what was not verified.
+3. **Bump the version and add the changelog entry** (`dev/versioning.md`): pick patch / minor
+   (§2 there), run `npm version <x.y.z> --no-git-tag-version`, add `## [x.y.z] - YYYY-MM-DD` with
+   `Added`/`Changed`/`Fixed`/… items at the top of `CHANGELOG.md`. Only docs/tests/tooling
+   changes skip this.
+4. `npm run check` once more after the doc edits and the version bump (the changelog test checks
+   that `CHANGELOG.md` and `package.json` agree).
+5. Report: what changed, which files, the new version, which tests ran (and their result), what
+   was not verified.
    Do not claim success without a green `npm run check`.
-5. Do not commit, push or create branches unless the user asks. Never touch `assets/`.
+6. Do not commit, push or create branches unless the user asks. Never touch `assets/`.

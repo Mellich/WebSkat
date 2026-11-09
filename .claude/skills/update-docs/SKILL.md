@@ -34,6 +34,7 @@ dependency, script, open item.
 | process / hard rules | `docs/dev/workflow.md`, root `AGENTS.md` |
 | status, open items, limitations | `docs/overview.md` §2 |
 | decisions, deviations | `docs/decisions.md` (append row, next `I` number) |
+| what changed in this version | `CHANGELOG.md` + version in `package.json` (`docs/dev/versioning.md`) |
 
 ## 3. How to write
 
@@ -44,6 +45,8 @@ dependency, script, open item.
 
 ## 4. Check
 
+- Code changed → the version is bumped and `CHANGELOG.md` has a matching release at the top
+  (`docs/dev/versioning.md`); `npx vitest run src/ui/changelog` passes.
 - Links point to existing files:
   `grep -rnoE 'docs/[a-zA-Z/.-]+\.md' AGENTS.md src e2e docs .claude | sort -u` and check each path.
 - Test ids in `docs/dev/e2e.md` §6 match

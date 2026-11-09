@@ -80,7 +80,8 @@ Consequences of the strict options you will hit:
 
 ## 6. Other config files
 
-- `vite.config.ts`: `base: './'` (works under a sub-path), React plugin, Vitest `environment:
+- `vite.config.ts`: `base: './'` (works under a sub-path), React plugin, `define.__APP_VERSION__`
+  (the `package.json` version, read at startup; `dev/versioning.md`), Vitest `environment:
   'node'`, excludes `e2e/**`. Component tests opt into jsdom with `// @vitest-environment jsdom`.
 - `playwright.config.ts`: see `dev/e2e.md` §2.
 - `.env.example`: build-time variables, see `deployment.md` §3. Copy to `.env.local` (ignored).

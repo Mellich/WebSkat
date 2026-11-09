@@ -1,0 +1,94 @@
+# Changelog
+
+All notable changes to WebSkat are listed here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html). How to add an entry and pick the
+next version: `docs/dev/versioning.md`.
+
+Versions before 0.7.0 were reconstructed from the git history.
+
+## [0.7.0] - 2026-11-09
+
+### Added
+
+- The app version is shown in the bottom left corner of every screen. Clicking it opens this
+  changelog in a new tab (`#/changelog`).
+- This changelog and a versioning process: every change updates the changelog and bumps the
+  version.
+
+## [0.6.0] - 2026-11-09
+
+### Added
+
+- Game log dialog from the top bar: joins, disconnects, bids, declared games, Ramsch and Bock
+  events and results, the same for everybody (protocol version 7).
+
+## [0.5.0] - 2026-11-09
+
+### Added
+
+- Table rule "Bockrunden": a 60 : 60 game makes the next three games Bock games with doubled
+  points (protocol version 6).
+
+## [0.4.0] - 2026-11-09
+
+### Added
+
+- Table rule "Ramsch when everybody passes": everybody plays alone and the fewest card points win
+  (protocol version 5).
+
+## [0.3.0] - 2026-11-08
+
+### Added
+
+- The host can replace a seat during a game with a waiting player or a bot, from a new Players
+  dialog, and can invite a disconnected player again with an invite code or link (protocol
+  version 4).
+- Connection dots next to the players.
+- Bidding speech bubbles that show each player's last bid, a setting for the bubble duration and
+  a summary line for the declarer.
+- Trick cards at fixed positions (left, right, own card bottom center).
+- The host can abort a running game.
+- Card images are preloaded.
+
+### Changed
+
+- The default scoring system is now standard scoring.
+
+### Fixed
+
+- The result dialog follows the Seeger/standard scoring setting.
+- "Leave" now tells the host; players who left are removed at the next deal.
+- Cards that cannot be played are disabled buttons with `aria-disabled`.
+- Text centering in buttons and labels.
+
+### Removed
+
+- The unused "reduced motion" setting and unused texts.
+
+## [0.2.0] - 2026-11-07
+
+### Added
+
+- Bots with three strengths (easy, normal, strong); the host sets the strength per bot in the
+  lobby.
+- Logo and a script to publish the build to GitHub Pages.
+
+### Changed
+
+- Playtest fixes: bids go up one step at a time, a finished trick stays visible for the configured
+  time, the game screen fits phones and desktops without scrolling, small card symbols instead of
+  written-out card names.
+
+### Fixed
+
+- Opaque card images.
+
+## [0.1.0] - 2026-11-07
+
+### Added
+
+- First complete version: Skat engine (bidding, Hand, Ouvert, Null, Grand, scoring), table layer
+  with seats and dealer rotation, Geberskat for 4–6 players, peer-to-peer networking over WebRTC,
+  React UI in English and German, table statistics, settings, reconnect and resume after a
+  reload, end-to-end tests and deployment docs.

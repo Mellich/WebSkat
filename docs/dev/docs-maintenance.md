@@ -23,6 +23,8 @@ Write each fact in **one** place and link to it from elsewhere.
 | Test helpers and test inventory | `docs/dev/testing.md` |
 | e2e specs, helpers, **test ids** | `docs/dev/e2e.md` |
 | Development process | `docs/dev/workflow.md` |
+| Versioning rules | `docs/dev/versioning.md` |
+| What changed in which version | `CHANGELOG.md` (version itself: `package.json`) |
 | File list of a source folder | that folder's `AGENTS.md` ("File map") |
 | Decisions and deviations | `docs/decisions.md` |
 | Project status and open items | `docs/overview.md` §2 |
@@ -57,5 +59,7 @@ Write each fact in **one** place and link to it from elsewhere.
 - [ ] `dev/e2e.md` §6 if test ids changed; `dev/testing.md` §4 if a new test file was added.
 - [ ] `overview.md` §2 if an open item was closed or a new limitation appeared.
 - [ ] `decisions.md` row for every decision.
+- [ ] Version bumped in `package.json`/`package-lock.json` and a matching release at the top of
+      `CHANGELOG.md` (`dev/versioning.md`) for every code change.
 - [ ] `README.md` for user-visible changes.
 - [ ] Links still point to existing files: `grep -rnoE 'docs/[a-z/-]+\.md' AGENTS.md src e2e docs | sort -u` and check each exists.

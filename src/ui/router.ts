@@ -8,7 +8,8 @@ export type Route =
   | { readonly kind: 'home' }
   | { readonly kind: 'table'; readonly key: string; readonly invite: string | null }
   | { readonly kind: 'dev-local'; readonly seed: number | null; readonly players: number; readonly bots: BotLevel }
-  | { readonly kind: 'dev-gallery' };
+  | { readonly kind: 'dev-gallery' }
+  | { readonly kind: 'changelog' };
 
 export function parseRoute(hash: string): Route {
   const [path = '', query = ''] = hash.replace(/^#/, '').split('?', 2);
@@ -25,6 +26,7 @@ export function parseRoute(hash: string): Route {
     };
   }
   if (path === '/dev/gallery') return { kind: 'dev-gallery' };
+  if (path === '/changelog') return { kind: 'changelog' };
   const table = /^\/t\/([^/]+)$/.exec(path);
   const raw = table?.[1];
   if (raw !== undefined && isValidKey(decodeURIComponent(raw))) {

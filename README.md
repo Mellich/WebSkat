@@ -122,3 +122,5 @@ can. Any TURN server works (a hosted service or coturn); game data stays end-to-
   (`docs/dev/`) and the decision log (`docs/decisions.md`).
 - `e2e/` holds the Playwright tests.
 - `.claude/skills/` holds task checklists for coding agents.
+- `CHANGELOG.md` lists the changes of every version (semantic versioning, `docs/dev/versioning.md`).
+  The app shows its version bottom left; clicking it opens the changelog.

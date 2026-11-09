@@ -32,6 +32,9 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | Path | Contents |
 |---|---|
 | `router.ts` | `Route` (table route carries `invite`), `parseRoute`, `useRoute`, `navigate`, `tableHash(key, invite?)` |
+| `version.ts` | `APP_VERSION` (from `package.json` via Vite `define __APP_VERSION__`; `docs/dev/versioning.md`) |
+| `changelog/` | `changelogText.ts` (`CHANGELOG.md?raw`), `parseChangelog.ts` (`parseChangelog`, `splitInlineCode`, `parseSemver`); `changelog.test.ts` checks the changelog against `APP_VERSION` |
+| `screens/ChangelogScreen.tsx` | `#/changelog`: releases from `CHANGELOG.md`, translated headings |
 | `assets.ts` | `cardUrl`, `backUrl`, `logoUrl`, `BackIndex`, `DEFAULT_BACK` |
 | `preload.ts` | `cardImageUrls(back)`, `preloadImages(urls)`: loads card faces and back once per page |
 | `cardNames.ts` | `cardLabel` (English fallback card name, default prop of components) |
@@ -55,7 +58,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `game/seats.ts` | `opponentsOf` (seat order relative to the viewer), `namesById` |
 | `game/trickPositions.ts` | `trickSeats` (who is left / right / bottom), `placeTrick` (plays → positions) |
 | `game/labels.ts` | `cardName`, `cardShort`, `declarationLabel`, `spitzenLabel`, `suitKey`, `suitSymbol` |
-| `components/` | `Card` (`disabled` = button that cannot be clicked), `Hand` (interactive hands are all buttons), `OpponentSeat`, `TrickArea`, `SkatPile`, `SpeechBubble`, `CardChip(s)`, `ConnectionDot`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` (+ `PlayerRow`, `ReplaceChooser`, `InviteBox`; `PlayersDialog.module.css`), `GameLogDialog` (`GameLogDialog.module.css`) |
+| `components/` | `Card` (`disabled` = button that cannot be clicked), `Hand` (interactive hands are all buttons), `OpponentSeat`, `TrickArea`, `SkatPile`, `SpeechBubble`, `CardChip(s)`, `ConnectionDot`, `VersionBadge` (version link bottom left), `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` (+ `PlayerRow`, `ReplaceChooser`, `InviteBox`; `PlayersDialog.module.css`), `GameLogDialog` (`GameLogDialog.module.css`) |
 | `stats/` | `StatsPanel`, `Standings`, `History`, `ScoreChart`, `ByType`, `chartGeometry.ts`, `gameLabel.ts` |
 | `store/session.ts` | `useSession` (connection, host, status, view, records, toasts), `errorText` |
 | `store/settings.ts` | `useSettings` (settings + `update`) |

@@ -46,6 +46,7 @@ All implementation phases 0–14 of the original plan are done (archive: `histor
 | F13 | Table rule "Ramsch when everybody passes" (host sets it in the lobby): everybody plays alone, fewest card points win | `skat-rules.md` §12, `table.md` §1–§3 |
 | F14 | Table rule "Bockrunden" (host sets it in the lobby): a 60 : 60 game makes the next 3 games Bock games with doubled points | `skat-rules.md` §13, `table.md` §2, §4, §5 |
 | F15 | Game log (📜): joins, disconnects, bids, declared games, Ramsch and Bock events, results; the same for everybody | `table.md` §4a, `ui.md` §10 |
+| F16 | Version label bottom left on every screen; opens the changelog (`#/changelog`, from `CHANGELOG.md`) in a new tab | `ui.md` §1, `dev/versioning.md` |
 
 ## 4. Out of scope
 

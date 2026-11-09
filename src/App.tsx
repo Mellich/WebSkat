@@ -1,6 +1,8 @@
 import { Suspense, lazy } from 'react';
 import { Toasts } from './ui/components/Toast';
+import { VersionBadge } from './ui/components/VersionBadge';
 import { useRoute } from './ui/router';
+import { ChangelogScreen } from './ui/screens/ChangelogScreen';
 import { Home } from './ui/screens/Home';
 import { TableScreen } from './ui/screens/TableScreen';
 
@@ -30,6 +32,8 @@ export function App() {
         return DevGallery === null ? <Home /> : <DevGallery />;
       case 'dev-local':
         return DevLocal === null ? <Home /> : <DevLocal seed={route.seed} players={route.players} bots={route.bots} />;
+      case 'changelog':
+        return <ChangelogScreen />;
       case 'home':
         return <Home />;
       default: {
@@ -41,6 +45,7 @@ export function App() {
   return (
     <>
       <Suspense fallback={null}>{screen}</Suspense>
+      {route.kind === 'changelog' ? null : <VersionBadge />}
       <Toasts />
     </>
   );

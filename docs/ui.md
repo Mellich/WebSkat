@@ -18,8 +18,20 @@ No router library. `useRoute()` reads `location.hash` (`useSyncExternalStore`);
 | `#/t/ABCD-EFGH?invite=WXYZ-2345` | `table` with `invite` (normalized; an invalid code is ignored) | same; the invite is taken over, then dropped from the URL |
 | `#/dev/local?seed=N&players=3..6&bots=easy\|normal\|strong` | `dev-local` | `dev/DevLocal.tsx` (DEV builds only, else Home) |
 | `#/dev/gallery` | `dev-gallery` | `dev/Gallery.tsx` (DEV builds only, else Home) |
+| `#/changelog` | `changelog` | `screens/ChangelogScreen.tsx` (all builds) |
 
-`App` also renders `<Toasts />` (toasts vanish after 4.5 s or on click).
+`App` also renders `<Toasts />` (toasts vanish after 4.5 s or on click) and, on every route except
+`changelog`, `<VersionBadge />`: `v<version>` fixed in the bottom left corner (`app-version`, small,
+over the content without taking layout space). It is a link to `#/changelog` with
+`target="_blank"`, so the changelog opens in a new tab and the game keeps running. The version is
+`APP_VERSION` (`version.ts`, from `package.json` via Vite `define`; `dev/versioning.md`).
+
+**Changelog screen** (`screens/ChangelogScreen.tsx`): title (`changelog.title`), current version
+(`changelog.current`), then one panel per release of `CHANGELOG.md` (`changelog-release`), newest
+first. The file is bundled with `?raw` (`changelog/changelogText.ts`) and parsed by
+`changelog/parseChangelog.ts` (releases, Keep a Changelog sections, items; backticks → `<code>`).
+Section titles are translated (`changelog.section.<Name>`); the items are shown as written in
+`CHANGELOG.md` (English).
 
 ## 2. Home (`screens/Home.tsx`)
 
@@ -184,6 +196,7 @@ blocked) and the `persist/*` modules. Values are validated on read.
 | `CardChip`, `CardChips` | card as text chip `♥10` with full name as `aria-label`/`title` |
 | `GameLogDialog` (`components/GameLogDialog.tsx`, plan 10) | Modal over `view.log` (the last 100 entries, oldest first; `log-list` / `log-entry`, `dealt` entries are separators). Scrolls to the newest entry when one arrives. Texts from `log/logText.ts` (pure, one `switch` over the entry kinds; strings in `i18n/parts/enLog.ts` / `deLog.ts`). Closes on Esc |
 | `TopBar`, `Toasts`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` | Dialogs close on Esc |
+| `VersionBadge` | `v<version>` link bottom left on every screen, opens `#/changelog` in a new tab (§1) |
 | `stats/*` | `statistics.md` §3 |
 
 Styling: `styles/tokens.css` (colors, `--card-w` etc.), `styles/global.css` (includes a
