@@ -40,7 +40,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `screens/TableScreen.tsx` | `#/t/KEY`: name form, `openTable(key, name, invite)`, TopBar, connection banner (Retry for `TIMEOUT`), lobby or game |
 | `screens/TableLobby.tsx` | key + copy, seats, bot strength selects, Add bot, Start, Kick |
 | `game/GameScreen.tsx` | in-game layout, bid bubbles, phase panel switch, hand, result |
-| `game/StatusArea.tsx` (+ `.module.css`) | status line row, declarer summary (`bid-summary`), sitting-out line |
+| `game/StatusArea.tsx` (+ `.module.css`) | status line row, declarer summary (`bid-summary`), Bock line (`bock-info`), sitting-out line |
 | `game/TableCenter.tsx` | the table area: Skat pile, bottom bid bubble, trick at fixed positions, last-trick bubble |
 | `game/AbortGameButton.tsx` | host's "Abort game" button in the status row, with a confirm dialog |
 | `game/BiddingPanel.tsx` | current bid, whose turn, Bid N / Hold / Play (18) / Pass |

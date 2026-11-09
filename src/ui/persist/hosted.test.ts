@@ -78,10 +78,40 @@ describe('host snapshots in localStorage', () => {
     storage.setItem(key, JSON.stringify(old));
 
     const loaded = loadHostSnapshot(storage, 'TESTKEY');
-    expect(loaded?.table.rules).toEqual({ ramsch: false });
+    expect(loaded?.table.rules).toEqual({ ramsch: false, bock: false });
     expect(loaded?.table.game?.engine.options).toEqual({ ramschOnPassIn: false });
     expect(loaded?.table.game?.engine.ramsch).toBe(false);
     expect(loaded?.table.records[0]?.ramsch).toBeNull();
+  });
+
+  it('upgrades a snapshot from before the Bockrunden rule', () => {
+    const storage = memoryStorage();
+    const table = passedInTable();
+    saveHostSnapshot(storage, snapshotOf(table));
+    const key = storage.key(0);
+    if (key === null) throw new Error('nothing saved');
+    const old = JSON.parse(JSON.stringify(snapshotOf(table))) as {
+      table: {
+        rules: { bock?: unknown };
+        bockGamesLeft?: unknown;
+        game: { bock?: unknown };
+        records: { bock?: unknown; bockTriggered?: unknown }[];
+      };
+    };
+    delete old.table.rules.bock;
+    delete old.table.bockGamesLeft;
+    delete old.table.game.bock;
+    for (const record of old.table.records) {
+      delete record.bock;
+      delete record.bockTriggered;
+    }
+    storage.setItem(key, JSON.stringify(old));
+
+    const loaded = loadHostSnapshot(storage, 'TESTKEY');
+    expect(loaded?.table.rules).toEqual({ ramsch: false, bock: false });
+    expect(loaded?.table.bockGamesLeft).toBe(0);
+    expect(loaded?.table.game?.bock).toBe(false);
+    expect(loaded?.table.records[0]).toMatchObject({ bock: false, bockTriggered: false });
   });
 
   it('returns the snapshot that was saved', () => {

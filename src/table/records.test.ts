@@ -101,3 +101,52 @@ describe('makeRecord details', () => {
     expect(Object.values(record.scores.seeger).reduce((a, b) => a + b, 0)).toBe(194);
   });
 });
+
+describe('makeRecord Bock doubling (skat-rules §13.1 B1–B3)', () => {
+  const table = tableWith(3);
+  const [a, b, c] = table.players.map((p) => p.id) as [string, string, string];
+  const roles = { forehand: a, middlehand: b, hindhand: c };
+  const bockGame = (game: ReturnType<typeof finishedGame>) => ({ ...game, bock: true });
+
+  it('B1: a Bock won Grand is +288 standard and +338 Seeger, others 0', () => {
+    const record = makeRecord(table, bockGame(finishedGame(table, roles, GRAND_144, 1)), ctxFor(0));
+    expect(record.scores.standard).toEqual({ [a]: 288, [b]: 0, [c]: 0 });
+    expect(record.scores.seeger).toEqual({ [a]: 338, [b]: 0, [c]: 0 });
+    expect(record.bock).toBe(true);
+  });
+
+  it('B2: a Bock lost Diamonds (N = 3) is −108 standard, −158 Seeger, others +40', () => {
+    const record = makeRecord(table, bockGame(finishedGame(table, roles, DIAMONDS_LOST, 2)), ctxFor(0));
+    expect(record.scores.standard).toEqual({ [a]: -108, [b]: 0, [c]: 0 });
+    expect(record.scores.seeger).toEqual({ [a]: -158, [b]: 40, [c]: 40 });
+  });
+
+  it('B3: a Bock Ramsch doubles every Ramsch score', () => {
+    const ramsch = {
+      kind: 'ramsch' as const,
+      points: { forehand: 50, middlehand: 40, hindhand: 30 },
+      tricks: { forehand: 4, middlehand: 3, hindhand: 3 },
+      skatTo: 'forehand' as const,
+      losers: ['forehand' as const],
+      jungfrau: false,
+      durchmarsch: null,
+      scores: { forehand: -50, middlehand: 0, hindhand: 0 },
+    };
+    const record = makeRecord(table, bockGame(finishedGame(table, roles, ramsch, 3)), ctxFor(0));
+    expect(record.scores.standard).toEqual({ [a]: -100, [b]: 0, [c]: 0 });
+    expect(record.scores.seeger).toEqual({ [a]: -100, [b]: 0, [c]: 0 });
+  });
+
+  it('keeps the plain engine values and sets bockTriggered only when asked', () => {
+    const plain = makeRecord(table, finishedGame(table, roles, DIAMONDS_LOST, 4), ctxFor(0));
+    expect(plain).toMatchObject({ bock: false, bockTriggered: false, gameValue: 27 });
+    const trig = makeRecord(table, finishedGame(table, roles, DIAMONDS_LOST, 5), ctxFor(0), true);
+    expect(trig).toMatchObject({ bock: false, bockTriggered: true });
+  });
+
+  it('does not double a passed-in Bock game (all zero)', () => {
+    const record = makeRecord(table, bockGame(finishedGame(table, roles, { kind: 'passed-in' }, 6)), ctxFor(0));
+    expect(record).toMatchObject({ bock: true, bockTriggered: false });
+    expect(record.scores.standard).toEqual({ [a]: 0, [b]: 0, [c]: 0 });
+  });
+});

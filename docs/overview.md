@@ -44,11 +44,12 @@ All implementation phases 0–14 of the original plan are done (archive: `histor
 | F11 | Bots with per-bot strength set by the host in the lobby | `bots.md` |
 | F12 | Offline practice (DEV builds): `#/dev/local` | `ui.md` §8 |
 | F13 | Table rule "Ramsch when everybody passes" (host sets it in the lobby): everybody plays alone, fewest card points win | `skat-rules.md` §12, `table.md` §1–§3 |
+| F14 | Table rule "Bockrunden" (host sets it in the lobby): a 60 : 60 game makes the next 3 games Bock games with doubled points | `skat-rules.md` §13, `table.md` §2, §4, §5 |
 
 ## 4. Out of scope
 
-- Kontra/Re, Bock rounds and other house rules (only ISkO rules, plus the strict bidding house
-  rule, plus the table rule Ramsch, `skat-rules.md` §12).
+- Kontra/Re and other house rules (only ISkO rules, plus the strict bidding house rule, plus the
+  table rules Ramsch, `skat-rules.md` §12, and Bockrunden, `skat-rules.md` §13).
 - Accounts, server-side storage, chat, voice, spectators, host migration, turn timers, sounds.
 - Protection against a cheating **host** (the host's browser holds all cards).
 

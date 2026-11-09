@@ -107,6 +107,7 @@ export function gameViewFor(s: TableState, game: ActiveGame, viewer: PlayerId): 
     number: game.number,
     phase: e.phase,
     ramsch: e.ramsch,
+    bock: game.bock,
     dealerId: game.dealerId,
     roles: game.roles,
     sittingOut: game.sittingOut,

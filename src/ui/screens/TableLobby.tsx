@@ -117,22 +117,41 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
       <section aria-label={t('lobby.rules')}>
         <h3 className={styles.label}>{t('lobby.rules')}</h3>
         {isHost ? (
-          <label>
-            <input
-              type="checkbox"
-              data-testid="rule-ramsch"
-              checked={table.rules.ramsch}
-              disabled={gameRunning}
-              onChange={(e) => {
-                connection.send({ type: 'set-rules', rules: { ...table.rules, ramsch: e.target.checked } });
-              }}
-            />{' '}
-            {t('lobby.ruleRamsch')}
-          </label>
+          <>
+            <label>
+              <input
+                type="checkbox"
+                data-testid="rule-ramsch"
+                checked={table.rules.ramsch}
+                disabled={gameRunning}
+                onChange={(e) => {
+                  connection.send({ type: 'set-rules', rules: { ...table.rules, ramsch: e.target.checked } });
+                }}
+              />{' '}
+              {t('lobby.ruleRamsch')}
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                data-testid="rule-bock"
+                checked={table.rules.bock}
+                disabled={gameRunning}
+                onChange={(e) => {
+                  connection.send({ type: 'set-rules', rules: { ...table.rules, bock: e.target.checked } });
+                }}
+              />{' '}
+              {t('lobby.ruleBock')}
+            </label>
+          </>
         ) : (
-          <p className={styles.hint}>
-            {t('lobby.ruleRamsch')}: {table.rules.ramsch ? t('lobby.ruleOn') : t('lobby.ruleOff')}
-          </p>
+          <>
+            <p className={styles.hint}>
+              {t('lobby.ruleRamsch')}: {table.rules.ramsch ? t('lobby.ruleOn') : t('lobby.ruleOff')}
+            </p>
+            <p className={styles.hint}>
+              {t('lobby.ruleBock')}: {table.rules.bock ? t('lobby.ruleOn') : t('lobby.ruleOff')}
+            </p>
+          </>
         )}
       </section>
 

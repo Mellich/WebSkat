@@ -438,3 +438,28 @@ winner of the last trick (it is not a trick). The three totals add up to 120.
 | R4 | 45 / 45 / 30 | 4 / 3 / 3 | F −45, M −45 |
 | R5 | 40 / 40 / 40 | 4 / 3 / 3 | F −40, M −40, H −40 |
 | R6 | scripted | — | H wins the last trick, the Skat is `SA D7` (11 points): H's card points include these 11 |
+
+## 13. Bockrunden (table rule, off by default)
+
+- **Trigger**: a suit or Grand game ends with 60 : 60 card points (§8). Null and Ramsch never
+  trigger.
+- **Effect**: the next 3 games are Bock games. A trigger inside a Bock game adds 3 more.
+  Every finished game (played, passed in, Ramsch) uses up one Bock game; aborted games do not.
+- **Scoring in a Bock game**: the game value part counts double.
+  - Standard: `2 × declarerScore` (§10.5).
+  - Seeger–Fabian: won `2 × gameValue + 50`; lost `2 × declarerScore − 50`; the bonus for the
+    other seated players (§10.6) is unchanged.
+  - Ramsch: `2 ×` the scores of §12.4.
+- The game that triggers is not doubled itself (unless it is a Bock game already).
+
+### 13.1 Worked examples = test vectors
+
+| # | Situation | Standard | Seeger–Fabian |
+|---|---|---|---|
+| B1 | Bock game, won Grand, value 144 (§10.7 #1) | declarer +288 | declarer +338, others 0 |
+| B2 | Bock game, lost Diamonds, value 27 (§10.7 #3), N = 3 | declarer −108 | declarer −158, others +40 |
+| B3 | Bock game, Ramsch R1 (§12.5) | F −100 | F −100 |
+| B4 | Counter: 0 left, a 60 : 60 game | → 3 left | |
+| B5 | Counter: 3 left, a Bock game without trigger | → 2 left | |
+| B6 | Counter: 2 left, a Bock game ending 60 : 60 | → 2 − 1 + 3 = 4 left | |
+| B7 | Counter: 1 left, a passed-in Bock game | → 0 left | |

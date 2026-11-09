@@ -9,6 +9,7 @@ import {
   type GameAction,
   type Result,
 } from '../engine';
+import { nextBockGamesLeft, triggersBock } from './bock';
 import { makeRecord } from './records';
 import { replacePlayer } from './replace';
 import { DEFAULT_RULES, setRules } from './rules';
@@ -72,6 +73,7 @@ export function createTable(args: {
     game: null,
     ready: [],
     rules: DEFAULT_RULES,
+    bockGamesLeft: 0,
     records: [],
     seq: 0,
   };
@@ -102,6 +104,7 @@ export function dealNext(state: TableState, ctx: Ctx): TableState {
     seed: ctx.seed,
     seatsAtDeal: n,
     recorded: false,
+    bock: s.rules.bock && s.bockGamesLeft > 0,
   };
   return touch({
     ...s,
@@ -129,10 +132,13 @@ function toLobbyIfTooFew(s: TableState): TableState {
 }
 
 function finishGame(s: TableState, game: ActiveGame, ctx: Ctx): CommandResult {
-  const record = makeRecord(s, game, ctx);
+  const result = game.engine.result;
+  const triggered = s.rules.bock && result !== null && triggersBock(result);
+  const record = makeRecord(s, game, ctx, triggered);
   const finished = touch({
     ...s,
     game: { ...game, recorded: true },
+    bockGamesLeft: nextBockGamesLeft(s.bockGamesLeft, game.bock, triggered),
     records: [...s.records, record],
     ready: s.players.filter((p) => p.isBot).map((p) => p.id),
   });

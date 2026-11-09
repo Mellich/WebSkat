@@ -1,6 +1,7 @@
 // Builds the GameRecord of a finished game with both scoring systems (docs/statistics.md §1, skat-rules §10.5–10.6).
 
 import { ROLES, assertNever, type Declaration, type GameResult, type Role } from '../engine';
+import { BOCK_FACTOR } from './bock';
 import {
   SUIT_LABELS,
   type ActiveGame,
@@ -13,7 +14,7 @@ import {
 
 type RecordBase = Pick<
   GameRecord,
-  'id' | 'number' | 'timestamp' | 'tableSize' | 'dealerId' | 'roles' | 'sittingOut' | 'names'
+  'id' | 'number' | 'timestamp' | 'tableSize' | 'dealerId' | 'roles' | 'sittingOut' | 'names' | 'bock' | 'bockTriggered'
 >;
 type PlayedResult = Extract<GameResult, { kind: 'played' }>;
 type RamschResult = Extract<GameResult, { kind: 'ramsch' }>;
@@ -51,19 +52,22 @@ function zeroes(ids: readonly PlayerId[]): Record<PlayerId, number> {
   return Object.fromEntries(ids.map((id) => [id, 0]));
 }
 
+/** Score deltas of a played game; `factor` doubles the game value part in a Bock game (§13). */
 function scoresFor(
   ids: readonly PlayerId[],
   declarerId: PlayerId,
   result: PlayedResult,
   seats: number,
+  factor: number,
 ): GameRecord['scores'] {
-  const standard = { ...zeroes(ids), [declarerId]: result.declarerScore };
+  const declarerScore = result.declarerScore * factor;
+  const standard = { ...zeroes(ids), [declarerId]: declarerScore };
   if (result.won) {
-    return { standard, seeger: { ...zeroes(ids), [declarerId]: result.gameValue + 50 } };
+    return { standard, seeger: { ...zeroes(ids), [declarerId]: result.gameValue * factor + 50 } };
   }
   const bonus = seegerBonus(seats);
   const seeger = Object.fromEntries(
-    ids.map((id) => [id, id === declarerId ? result.declarerScore - 50 : bonus]),
+    ids.map((id) => [id, id === declarerId ? declarerScore - 50 : bonus]),
   );
   return { standard, seeger };
 }
@@ -100,13 +104,14 @@ function ramschRecord(
   ids: readonly PlayerId[],
   result: RamschResult,
   roles: Readonly<Record<Role, PlayerId>>,
+  factor: number,
 ): GameRecord {
-  const byId = (values: Readonly<Record<Role, number>>): Record<PlayerId, number> => {
+  const byId = (values: Readonly<Record<Role, number>>, scale = 1): Record<PlayerId, number> => {
     const out = zeroes(ids);
-    for (const role of ROLES) out[roles[role]] = values[role];
+    for (const role of ROLES) out[roles[role]] = values[role] * scale;
     return out;
   };
-  const scores = byId(result.scores);
+  const scores = byId(result.scores, factor);
   return {
     ...base,
     outcome: 'ramsch',
@@ -138,8 +143,17 @@ function ramschRecord(
   };
 }
 
-/** Creates the record of a finished game. The game must have a result. */
-export function makeRecord(table: TableState, game: ActiveGame, ctx: Ctx): GameRecord {
+/**
+ * Creates the record of a finished game. The game must have a result. `bockTriggered` is set by
+ * the table when this 60 : 60 game starts Bock games (skat-rules §13).
+ */
+export function makeRecord(
+  table: TableState,
+  game: ActiveGame,
+  ctx: Ctx,
+  bockTriggered = false,
+): GameRecord {
+  const factor = game.bock ? BOCK_FACTOR : 1;
   const result = game.engine.result;
   if (result === null) {
     throw new Error('makeRecord needs a finished game');
@@ -154,12 +168,14 @@ export function makeRecord(table: TableState, game: ActiveGame, ctx: Ctx): GameR
     roles: game.roles,
     sittingOut: game.sittingOut,
     names: Object.fromEntries(table.players.map((p) => [p.id, p.name])),
+    bock: game.bock,
+    bockTriggered,
   };
   if (result.kind === 'passed-in') {
     return passedInRecord(base, ids);
   }
   if (result.kind === 'ramsch') {
-    return ramschRecord(base, ids, result, game.roles);
+    return ramschRecord(base, ids, result, game.roles, factor);
   }
   const declarerId = game.roles[result.declarer];
   const d = result.declaration;
@@ -184,7 +200,7 @@ export function makeRecord(table: TableState, game: ActiveGame, ctx: Ctx): GameR
     schwarz: result.schwarz,
     overbid: result.overbid,
     won: result.won,
-    scores: scoresFor(ids, declarerId, result, game.seatsAtDeal),
+    scores: scoresFor(ids, declarerId, result, game.seatsAtDeal, factor),
     ramsch: null,
   };
 }

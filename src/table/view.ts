@@ -41,6 +41,7 @@ export function viewFor(s: TableState, viewer: PlayerId): TableView {
       nextDealerId: nextDealerId(s),
       readyIds: [...s.ready],
       rules: s.rules,
+      bockGamesLeft: s.bockGamesLeft,
     },
     you: youFor(s, viewer),
     game: s.game === null ? null : gameViewFor(s, s.game, viewer),

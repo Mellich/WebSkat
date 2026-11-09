@@ -26,7 +26,8 @@ const view: TableView = {
     pending: [],
     nextDealerId: null,
     readyIds: [],
-    rules: { ramsch: false },
+    rules: { ramsch: false, bock: false },
+    bockGamesLeft: 0,
   },
   you: { id: 'a', seat: 0, role: 'forehand' },
   game: null,
@@ -65,6 +66,8 @@ const record: GameRecord = {
   sittingOut: [],
   names: { a: 'Anna', b: 'Ben', c: 'Cem' },
   outcome: 'played',
+  bock: false,
+  bockTriggered: false,
   declarerId: 'a',
   bid: 18,
   game: 'diamonds',
@@ -138,6 +141,8 @@ describe('ResultDialog after a Ramsch', () => {
   const ramschRecord: GameRecord = {
     ...record,
     outcome: 'ramsch',
+    bock: false,
+    bockTriggered: false,
     declarerId: null,
     bid: null,
     game: null,
@@ -176,3 +181,22 @@ describe('ResultDialog after a Ramsch', () => {
   });
 });
 
+
+describe('ResultDialog Bock notes (skat-rules §13)', () => {
+  it('says the points are doubled in a Bock game', () => {
+    render(<ResultDialog view={view} result={lost} record={{ ...record, bock: true }} scoring="standard" onContinue={() => undefined} />);
+    expect(screen.getByText('Bock game: points doubled.')).toBeTruthy();
+    expect(screen.queryByText('60 : 60 — the next 3 games are Bock games.')).toBeNull();
+  });
+
+  it('says that 60 : 60 starts the next 3 Bock games', () => {
+    render(<ResultDialog view={view} result={lost} record={{ ...record, bockTriggered: true }} scoring="standard" onContinue={() => undefined} />);
+    expect(screen.getByText('60 : 60 — the next 3 games are Bock games.')).toBeTruthy();
+    expect(screen.queryByText('Bock game: points doubled.')).toBeNull();
+  });
+
+  it('shows no Bock note for an ordinary game', () => {
+    render(<ResultDialog view={view} result={lost} record={record} scoring="standard" onContinue={() => undefined} />);
+    expect(screen.queryByText(/Bock/)).toBeNull();
+  });
+});

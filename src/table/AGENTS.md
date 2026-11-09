@@ -23,6 +23,7 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 | `types.ts` | `PlayerId`, `BotLevel`, `Player`, `TableStatus`, `ActiveGame`, `TableState`, `TableCommand`, `ReplaceBy`, `Ctx`, `TableErrorCode`, `GameKindLabel`, `ScoreDeltas`, `GameRecord`, `SUIT_LABELS` |
 | `table.ts` | `createTable`, `applyCommand` (the reducer), `dealNext`, `tryDeal`, `CommandResult` |
 | `rules.ts` | `DEFAULT_RULES`, `setRules` (`set-rules`: host, no game running) |
+| `bock.ts` | `BOCK_GAMES`, `BOCK_FACTOR`, `triggersBock` (60 : 60), `nextBockGamesLeft` (Bockrunden, skat-rules §13) |
 | `replace.ts` | `replacePlayer` (`replace-player`: a waiting player or a bot takes the seat, role, sitting-out and dealer slot) |
 | `seating.ts` | `MIN_SEATS`, `MAX_SEATS`, `MAX_NAME_LENGTH`, `allPlayers`, `touch`, `uniqueName`, `addPlayer`, `removePlayer`, `setConnected`, `markLeaving`, `removeLeavers` |
 | `rotation.ts` | `pickFirstDealer`, `sittingOutSeats`, `rolesForDealer`, `roleOf` (Geberskat) |
@@ -36,7 +37,7 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 | `index.ts` | public re-exports (also `BotView` type) |
 | `testing.ts` | `tableWith`, `ctxFor`, `randomStep`, `playUntilRecords`, `pickRandom` |
 | `fixtures.ts` | `finishedGame`, `GRAND_144`, `DIAMONDS_LOST`, `NULL_OUVERT_WON` |
-| `*.test.ts` | `table`, `leave`, `replace`, `seating`, `rotation`, `records`, `stats`, `view`, `view.redaction`, `rules`, `ramsch` (records, stats, views of a Ramsch), `bot`, `bot/*` (incl. `bot/ramsch`) |
+| `*.test.ts` | `table`, `leave`, `replace`, `seating`, `rotation`, `records` (incl. Bock doubling), `stats`, `view` (incl. Bock fields), `view.redaction`, `rules`, `ramsch` (records, stats, views of a Ramsch), `bock` (trigger, counter, table flow), `bot`, `bot/*` (incl. `bot/ramsch`) |
 
 ## `view.ts` / `viewGame.ts` are the security boundary
 

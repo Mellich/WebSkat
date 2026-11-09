@@ -88,6 +88,7 @@ const GameViewSchema: z.ZodType<GameView> = z.object({
   number: z.number().int().min(1),
   phase: z.enum(['bidding', 'skat-decision', 'discarding', 'declaring', 'playing', 'finished']),
   ramsch: z.boolean(),
+  bock: z.boolean(),
   dealerId: id,
   roles,
   sittingOut: playerIds,
@@ -140,7 +141,8 @@ export const TableViewSchema: z.ZodType<TableView> = z.object({
     pending: z.array(PlayerPublicSchema),
     nextDealerId: nullableId,
     readyIds: playerIds,
-    rules: z.object({ ramsch: z.boolean() }),
+    rules: z.object({ ramsch: z.boolean(), bock: z.boolean() }),
+    bockGamesLeft: z.number().int().min(0),
   }),
   you: z.object({
     id,
@@ -185,5 +187,8 @@ export const GameRecordSchema: z.ZodType<GameRecord> = z.object({
   scores: ScoresSchema,
   // records cached before the Ramsch rule have no block: they read as null
   ramsch: RamschRecordSchema.nullable().default(null),
+  // records cached before the Bockrunden rule have no flags: they read as false
+  bock: z.boolean().default(false),
+  bockTriggered: z.boolean().default(false),
 });
 

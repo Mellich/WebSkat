@@ -4,7 +4,7 @@ import { applyCommand } from './table';
 import type { Ctx, PlayerId, TableCommand, TableErrorCode, TableState } from './types';
 
 const CTX: Ctx = ctxFor(42, 1000);
-const RAMSCH_ON = { type: 'set-rules', rules: { ramsch: true } } as const;
+const RAMSCH_ON = { type: 'set-rules', rules: { ramsch: true, bock: false } } as const;
 const PASS = { type: 'game', action: { type: 'pass' } } as const;
 
 function apply(s: TableState, actor: PlayerId, c: TableCommand, ctx: Ctx = CTX): TableState {
@@ -21,12 +21,12 @@ function errorOf(s: TableState, actor: PlayerId, c: TableCommand): TableErrorCod
 
 describe('set-rules', () => {
   it('starts with every table rule off', () => {
-    expect(tableWith(3).rules).toEqual({ ramsch: false });
+    expect(tableWith(3).rules).toEqual({ ramsch: false, bock: false });
   });
 
   it('lets the host turn Ramsch on in the lobby', () => {
     const s = apply(tableWith(3), 'p0', RAMSCH_ON);
-    expect(s.rules).toEqual({ ramsch: true });
+    expect(s.rules).toEqual({ ramsch: true, bock: false });
   });
 
   it('is for the host only', () => {

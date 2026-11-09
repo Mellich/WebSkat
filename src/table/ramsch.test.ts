@@ -109,6 +109,6 @@ describe('views of a Ramsch', () => {
   });
 
   it('gives the rules to the table view', () => {
-    expect(viewFor(tableWith(3), 'p1').table.rules).toEqual({ ramsch: false });
+    expect(viewFor(tableWith(3), 'p1').table.rules).toEqual({ ramsch: false, bock: false });
   });
 });

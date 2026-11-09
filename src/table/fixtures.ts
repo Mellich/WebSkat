@@ -21,6 +21,7 @@ export function finishedGame(
     seed: 1,
     seatsAtDeal: table.players.length,
     recorded: false,
+    bock: false,
   };
 }
 

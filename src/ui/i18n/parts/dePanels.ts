@@ -73,6 +73,7 @@ export const dePanels: Record<keyof typeof enPanels, string> = {
   'lobby.botLevel': 'Stärke von {name}',
   'lobby.rules': 'Tischregeln',
   'lobby.ruleRamsch': 'Ramsch, wenn alle passen',
+  'lobby.ruleBock': 'Bockrunden (60:60 → die nächsten 3 Spiele zählen doppelt)',
   'lobby.ruleOn': 'an',
   'lobby.ruleOff': 'aus',
 };

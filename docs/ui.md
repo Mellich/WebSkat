@@ -55,8 +55,8 @@ exists, Home navigates to that table (`decisions.md` I80).
   `rejected TIMEOUT` also shows **Retry** (`retry-join`): it drops the connection, and the effect
   joins again with the stored session. `INVITE_INVALID` has its own text.
 - `TableLobby` shows the key, the seats (bot strength per bot for the host), the "Table rules"
-  section (`lobby.rules`: the host's checkbox `rule-ramsch`, "Ramsch when everybody passes"; the others
-  read "on"/"off"), and the host's Add bot / Start buttons. The rule checkbox is disabled while a
+  section (`lobby.rules`: the host's checkboxes `rule-ramsch` ("Ramsch when everybody passes") and
+  `rule-bock` ("Bockrunden (60:60 → next 3 games count double)"); the others read "on"/"off"), and the host's Add bot / Start buttons. The rule checkbox is disabled while a
   game runs.
 - Shows `TableLobby` while `view.table.status === 'lobby'`, the viewer is `pending`, or there is
   no game; otherwise `GameScreen` (keyed by game number, so each game starts with fresh local

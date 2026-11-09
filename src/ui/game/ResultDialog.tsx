@@ -31,6 +31,8 @@ export function ResultDialog({ view, result, record, scoring, onContinue }: Resu
     onContinue,
     iAmReady: readyIds.has(view.you.id),
     waiting: waiting.map((p) => p.name),
+    // a passed-in game has no score to double, so it gets no Bock note
+    record: result.kind === 'passed-in' ? null : record,
   };
 
   if (result.kind === 'passed-in') {
@@ -92,10 +94,11 @@ interface ShellProps {
   readonly onContinue: () => void;
   readonly iAmReady: boolean;
   readonly waiting: readonly string[];
+  readonly record: GameRecord | null;
   readonly children: ReactNode;
 }
 
-function Shell({ t, onContinue, iAmReady, waiting, children }: ShellProps) {
+function Shell({ t, onContinue, iAmReady, waiting, record, children }: ShellProps) {
   const status = waiting.length > 0
     ? t('result.waitingFor', { names: waiting.join(', ') })
     : t('result.waitingOthers');
@@ -104,6 +107,8 @@ function Shell({ t, onContinue, iAmReady, waiting, children }: ShellProps) {
       <div className={styles.dialog} role="dialog" aria-modal="true" aria-label={t('result.title')} data-testid="result-dialog">
         <h2>{t('result.title')}</h2>
         {children}
+        {record?.bock ? <p>{t('result.bock')}</p> : null}
+        {record?.bockTriggered ? <p>{t('result.bockTriggered')}</p> : null}
         {iAmReady ? <p className={styles.waiting}>{status}</p> : null}
         <button type="button" onClick={onContinue} disabled={iAmReady} data-testid="continue">{t('result.continue')}</button>
       </div>

@@ -199,3 +199,21 @@ describe('bot strength in the view', () => {
     expect(players.map((p) => p.botLevel)).toEqual([null, null, 'normal']);
   });
 });
+
+describe('Bockrunden in views (skat-rules §13)', () => {
+  it('shows the Bock rule and the games left to every seated player', () => {
+    let s = step(tableWith(3), 'p0', { type: 'set-rules', rules: { ramsch: false, bock: true } });
+    s = { ...s, bockGamesLeft: 2 };
+    const view = viewFor(s, 'p1');
+    expect(view.table.rules).toEqual({ ramsch: false, bock: true });
+    expect(view.table.bockGamesLeft).toBe(2);
+  });
+
+  it('marks a running Bock game in the game view', () => {
+    const s = step(tableWith(3), 'p0', { type: 'start' });
+    const game = s.game;
+    if (game === null) throw new Error('no game dealt');
+    expect(viewFor(s, 'p1').game?.bock).toBe(false);
+    expect(viewFor({ ...s, game: { ...game, bock: true } }, 'p1').game?.bock).toBe(true);
+  });
+});

@@ -221,6 +221,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
             </>
           )}
           summary={summary}
+          bockInfo={game.bock ? t('bock.active', { count: view.table.bockGamesLeft }) : null}
           sittingOut={opponents.sittingOut.length === 0 ? null : (
             <p className={styles.sittingOut} aria-label={t('sitOut.bar')} data-testid="sitting-out">
               {t('sitOut.bar')}: {opponents.sittingOut.map((o) => o.player.name).join(', ')}

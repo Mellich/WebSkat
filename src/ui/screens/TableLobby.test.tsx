@@ -69,15 +69,36 @@ describe('TableLobby table rules', () => {
     const box = screen.getByTestId<HTMLInputElement>('rule-ramsch');
     expect(box.checked).toBe(false);
     fireEvent.click(box);
-    expect(send).toHaveBeenCalledWith({ type: 'set-rules', rules: { ramsch: true } });
+    expect(send).toHaveBeenCalledWith({ type: 'set-rules', rules: { ramsch: true, bock: false } });
   });
 
   it('shows the rule as text to other players', () => {
     useSettings.getState().update({ language: 'en' });
-    const s = { ...lobby(), rules: { ramsch: true } };
+    const s = { ...lobby(), rules: { ramsch: true, bock: false } };
     const { connection } = connectionMock();
     render(<TableLobby view={viewFor({ ...s, players: [...s.players, { id: 'g', name: 'Gast', connected: true, isBot: false }] }, 'g')} connection={connection} tableKey="ABCDEFGH" />);
     expect(screen.queryByTestId('rule-ramsch')).toBeNull();
     expect(screen.getByText('Ramsch when everybody passes: on')).toBeTruthy();
+  });
+});
+
+describe('TableLobby Bockrunden rule', () => {
+  it('lets the host switch Bockrunden on and keeps the Ramsch setting', () => {
+    useSettings.getState().update({ language: 'en' });
+    const { connection, send } = connectionMock();
+    render(<TableLobby view={viewFor(lobby(), 'h')} connection={connection} tableKey="ABCDEFGH" />);
+    const box = screen.getByTestId<HTMLInputElement>('rule-bock');
+    expect(box.checked).toBe(false);
+    fireEvent.click(box);
+    expect(send).toHaveBeenCalledWith({ type: 'set-rules', rules: { ramsch: false, bock: true } });
+  });
+
+  it('shows the Bock rule as text to other players', () => {
+    useSettings.getState().update({ language: 'en' });
+    const s = { ...lobby(), rules: { ramsch: false, bock: true } };
+    const { connection } = connectionMock();
+    render(<TableLobby view={viewFor({ ...s, players: [...s.players, { id: 'g', name: 'Gast', connected: true, isBot: false }] }, 'g')} connection={connection} tableKey="ABCDEFGH" />);
+    expect(screen.queryByTestId('rule-bock')).toBeNull();
+    expect(screen.getByText('Bockrunden (60:60 → next 3 games count double): on')).toBeTruthy();
   });
 });

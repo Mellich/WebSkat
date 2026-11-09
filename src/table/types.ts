@@ -30,11 +30,13 @@ export interface ActiveGame {
   readonly seed: number; // SECRET (host only)
   readonly seatsAtDeal: number; // N when dealt (Seeger bonus)
   readonly recorded: boolean; // the record of this game has been created
+  readonly bock: boolean; // a Bock game: game value counts double (skat-rules §13)
 }
 
 /** Table rules, changed by the host between games (docs/table.md §1, skat-rules §12). */
 export interface TableRules {
   readonly ramsch: boolean; // Ramsch instead of a passed-in game
+  readonly bock: boolean; // Bockrunden: 60 : 60 starts 3 double games (skat-rules §13)
 }
 
 export interface TableState {
@@ -51,6 +53,7 @@ export interface TableState {
   readonly game: ActiveGame | null;
   readonly ready: readonly PlayerId[]; // who pressed "continue" after the finished game
   readonly rules: TableRules;
+  readonly bockGamesLeft: number; // Bock games still to come, the running one included
   readonly records: readonly GameRecord[];
   readonly seq: number; // increments on every state change
 }
@@ -112,6 +115,8 @@ export interface GameRecord {
   readonly sittingOut: readonly PlayerId[];
   readonly names: Readonly<Record<PlayerId, string>>; // names at that time (survive kicks)
   readonly outcome: 'passed-in' | 'played' | 'ramsch';
+  readonly bock: boolean; // a Bock game (skat-rules §13): scores already doubled
+  readonly bockTriggered: boolean; // this game (60 : 60) started new Bock games
   // below: only when outcome === 'played' (null otherwise)
   readonly declarerId: PlayerId | null;
   readonly bid: number | null;

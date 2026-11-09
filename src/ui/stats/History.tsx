@@ -15,6 +15,7 @@ function flags(r: GameRecord, t: Translator): string {
   const parts: string[] = [];
   if (r.ramsch?.jungfrau) parts.push(t('game.jungfrau'));
   if (r.ramsch?.durchmarschId) parts.push(t('game.durchmarsch'));
+  if (r.bock) parts.push(t('game.bock'));
   if (r.schneider || r.announce === 'schneider') parts.push(t('game.schneider'));
   if (r.schwarz || r.announce === 'schwarz') parts.push(t('game.schwarz'));
   if (r.overbid) parts.push(t('stats.overbid'));

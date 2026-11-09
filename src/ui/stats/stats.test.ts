@@ -50,6 +50,8 @@ describe('gameLabel', () => {
     sittingOut: [],
     names: {},
     outcome: 'played',
+    bock: false,
+    bockTriggered: false,
     declarerId: 'a',
     bid: 18,
     game: 'hearts',

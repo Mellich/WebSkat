@@ -68,6 +68,7 @@ export interface GameView {
   readonly number: number;
   readonly phase: GamePhase;
   readonly ramsch: boolean; // a Ramsch is played or was played (no declarer)
+  readonly bock: boolean; // a Bock game: points count double (skat-rules §13)
   readonly dealerId: PlayerId;
   readonly roles: Readonly<Record<Role, PlayerId>>;
   readonly sittingOut: readonly PlayerId[];
@@ -110,6 +111,7 @@ export interface TableView {
     readonly nextDealerId: PlayerId | null;
     readonly readyIds: readonly PlayerId[];
     readonly rules: TableRules;
+    readonly bockGamesLeft: number; // Bock games still to come, the running one included
   };
   readonly you: {
     readonly id: PlayerId;

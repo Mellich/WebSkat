@@ -63,5 +63,5 @@ export const TableCommandSchema: z.ZodType<TableCommand> = z.discriminatedUnion(
   z.object({ type: z.literal('add-bot') }),
   z.object({ type: z.literal('set-bot-level'), playerId: z.string().min(1).max(64), level: z.enum(['easy', 'normal', 'strong']) }),
   z.object({ type: z.literal('leave') }),
-  z.object({ type: z.literal('set-rules'), rules: z.object({ ramsch: z.boolean() }) }),
+  z.object({ type: z.literal('set-rules'), rules: z.object({ ramsch: z.boolean(), bock: z.boolean() }) }),
 ]);

@@ -95,6 +95,10 @@ During bidding the hand is shown at full brightness but not clickable (`showAll`
 
 ## 6. Status line texts (priority order)
 
+In a Bock game (skat-rules §13) the status area shows one more line below the status row:
+`bock-info` ("Bock game: points ×2 · {count} Bock games left incl. this one"), with the same
+ellipsis as the declarer line.
+
 1. Holding a trick → "{winner} takes the trick".
 2. Finished → empty.
 3. Viewer's turn → "Your turn".
@@ -106,6 +110,10 @@ also shows an **Abort game** button (`data-testid="abort-game"`, `AbortGameButto
 dialog comes first; the confirmed click sends `abort-game`, and the next game is dealt.
 
 ## 7. ResultDialog (`ResultDialog.tsx`)
+
+A Bock game (played or Ramsch, not passed in) shows "Bock game: points doubled."; a 60 : 60 game
+that starts Bock games shows "60 : 60 — the next 3 games are Bock games." Both lines come from the
+record (`bock`, `bockTriggered`), below the result text.
 
 A bottom sheet whose backdrop lets clicks through, so TopBar (Stats, Settings) stays usable.
 

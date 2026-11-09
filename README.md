@@ -20,6 +20,8 @@ implemented are in `docs/skat-rules.md`. Contributors and coding agents read `AG
    The host can also set the table rule **Ramsch when everybody passes** in the lobby: if all
    players pass in the bidding, a Ramsch round starts instead of a new deal (everybody plays alone
    and the fewest card points win).
+   The host can also switch on **Bockrunden**: if a game ends 60 : 60, the next three games are
+   Bock games and their points count double.
 5. After each game, every player presses **Continue**; the next game is dealt when all connected
    players are ready.
 

@@ -21,6 +21,7 @@ interface ActiveGame {
   seed;                   // SECRET, host only
   seatsAtDeal;            // N when dealt (Seeger bonus)
   recorded: boolean;      // record created
+  bock: boolean;          // a Bock game (Bockrunden, skat-rules §13): points count double
 }
 
 interface TableState {
@@ -38,7 +39,7 @@ interface TableState {
   seq;                    // +1 on every change (`touch`)
 }
 
-interface TableRules { ramsch: boolean }    // default off; each deal passes it as GameOptions.ramschOnPassIn
+interface TableRules { ramsch: boolean; bock: boolean }    // default off; ramsch is passed as GameOptions.ramschOnPassIn; bock: §13
 interface Ctx { now: number; seed: number }   // supplied by the host for every command
 ```
 
@@ -51,7 +52,9 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 | `createTable({key, name, isPublic, hostId, hostName, maxSeats?})` | `table.ts` | Lobby with the host seated; `maxSeats` clamped to 3..6, default 6; `rules = DEFAULT_RULES` |
 | `applyCommand(s, actor, command, ctx)` | `table.ts` | The reducer: `Result<{state, record}, TableErrorCode>` (§3) |
 | `dealNext(s, ctx)` | `table.ts` | Removes leavers first (`removeLeavers`), seats pending players; < 3 seated → back to lobby. Dealer = `nextDealerIdx % N`, pointer moves one seat on, `newGame(ctx.seed, { ramschOnPassIn: rules.ramsch })`, roles from the rotation, `ready` = bots |
-| `setRules(s, actor, rules)` | `rules.ts` | Host only, not while a game runs (lobby or finished game); sets `rules`. `DEFAULT_RULES = { ramsch: false }` |
+| `setRules(s, actor, rules)` | `rules.ts` | Host only, not while a game runs (lobby or finished game); sets `rules`. Turning `bock` off sets `bockGamesLeft = 0`. `DEFAULT_RULES = { ramsch: false, bock: false }` |
+| `triggersBock(result)` | `bock.ts` | True for a played suit or Grand game with `declarerPoints === 60` (60 : 60; Null and Ramsch never) |
+| `nextBockGamesLeft(left, wasBock, triggered)` | `bock.ts` | `max(0, left − (wasBock ? 1 : 0)) + (triggered ? 3 : 0)`; `BOCK_GAMES = 3`, `BOCK_FACTOR = 2` |
 | `tryDeal(s, ctx)` | `table.ts` | Deals the next game when the game is finished and every **connected human** is in `ready` |
 | `addPlayer(s, {id, name, isBot?, botLevel?})` | `seating.ts` | Known id → reconnect (`connected = true`). Else validates the name (`INVALID_NAME`), checks `players + pending < maxSeats` (`TABLE_FULL`), makes the name unique, seats the player if `game === null`, otherwise adds to `pending` |
 | `removePlayer(s, id)` | `seating.ts` | Removes from seats or pending; keeps the pointer on the same upcoming dealer (a removed seat before the pointer shifts it down); drops the id from `ready` |
@@ -97,6 +100,9 @@ Joining is not a command: the host calls `addPlayer` when a `join` message arriv
   games.
 - Table rules change only when no game runs, so every game is dealt under the rules it was
   dealt with.
+- The Bock counter (`bockGamesLeft`) changes only when a record is created (`finishGame`), never
+  at deal or abort. A game is a Bock game when the rule is on and the counter is above 0 at deal
+  time (`ActiveGame.bock`). Passed-in and Ramsch games use up one Bock game too.
 - A player who leaves during a running game keeps the seat (`leaving`, disconnected) until the next
   deal; `dealNext` removes leavers first. Rejoining with the same id before that cancels the leave.
 - Pending players are seated only in `dealNext` (before roles are computed). New players are
@@ -120,6 +126,11 @@ seeger:   won  → declarer = gameValue + 50; others 0
           passed-in → all 0
 seegerBonus(N): 3 → 40, 4 → 30, 5 → 24, 6 → 20
 Ramsch (outcome 'ramsch'): standard = seeger = the engine's Ramsch scores (skat-rules §12.4), mapped to ids
+
+Bock (skat-rules §13): in a Bock game (`game.bock`) every game-value part is multiplied by 2:
+`declarerScore × 2` (standard), won `gameValue × 2 + 50` and lost `declarerScore × 2 − 50`
+(Seeger; the defenders' bonus is not doubled), Ramsch scores × 2. `makeRecord(table, game, ctx,
+bockTriggered)` sets `bock` and `bockTriggered` (`finishGame` passes `triggersBock(result)`).
 ```
 
 `names` holds the names at that time, so history stays readable after a kick. `id` is
@@ -133,12 +144,13 @@ and the `ramsch` block: `points`, `tricks`, `loserIds`, `jungfrau`, `durchmarsch
 - `seq`
 - `table`: `key`, `name`, `hostId`, `maxSeats`, `status`, `players` / `pending` as `PlayerPublic`
   (`id`, `name`, `connected`, `isBot`, `botLevel` (null for humans), `seat` (null while pending)),
-  `nextDealerId`, `readyIds`, `rules` (`TableRules`, shown in the lobby).
+  `nextDealerId`, `readyIds`, `rules` (`TableRules`, shown in the lobby), `bockGamesLeft`.
 - `you`: `id`, `seat`, `role`: a `Role`, `'sitting-out'`, `'pending'` or `'lobby'` (also for
   unknown ids; never throws).
 - `game`: `GameView` or `null`.
 
 `GameView` fields: `number`, `phase`, `ramsch` (a Ramsch is played or was played: no declarer),
+`bock` (a Bock game: points count double),
 `dealerId`, `roles` (Role → id), `sittingOut`, `turnId`,
 `waitingFor` (= `turnId` if that player is disconnected), `bidding` (`stage`, `callerId`,
 `listenerId`, `currentBid`, `history` with player ids), `declarerId`, `bid`, `pickedUpSkat`,

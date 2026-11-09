@@ -34,7 +34,7 @@ function migrateRamschRule(parsed: unknown): void {
   const table = parsed.table;
   if (typeof table !== 'object' || table === null) return;
   const t = table as Record<string, unknown>;
-  if (!('rules' in t)) t.rules = { ramsch: false };
+  if (!('rules' in t)) t.rules = { ramsch: false, bock: false };
   const game = t.game;
   if (typeof game === 'object' && game !== null && 'engine' in game) {
     const engine = game.engine;
@@ -52,8 +52,37 @@ function migrateRamschRule(parsed: unknown): void {
   }
 }
 
+/**
+ * Snapshots before the Bockrunden rule (protocol 5) have no `bock` in the table rules, no
+ * `bockGamesLeft`, no `bock` flag on the running game, and no `bock`/`bockTriggered` on records.
+ * No Bock game existed, so every value is false / 0.
+ */
+function migrateBockRule(parsed: unknown): void {
+  if (typeof parsed !== 'object' || parsed === null || !('table' in parsed)) return;
+  const table = parsed.table;
+  if (typeof table !== 'object' || table === null) return;
+  const t = table as Record<string, unknown>;
+  const rules = t.rules;
+  if (typeof rules === 'object' && rules !== null && !('bock' in rules)) {
+    (rules as Record<string, unknown>).bock = false;
+  }
+  if (!('bockGamesLeft' in t)) t.bockGamesLeft = 0;
+  const game = t.game;
+  if (typeof game === 'object' && game !== null && !('bock' in game)) {
+    (game as Record<string, unknown>).bock = false;
+  }
+  if (!Array.isArray(t.records)) return;
+  for (const record of t.records as unknown[]) {
+    if (typeof record !== 'object' || record === null) continue;
+    const r = record as Record<string, unknown>;
+    if (!('bock' in r)) r.bock = false;
+    if (!('bockTriggered' in r)) r.bockTriggered = false;
+  }
+}
+
 /** Runs every migration step on a parsed snapshot. */
 export function migrateSnapshot(parsed: unknown): void {
   migrateBotLevel(parsed);
   migrateRamschRule(parsed);
+  migrateBockRule(parsed);
 }

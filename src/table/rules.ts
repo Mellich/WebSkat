@@ -4,7 +4,7 @@ import { err, ok, type Result } from '../engine';
 import type { PlayerId, TableErrorCode, TableRules, TableState } from './types';
 import { touch } from './seating';
 
-export const DEFAULT_RULES: TableRules = { ramsch: false };
+export const DEFAULT_RULES: TableRules = { ramsch: false, bock: false };
 
 export function setRules(
   s: TableState,
@@ -15,5 +15,6 @@ export function setRules(
   if (s.game !== null && s.game.engine.phase !== 'finished') {
     return err('GAME_RUNNING', 'Wait until the game is finished.');
   }
-  return ok(touch({ ...s, rules }));
+  // Turning Bockrunden off ends the running Bock series (skat-rules §13).
+  return ok(touch({ ...s, rules, bockGamesLeft: rules.bock ? s.bockGamesLeft : 0 }));
 }
