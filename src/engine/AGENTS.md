@@ -24,7 +24,7 @@ API). Tests: `docs/dev/testing.md`.
 
 | File | Contents |
 |---|---|
-| `types.ts` | `Suit`, `Rank`, `CardId`, `Role`/`ROLES`, `Declaration`, `GamePhase`, `BiddingState`, `GameAction`, `GameState`, `GameResult`, `GameErrorCode`, `Result`, `ok`, `err`, `assertNever` |
+| `types.ts` | `Suit`, `Rank`, `CardId`, `Role`/`ROLES`, `Declaration`, `GamePhase`, `BiddingState`, `GameAction`, `GameOptions`/`DEFAULT_GAME_OPTIONS`, `GameState`, `GameResult`, `GameErrorCode`, `Result`, `ok`, `err`, `assertNever` |
 | `cards.ts` | `SUITS`, `RANKS`, `ALL_CARDS`, `card`, `suitOf`, `rankOf`, `isCardId`, `cardPoints`, `sumPoints`, `sortHand` |
 | `rng.ts` | `mulberry32(seed)`, `shuffle(items, seed)` |
 | `deck.ts` | `deal(seed)` → hands + Skat |
@@ -34,11 +34,13 @@ API). Tests: `docs/dev/testing.md`.
 | `declaration.ts` | `validateDeclaration`, `declarationOptions` |
 | `bidding.ts` | `initialBidding`, `nextBidValue`, `applyBid`, `legalBidValues`, `biddingOutcome` |
 | `play.ts` | `playCard`, `nextRole` |
+| `ramsch.ts` | `playModeOf` (Grand mode in a Ramsch), `ramschScores` (numbers in), `scoreRamsch` (skat-rules §12) |
 | `scoring.ts` | `computeScore` (numbers in, for tests), `scoreGame`, `skatPointsForDeclarer` |
-| `game.ts` | `Legal`, `newGame`, `applyAction` (the reducer), `getLegal`, `enumerateActions`, `isFinished` |
+| `legal.ts` | `Legal`, `getLegal`, `enumerateActions` (re-exported by `game.ts`; not in `index.ts`) |
+| `game.ts` | `newGame(seed, options)`, `applyAction` (the reducer), `isFinished` |
 | `index.ts` | public re-exports |
 | `testing.ts` | test helpers (`hand`, `stateWith`, `apply`, `run`, `afterBidding`, …) |
-| `*.test.ts` | one test file per module; `game.fuzz.test.ts` (2000 random games), `game.scripted.test.ts` (a full game as living documentation), `game.legal.test.ts` |
+| `*.test.ts` | one test file per module; `game.fuzz.test.ts` (2000 random games), `ramsch.fuzz.test.ts` (500 Ramsch games), `ramsch.test.ts` (R1–R5 vectors, Ramsch flow), `game.scripted.test.ts` (a full game as living documentation), `game.legal.test.ts` |
 
 ## Recipes
 
@@ -54,6 +56,8 @@ API). Tests: `docs/dev/testing.md`.
 
 - Jacks are **not** part of their printed suit in suit games and Grand (`DJ` is trump). In Null
   they are ordinary cards between 10 and Q.
+- A Ramsch has no declaration: `declaration` stays `null`. Use `playModeOf(state)`, never
+  `state.declaration`, to get the play mode (card play, legal moves, bots).
 - The first bidder is the **middlehand** (caller); the forehand is the listener. `newGame` sets
   `turn = 'middlehand'`.
 - Bids go strictly up one step (`nextBidValue`); jumps are `ILLEGAL_BID`.

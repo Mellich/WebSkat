@@ -9,6 +9,7 @@ export const enPanels = {
   'stats.scoring': 'Scoring',
   'stats.seeger': 'Seeger–Fabian',
   'stats.standard': 'Standard',
+  'stats.ramsch': 'Ramsch',
   'stats.empty': 'No games played yet.',
   'stats.rank': '#',
   'stats.name': 'Name',
@@ -68,4 +69,8 @@ export const enPanels = {
   'botLevel.normal': 'Normal',
   'botLevel.strong': 'Strong',
   'lobby.botLevel': 'Strength of {name}',
+  'lobby.rules': 'Table rules',
+  'lobby.ruleRamsch': 'Ramsch when everybody passes',
+  'lobby.ruleOn': 'on',
+  'lobby.ruleOff': 'off',
 } as const;

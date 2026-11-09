@@ -16,7 +16,7 @@ One record per **finished** game (played or passed in). Aborted games create non
 | `tableSize` | seated players when dealt |
 | `dealerId`, `roles`, `sittingOut` | who sat where |
 | `names` | player id → name at that time (survives kicks) |
-| `outcome` | `'played'` or `'passed-in'` |
+| `outcome` | `'played'`, `'passed-in'` or `'ramsch'` (table rule, skat-rules §12) |
 | `declarerId`, `bid`, `game` (`clubs`…`null`), `hand`, `ouvert`, `announce` | the declared game (null/false/`none` when passed in) |
 | `spitzenWith`, `spitzenCount`, `multiplier`, `gameValue` | value calculation (null for Null where not applicable) |
 | `declarerPoints`, `defenderPoints` | card points; **null for Null games** |
@@ -28,14 +28,14 @@ Score rules: `table.md` §5 and `skat-rules.md` §10.5–10.6.
 ## 2. Aggregation (`computeStats(records, knownPlayers)`)
 
 Returns `TableStats`:
-- `gamesTotal`, `passedIn`;
+- `gamesTotal`, `passedIn`, `ramsch` (count of Ramsch records; their scores are in the totals);
 - `players: PlayerStats[]`, sorted by standard total (ties by name); the UI re-sorts by the chosen
   scoring;
 - `byGame`: per game kind `{ played, declarerWon }`;
 - `series`: after each record, the cumulative `{standard, seeger}` per player (for the chart;
   absent players keep their value).
 
-`PlayerStats`: `games` (records where seated, incl. sitting out and passed-in), `played`,
+`PlayerStats`: `games` (records where seated, incl. sitting out, passed-in and Ramsch), `played` (`outcome === 'played'` only, so Ramsch games are not counted here),
 `satOut`, `declared`, `won`, `lost`, `winRate` (won/declared or null), `asDefender`,
 `defenderWins`, `total`, `average` (total / games), `best`, `worst` (each `{standard, seeger}`),
 `byGame` (declared/won per kind), `hands`, `ouverts`, `schneiderWins`, `schwarzWins`,
@@ -46,7 +46,7 @@ come from the latest record containing the id, falling back to `knownPlayers`.
 
 Test vectors (`stats.test.ts`, `records.test.ts`): the three Seeger games of `skat-rules.md`
 §10.7 give cumulative A = 90, B = 40, C = 136; a sitting-out player in a 4-player table gets +30
-when the declarer loses; passed-in records add 0.
+when the declarer loses; passed-in records add 0. A Ramsch record adds its engine scores (skat-rules §12.4) to the totals and to both systems alike.
 
 ## 3. UI (`src/ui/stats/`)
 
@@ -56,8 +56,8 @@ toggle (the same `scoring` setting as in Settings) and three tabs (`stats-tab-<i
 | Tab | Component | Content |
 |---|---|---|
 | `standings` | `Standings.tsx` | rank, name, total, games, declared, won %, average, best, worst; viewer's row highlighted |
-| `history` | `History.tsx` | one row per game, newest first (`history-row`): number, time, declarer, game label (`gameLabel`), spitzen, bid, card points, flags, result, one delta column per player; passed-in rows greyed; scrolls horizontally on phones |
-| `charts` | `ScoreChart.tsx`, `ByType.tsx` | SVG line chart of `series` (geometry in `chartGeometry.ts` `chartPlots`), games by type bars |
+| `history` | `History.tsx` | one row per game, newest first (`history-row`): number, time, declarer, game label (`gameLabel`, "Ramsch" for Ramsch), spitzen, bid, card points, flags, result, one delta column per player; passed-in rows greyed; a Ramsch row has no declarer, bid or result column and shows the flags Jungfrau/Durchmarsch; scrolls horizontally on phones |
+| `charts` | `ScoreChart.tsx`, `ByType.tsx` | SVG line chart of `series` (geometry in `chartGeometry.ts` `chartPlots`), games by type bars and the Ramsch count (`stats.ramsch`) |
 
 Empty state: "No games played yet". The result dialog does **not** use these components
 (`ui-game-screen.md` §7); it shows the game's record delta for the selected system.

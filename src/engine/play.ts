@@ -1,5 +1,6 @@
+import { playModeOf } from './ramsch';
 import { scoreGame } from './scoring';
-import { legalCards, modeOf, trickWinner } from './trump';
+import { legalCards, trickWinner } from './trump';
 import {
   assertNever,
   err,
@@ -32,8 +33,8 @@ export function playCard(
   role: Role,
   card: CardId,
 ): Result<GameState, GameErrorCode> {
-  const declaration = state.declaration;
-  if (state.phase !== 'playing' || declaration === null) {
+  const mode = playModeOf(state);
+  if (state.phase !== 'playing' || mode === null) {
     return err('WRONG_PHASE', 'Cards can only be played during the play phase.');
   }
   if (role !== state.turn) {
@@ -43,7 +44,6 @@ export function playCard(
   if (!hand.includes(card)) {
     return err('ILLEGAL_CARD', 'That card is not in your hand.');
   }
-  const mode = modeOf(declaration);
   if (!legalCards(hand, state.trick, mode).includes(card)) {
     return err('ILLEGAL_CARD', 'You must follow the led suit if you can.');
   }
@@ -64,7 +64,7 @@ export function playCard(
     tricks,
     turn: winner,
   };
-  const nullEndedByDeclarer = declaration.kind === 'null' && winner === state.declarer;
+  const nullEndedByDeclarer = state.declaration?.kind === 'null' && winner === state.declarer;
   if (!nullEndedByDeclarer && tricks.length < TRICKS_PER_GAME) {
     return ok(next);
   }

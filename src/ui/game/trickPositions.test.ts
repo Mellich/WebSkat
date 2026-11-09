@@ -10,6 +10,7 @@ function gameWith(roles: GameView['roles'], sittingOut: readonly string[]): Game
   return {
     number: 1,
     phase: 'playing',
+    ramsch: false,
     dealerId: 'a',
     roles,
     sittingOut,
@@ -53,6 +54,7 @@ function viewOf(players: readonly PlayerPublic[], you: string, game: GameView | 
       pending: [],
       nextDealerId: null,
       readyIds: [],
+      rules: { ramsch: false },
     },
     you: { id: you, seat: players.findIndex((p) => p.id === you), role: 'middlehand' },
     game,

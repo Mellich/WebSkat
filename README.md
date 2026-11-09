@@ -17,6 +17,9 @@ implemented are in `docs/skat-rules.md`. Contributors and coding agents read `AG
    the key on the start page, or open the link.
 4. When at least three players or bots are seated, the host presses **Start game**. Bots can fill
    seats with **Add bot**; the host sets each bot's strength (Easy, Normal or Strong) in the lobby.
+   The host can also set the table rule **Ramsch when everybody passes** in the lobby: if all
+   players pass in the bidding, a Ramsch round starts instead of a new deal (everybody plays alone
+   and the fewest card points win).
 5. After each game, every player presses **Continue**; the next game is dealt when all connected
    players are ready.
 

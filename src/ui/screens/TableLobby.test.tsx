@@ -59,3 +59,25 @@ describe('TableLobby bot strength', () => {
     expect(screen.getByTestId<HTMLButtonElement>('start-game').disabled).toBe(false);
   });
 });
+
+describe('TableLobby table rules', () => {
+  it('lets the host switch Ramsch on and sends the whole rule set', () => {
+    useSettings.getState().update({ language: 'en' });
+    const s = lobby();
+    const { connection, send } = connectionMock();
+    render(<TableLobby view={viewFor(s, 'h')} connection={connection} tableKey="ABCDEFGH" />);
+    const box = screen.getByTestId<HTMLInputElement>('rule-ramsch');
+    expect(box.checked).toBe(false);
+    fireEvent.click(box);
+    expect(send).toHaveBeenCalledWith({ type: 'set-rules', rules: { ramsch: true } });
+  });
+
+  it('shows the rule as text to other players', () => {
+    useSettings.getState().update({ language: 'en' });
+    const s = { ...lobby(), rules: { ramsch: true } };
+    const { connection } = connectionMock();
+    render(<TableLobby view={viewFor({ ...s, players: [...s.players, { id: 'g', name: 'Gast', connected: true, isBot: false }] }, 'g')} connection={connection} tableKey="ABCDEFGH" />);
+    expect(screen.queryByTestId('rule-ramsch')).toBeNull();
+    expect(screen.getByText('Ramsch when everybody passes: on')).toBeTruthy();
+  });
+});

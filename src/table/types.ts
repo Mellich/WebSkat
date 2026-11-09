@@ -32,6 +32,11 @@ export interface ActiveGame {
   readonly recorded: boolean; // the record of this game has been created
 }
 
+/** Table rules, changed by the host between games (docs/table.md §1, skat-rules §12). */
+export interface TableRules {
+  readonly ramsch: boolean; // Ramsch instead of a passed-in game
+}
+
 export interface TableState {
   readonly key: string;
   readonly name: string;
@@ -45,6 +50,7 @@ export interface TableState {
   readonly gameCounter: number; // games dealt so far (incl. aborted)
   readonly game: ActiveGame | null;
   readonly ready: readonly PlayerId[]; // who pressed "continue" after the finished game
+  readonly rules: TableRules;
   readonly records: readonly GameRecord[];
   readonly seq: number; // increments on every state change
 }
@@ -63,7 +69,8 @@ export type TableCommand =
   | { readonly type: 'replace-player'; readonly playerId: PlayerId; readonly by: ReplaceBy }
   | { readonly type: 'add-bot' }
   | { readonly type: 'set-bot-level'; readonly playerId: PlayerId; readonly level: BotLevel }
-  | { readonly type: 'leave' };
+  | { readonly type: 'leave' }
+  | { readonly type: 'set-rules'; readonly rules: TableRules };
 
 /** Values supplied by the caller: wall clock (record timestamps) and the deal seed. */
 export interface Ctx {
@@ -104,7 +111,7 @@ export interface GameRecord {
   readonly roles: Readonly<Record<Role, PlayerId>>;
   readonly sittingOut: readonly PlayerId[];
   readonly names: Readonly<Record<PlayerId, string>>; // names at that time (survive kicks)
-  readonly outcome: 'passed-in' | 'played';
+  readonly outcome: 'passed-in' | 'played' | 'ramsch';
   // below: only when outcome === 'played' (null otherwise)
   readonly declarerId: PlayerId | null;
   readonly bid: number | null;
@@ -124,6 +131,14 @@ export interface GameRecord {
   readonly overbid: boolean;
   readonly won: boolean;
   readonly scores: ScoreDeltas;
+  // only when outcome === 'ramsch' (null otherwise); all keyed by player id
+  readonly ramsch: {
+    readonly points: Readonly<Record<PlayerId, number>>;
+    readonly tricks: Readonly<Record<PlayerId, number>>;
+    readonly loserIds: readonly PlayerId[];
+    readonly jungfrau: boolean;
+    readonly durchmarschId: PlayerId | null;
+  } | null;
 }
 
 /** Label of the suit trump used in statistics and history. */

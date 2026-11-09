@@ -43,11 +43,12 @@ All implementation phases 0–14 of the original plan are done (archive: `histor
 | F10 | Card back choice, EN/DE, trick display time, two-tap play | `ui.md` §6 |
 | F11 | Bots with per-bot strength set by the host in the lobby | `bots.md` |
 | F12 | Offline practice (DEV builds): `#/dev/local` | `ui.md` §8 |
+| F13 | Table rule "Ramsch when everybody passes" (host sets it in the lobby): everybody plays alone, fewest card points win | `skat-rules.md` §12, `table.md` §1–§3 |
 
 ## 4. Out of scope
 
-- Ramsch, Kontra/Re, Bock rounds and other house rules (only ISkO rules, plus the strict
-  bidding house rule).
+- Kontra/Re, Bock rounds and other house rules (only ISkO rules, plus the strict bidding house
+  rule, plus the table rule Ramsch, `skat-rules.md` §12).
 - Accounts, server-side storage, chat, voice, spectators, host migration, turn timers, sounds.
 - Protection against a cheating **host** (the host's browser holds all cards).
 

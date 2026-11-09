@@ -35,7 +35,7 @@ function allowedCards(s: TableState, viewer: PlayerId): Set<CardId> {
   if (declarerViewer && e.pickedUpSkat && (e.phase === 'discarding' || e.phase === 'declaring')) {
     add(e.skat);
   }
-  if (e.phase === 'finished' && declarer !== null) {
+  if (e.phase === 'finished' && (declarer !== null || e.ramsch)) {
     add(e.skat);
     add(e.discarded);
     for (const t of e.tricks) add(t.plays.map((p) => p.card));
@@ -68,7 +68,11 @@ describe('view redaction', () => {
     for (let g = 0; g < 300; g++) {
       const seats = 3 + (g % 4);
       const ctx = ctxFor(Math.floor(rand() * 4294967296), 0);
-      const started = applyCommand(tableWith(seats), 'p0', { type: 'start' }, ctx);
+      // Every second game is played with the Ramsch rule (the Skat is public after a Ramsch).
+      const rules = { ramsch: g % 2 === 0 };
+      const lobby = applyCommand(tableWith(seats), 'p0', { type: 'set-rules', rules }, ctx);
+      if (!lobby.ok) throw new Error(lobby.error.code);
+      const started = applyCommand(lobby.value.state, 'p0', { type: 'start' }, ctx);
       if (!started.ok) throw new Error(started.error.code);
       let s = started.value.state;
       const joiner = addPlayer(s, { id: `late${String(g)}`, name: 'Late' });

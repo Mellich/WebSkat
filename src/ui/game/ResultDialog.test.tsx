@@ -26,6 +26,7 @@ const view: TableView = {
     pending: [],
     nextDealerId: null,
     readyIds: [],
+    rules: { ramsch: false },
   },
   you: { id: 'a', seat: 0, role: 'forehand' },
   game: null,
@@ -85,6 +86,7 @@ const record: GameRecord = {
     standard: { a: -54, b: 0, c: 0 },
     seeger: { a: -104, b: 40, c: 40 },
   },
+  ramsch: null,
 };
 
 function scoreCells(): string[] {
@@ -121,3 +123,56 @@ describe('ResultDialog score table', () => {
     expect(screen.queryByRole('table')).toBeNull();
   });
 });
+
+describe('ResultDialog after a Ramsch', () => {
+  const ramsch: ViewResult = {
+    kind: 'ramsch',
+    points: { a: 50, b: 40, c: 30 },
+    tricks: { a: 4, b: 3, c: 3 },
+    skatToId: 'c',
+    loserIds: ['a'],
+    jungfrau: false,
+    durchmarschId: null,
+    scores: { a: -50, b: 0, c: 0 },
+  };
+  const ramschRecord: GameRecord = {
+    ...record,
+    outcome: 'ramsch',
+    declarerId: null,
+    bid: null,
+    game: null,
+    declarerPoints: null,
+    defenderPoints: null,
+    declarerTricks: null,
+    scores: { standard: { a: -50, b: 0, c: 0 }, seeger: { a: -50, b: 0, c: 0 } },
+    ramsch: { points: { a: 50, b: 40, c: 30 }, tricks: { a: 4, b: 3, c: 3 }, loserIds: ['a'], jungfrau: false, durchmarschId: null },
+  };
+
+  it('names the losers and shows each card point count and score change', () => {
+    render(<ResultDialog view={view} result={ramsch} record={ramschRecord} scoring="standard" onContinue={() => undefined} />);
+    expect(screen.getByText('Anna lost the Ramsch')).toBeTruthy();
+    const rows = within(screen.getByRole('table'))
+      .getAllByRole('row')
+      .map((row) => Array.from(row.querySelectorAll('td'), (cell) => cell.textContent));
+    expect(rows).toEqual([
+      ['Anna', '50', '−50'],
+      ['Ben', '40', '0'],
+      ['Cem', '30', '0'],
+    ]);
+    expect(screen.queryByText(/Jungfrau/)).toBeNull();
+  });
+
+  it('shows the Jungfrau note and the Durchmarsch headline', () => {
+    const durchmarsch: ViewResult = { ...ramsch, kind: 'ramsch', durchmarschId: 'b', loserIds: [], jungfrau: false };
+    const { unmount } = render(
+      <ResultDialog view={view} result={durchmarsch} record={null} scoring="standard" onContinue={() => undefined} />,
+    );
+    expect(screen.getByText('Ben took every trick: Durchmarsch!')).toBeTruthy();
+    unmount();
+    render(
+      <ResultDialog view={view} result={{ ...ramsch, jungfrau: true }} record={ramschRecord} scoring="standard" onContinue={() => undefined} />,
+    );
+    expect(screen.getByText('Jungfrau: a player took no trick, the loss counts double.')).toBeTruthy();
+  });
+});
+

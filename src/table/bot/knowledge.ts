@@ -5,7 +5,7 @@ import {
   effectiveSuit,
   enumerateActions,
   getLegal,
-  modeOf,
+  playModeOf,
   ROLES,
   type BiddingState,
   type CardId,
@@ -15,6 +15,7 @@ import {
   type GamePhase,
   type GameState,
   type Legal,
+  type PlayMode,
   type Role,
   type Suit,
   type Trick,
@@ -26,6 +27,8 @@ export type Voids = Readonly<Record<Role, readonly EffectiveSuit[]>>;
 /** The part of a seat's knowledge that card play needs. Simulations build these as well. */
 export interface PlayView {
   readonly role: Role;
+  /** A Ramsch: no declarer, only Jacks are trump (Grand order), skat-rules §12. */
+  readonly ramsch: boolean;
   readonly hand: readonly CardId[];
   readonly declarer: Role | null;
   readonly declaration: Declaration | null;
@@ -54,12 +57,8 @@ export interface BotView extends PlayView {
 const NO_VOIDS: Voids = { forehand: [], middlehand: [], hindhand: [] };
 
 /** Suits each role has shown to be out of, from failing to follow the led suit. */
-export function voidsOf(
-  tricks: readonly Trick[],
-  declaration: Declaration | null,
-): Voids {
-  if (declaration === null) return NO_VOIDS;
-  const mode = modeOf(declaration);
+export function voidsOf(tricks: readonly Trick[], mode: PlayMode | null): Voids {
+  if (mode === null) return NO_VOIDS;
   const found: Record<Role, EffectiveSuit[]> = { forehand: [], middlehand: [], hindhand: [] };
   for (const trick of tricks) {
     const lead = trick.plays[0];
@@ -86,6 +85,7 @@ export function botViewOf(game: GameState, role: Role): BotView {
   const legal = getLegal(game, role);
   return {
     role,
+    ramsch: game.ramsch,
     phase: game.phase,
     hand: [...game.hands[role]],
     declarer: game.declarer,
@@ -103,7 +103,7 @@ export function botViewOf(game: GameState, role: Role): BotView {
       middlehand: game.hands.middlehand.length,
       hindhand: game.hands.hindhand.length,
     },
-    voids: voidsOf([...game.tricks, game.trick], game.declaration),
+    voids: voidsOf([...game.tricks, game.trick], playModeOf(game)),
     legal,
     playable: legal.playableCards ?? [],
     actions: enumerateActions(game, role),

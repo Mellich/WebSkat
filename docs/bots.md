@@ -66,11 +66,12 @@ export function botViewOf(game: GameState, role: Role): BotView;
 |---|---|
 | `index.ts` | `botAction(game, role, level, rand): GameAction` dispatcher. Builds the `BotView`, calls the level's strategy, **checks the result against `enumerateActions(game, role)`**, and falls back to a random legal action if it is not there (tests assert the fallback never happens) |
 | `knowledge.ts` | `PlayView` (what card play needs; also built by `simulate.ts`), `BotView extends PlayView` (+ phase, bid, bidding, Skat, counts, `legal`, `actions`), `botViewOf`, `voidsOf` |
-| `cardsLeft.ts` | helpers on a `BotView`: `unknownCards(view)`, `remainingTrumps(view)`, `isTopRemaining(card, view)` (no higher card of the same effective suit is unplayed and outside own hand), `teamOf(role, view)`, `partnerOf(role, view)` |
+| `cardsLeft.ts` | helpers on a `BotView` (`modeOfView` is Grand in a Ramsch): `unknownCards(view)`, `remainingTrumps(view)`, `isTopRemaining(card, view)` (no higher card of the same effective suit is unplayed and outside own hand), `teamOf(role, view)`, `partnerOf(role, view)` |
 | `easy.ts` | random legal action (`easyAction`, `pickOne`) |
 | `evaluate.ts` | hand evaluation, best game, maximum bid (§4) |
 | `auction.ts` | Normal/Strong decisions for `bid`/`hold`/`pass`/`claim`, Skat decision, discard, declare (§4) |
-| `heuristics.ts` | Normal card play (§5) |
+| `heuristics.ts` | Normal card play (§5); hands a Ramsch to `ramsch.ts` |
+| `ramsch.ts` | Ramsch card play for Normal and Strong (§5.4) |
 | `simulate.ts` | light play-out of a full-information deal using engine primitives (`legalCards`, `trickWinner`, `cardPoints`). Does not build a `GameState` |
 | `sample.ts` | random hidden-card deals consistent with a `BotView` (§6.1) |
 | `strong.ts` | Strong card play and Strong Skat estimate (§6) |
@@ -175,6 +176,18 @@ side suit with the fewest cards in hand.
   Leading → the lowest card of the suit in which the declarer has shown the most high cards or no
   void; with open cards (Null Ouvert), lead a suit where the declarer's lowest card is higher than
   the bot's lowest card.
+
+### 5.4 Ramsch (`ramsch.ts`, skat-rules §12)
+Everybody plays alone and wants few card points; the view has `ramsch: true` and no declarer.
+- **One playable card**: play it.
+- **Leading**: the playable card with the fewest card points; ties → non-trumps first, then the
+  weakest.
+- **Following, cannot win** (`losers` = playable cards that do not win now): the loser with the most
+  card points (ties → strongest). The points go to the trick winner.
+- **Following, must win** (no loser): the playable card with the fewest card points (ties → strongest).
+
+Easy plays Ramsch randomly like any other game. Strong has no sampling in Ramsch (`strongCard`
+returns the Normal choice at once), because sampling assumes a declarer.
 
 ## 6. Strong level (`sample.ts`, `simulate.ts`, `strong.ts`)
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { HostSnapshot } from '../../net';
-import { addPlayer, type TableState } from '../../table';
+import { addPlayer, applyCommand, type TableState } from '../../table';
 import { tableWith } from '../../table/testing';
 import { listHostedKeys, loadHostSnapshot, removeHostSnapshot, resumableSnapshot, saveHostSnapshot } from './hosted';
 
@@ -26,6 +26,18 @@ function snapshotOf(table: TableState): HostSnapshot {
   return { table, tokens: { 'token-anna': 'p1' } };
 }
 
+/** A three-player table whose first game was passed in (one record). */
+function passedInTable(): TableState {
+  let s = applyCommand(tableWith(3), 'p0', { type: 'start' }, { now: 1, seed: 7 });
+  if (!s.ok) throw new Error(s.error.message);
+  const game = s.value.state.game;
+  for (const id of [game?.roles.middlehand, game?.roles.hindhand, game?.roles.forehand]) {
+    s = applyCommand(s.value.state, id ?? '', { type: 'game', action: { type: 'pass' } }, { now: 2, seed: 7 });
+    if (!s.ok) throw new Error(s.error.message);
+  }
+  return s.value.state;
+}
+
 /** Host p0, humans p1 and p2, and a bot. */
 function tableWithBot(): TableState {
   const added = addPlayer(tableWith(3), { id: 'bot-1', name: 'Bot', isBot: true });
@@ -48,6 +60,28 @@ describe('host snapshots in localStorage', () => {
     const loaded = loadHostSnapshot(storage, 'TESTKEY');
     expect(loaded).not.toBeNull();
     expect(loaded?.invites).toBeUndefined();
+  });
+
+  it('upgrades a snapshot from before the Ramsch rule', () => {
+    const storage = memoryStorage();
+    const table = passedInTable();
+    saveHostSnapshot(storage, snapshotOf(table));
+    const key = storage.key(0);
+    if (key === null) throw new Error('nothing saved');
+    const old = JSON.parse(JSON.stringify(snapshotOf(table))) as {
+      table: { rules?: unknown; game: { engine: { options?: unknown; ramsch?: unknown } }; records: { ramsch?: unknown }[] };
+    };
+    delete old.table.rules;
+    delete old.table.game.engine.options;
+    delete old.table.game.engine.ramsch;
+    for (const record of old.table.records) delete record.ramsch;
+    storage.setItem(key, JSON.stringify(old));
+
+    const loaded = loadHostSnapshot(storage, 'TESTKEY');
+    expect(loaded?.table.rules).toEqual({ ramsch: false });
+    expect(loaded?.table.game?.engine.options).toEqual({ ramschOnPassIn: false });
+    expect(loaded?.table.game?.engine.ramsch).toBe(false);
+    expect(loaded?.table.records[0]?.ramsch).toBeNull();
   });
 
   it('returns the snapshot that was saved', () => {

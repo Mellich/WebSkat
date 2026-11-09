@@ -11,7 +11,7 @@ import type {
   Role,
   Suit,
 } from '../engine';
-import type { BotLevel, PlayerId, TableStatus } from './types';
+import type { BotLevel, PlayerId, TableRules, TableStatus } from './types';
 
 export interface PlayerPublic {
   readonly id: PlayerId;
@@ -46,7 +46,17 @@ export type ViewResult =
   | { readonly kind: 'passed-in' }
   | (Omit<Extract<GameResult, { kind: 'played' }>, 'declarer'> & {
       readonly declarerId: PlayerId;
-    });
+    })
+  | {
+      readonly kind: 'ramsch';
+      readonly points: Readonly<Record<PlayerId, number>>;
+      readonly tricks: Readonly<Record<PlayerId, number>>;
+      readonly skatToId: PlayerId;
+      readonly loserIds: readonly PlayerId[];
+      readonly jungfrau: boolean;
+      readonly durchmarschId: PlayerId | null;
+      readonly scores: Readonly<Record<PlayerId, number>>;
+    };
 
 export interface ViewBidEvent {
   readonly playerId: PlayerId;
@@ -57,6 +67,7 @@ export interface ViewBidEvent {
 export interface GameView {
   readonly number: number;
   readonly phase: GamePhase;
+  readonly ramsch: boolean; // a Ramsch is played or was played (no declarer)
   readonly dealerId: PlayerId;
   readonly roles: Readonly<Record<Role, PlayerId>>;
   readonly sittingOut: readonly PlayerId[];
@@ -98,6 +109,7 @@ export interface TableView {
     readonly pending: readonly PlayerPublic[];
     readonly nextDealerId: PlayerId | null;
     readonly readyIds: readonly PlayerId[];
+    readonly rules: TableRules;
   };
   readonly you: {
     readonly id: PlayerId;

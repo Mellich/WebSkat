@@ -1,5 +1,5 @@
-import { PROTOCOL_VERSION } from './constants';
 import { describe, expect, it } from 'vitest';
+import { PROTOCOL_VERSION } from './constants';
 import { addPlayer, applyCommand, createTable, viewFor, type TableState } from '../table';
 import { AdSchema, ClientMessageSchema, HostMessageSchema } from './protocol';
 import { GameRecordSchema, TableViewSchema } from './schemaView';
@@ -48,6 +48,11 @@ describe('client messages', () => {
     expect(GameActionSchema.safeParse({ type: 'pass' }).success).toBe(true);
     expect(TableCommandSchema.safeParse({ type: 'leave' }).success).toBe(true);
     expect(TableCommandSchema.safeParse({ type: 'kick' }).success).toBe(false);
+  });
+
+  it('accepts the set-rules command and rejects a rule without a value', () => {
+    expect(TableCommandSchema.safeParse({ type: 'set-rules', rules: { ramsch: true } }).success).toBe(true);
+    expect(TableCommandSchema.safeParse({ type: 'set-rules', rules: {} }).success).toBe(false);
   });
 });
 
@@ -129,6 +134,47 @@ describe('real views and records from the table layer', () => {
     const s = playedPassIn();
     expect(s.records).toHaveLength(1);
     expect(GameRecordSchema.safeParse(s.records[0]).success).toBe(true);
+  });
+
+  it('parses a Ramsch in progress and a Ramsch record with its block', () => {
+    let s = createTable({ key: 'ABCD-EFGH', name: 'Friday', isPublic: true, hostId: 'h', hostName: 'Host', maxSeats: 6 });
+    for (const name of ['Anna', 'Ben']) {
+      const added = addPlayer(s, { id: name.toLowerCase(), name });
+      if (!added.ok) throw new Error(added.error.message);
+      s = added.value;
+    }
+    const ctx = { now: 5, seed: 99 };
+    for (const command of [{ type: 'set-rules', rules: { ramsch: true } }, { type: 'start' }] as const) {
+      const result = applyCommand(s, 'h', command, ctx);
+      if (!result.ok) throw new Error(result.error.message);
+      s = result.value.state;
+    }
+    const roles = s.game?.roles;
+    for (const id of [roles?.middlehand, roles?.hindhand, roles?.forehand]) {
+      const result = applyCommand(s, id ?? '', { type: 'game', action: { type: 'pass' } }, ctx);
+      if (!result.ok) throw new Error(result.error.message);
+      s = result.value.state;
+    }
+    const view = viewFor(s, 'anna');
+    expect(view.game?.ramsch).toBe(true);
+    expect(view.table.rules).toEqual({ ramsch: true });
+    expect(TableViewSchema.safeParse(view).success).toBe(true);
+
+    const record = {
+      ...playedPassIn().records[0],
+      outcome: 'ramsch',
+      ramsch: { points: { h: 50, anna: 40, ben: 30 }, tricks: { h: 4, anna: 3, ben: 3 }, loserIds: ['h'], jungfrau: false, durchmarschId: null },
+    };
+    expect(GameRecordSchema.safeParse(record).success).toBe(true);
+  });
+
+  it('reads a record cached before the Ramsch rule as ramsch null', () => {
+    const record = playedPassIn().records[0];
+    if (record === undefined) throw new Error('no record');
+    const old: Record<string, unknown> = { ...record };
+    delete old.ramsch;
+    const parsed = GameRecordSchema.safeParse(old);
+    expect(parsed.success && parsed.data.ramsch).toBeNull();
   });
 });
 

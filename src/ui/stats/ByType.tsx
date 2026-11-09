@@ -14,7 +14,7 @@ const ORDER: readonly { readonly kind: GameKindLabel; readonly key: TranslationK
   { kind: 'null', key: 'game.null' },
 ];
 
-export function ByType({ byGame }: { readonly byGame: TableStats['byGame'] }) {
+export function ByType({ byGame, ramsch }: { readonly byGame: TableStats['byGame']; readonly ramsch: number }) {
   const t = useT();
   const max = Math.max(1, ...ORDER.map((o) => byGame[o.kind].played));
   return (
@@ -29,6 +29,7 @@ export function ByType({ byGame }: { readonly byGame: TableStats['byGame'] }) {
           </li>
         );
       })}
+      <li>{t('stats.ramsch')}: {ramsch}</li>
     </ul>
   );
 }

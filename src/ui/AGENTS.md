@@ -50,6 +50,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `game/SkatPanels.tsx` | `SkatDecision` (pick up / Hand), `DiscardPanel` |
 | `game/DeclarationPicker.tsx` | game tiles, extras, floor-value hint, Declare |
 | `game/ResultDialog.tsx` | result sheet, score table of the selected scoring system, Continue / ready state |
+| `game/RamschResult.tsx` | the Ramsch part of the result sheet: headline (losers or Durchmarsch), Jungfrau line, card points and score change per player, Skat |
 | `game/useShownTrick.ts` | holds a finished trick for `trickDisplayMs` |
 | `game/seats.ts` | `opponentsOf` (seat order relative to the viewer), `namesById` |
 | `game/trickPositions.ts` | `trickSeats` (who is left / right / bottom), `placeTrick` (plays → positions) |

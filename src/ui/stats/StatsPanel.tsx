@@ -107,7 +107,7 @@ export function StatsPanel({ records, players, viewerId, onClose }: StatsPanelPr
                 scoring={scoring}
               />
               <h3>{t('stats.byType')}</h3>
-              <ByType byGame={stats.byGame} />
+              <ByType byGame={stats.byGame} ramsch={stats.ramsch} />
             </>
           ) : null}
         </div>

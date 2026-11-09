@@ -52,3 +52,10 @@ describe('declarerSummary', () => {
     expect(declarerSummary(game('finished', { declarerId: null }), nameOf, t)).toBeNull();
   });
 });
+
+describe('declarerSummary in Ramsch', () => {
+  it('says that everybody plays alone, without a declarer', () => {
+    expect(declarerSummary(game('playing', { ramsch: true, declarerId: null, bid: null }), nameOf, t))
+      .toBe('Ramsch: everybody plays alone; fewest points win');
+  });
+});

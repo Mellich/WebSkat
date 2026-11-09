@@ -1,6 +1,7 @@
 import { sumPoints } from './cards';
 import { countSpitzen } from './spitzen';
 import { modeOf } from './trump';
+import { scoreRamsch } from './ramsch';
 import type { Declaration, GameResult, GameState, TrumpDeclaration } from './types';
 import { baseValue, gameMultiplier, nullValue } from './values';
 
@@ -95,6 +96,7 @@ export function skatPointsForDeclarer(state: GameState): number {
  * declaration (i.e. games that were never played).
  */
 export function scoreGame(state: GameState): GameResult {
+  if (state.ramsch) return scoreRamsch(state);
   const { declarer, bid, declaration } = state;
   if (declarer === null || bid === null || declaration === null) {
     return { kind: 'passed-in' };

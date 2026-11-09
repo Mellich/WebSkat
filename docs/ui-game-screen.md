@@ -8,8 +8,8 @@ under the `TopBar` and is re-mounted for each game number.
 | Area (CSS grid name) | Content | Test id |
 |---|---|---|
 | `oppL`, `oppR` | `OpponentSeat` of the two other **active** players: `oppL` = next player in clockwise seat order after the viewer, `oppR` = the one after (`seats.ts` `opponentsOf`). Role text, "· Dealer" if dealer, card count, backs or ouvert cards, glow on turn; bid bubble below the box (§9) | `opponent-seat`, `bid-bubble-left`, `bid-bubble-right` |
-| `table` | `TableCenter.tsx`: `SkatPile` (bidding, Skat decision), `TrickArea` with three fixed positions (left = `oppL` player, right = `oppR` player, bottom = the viewer, or the third active player for sitting-out viewers; `game/trickPositions.ts`), each card's player name as a label on the card, the "last trick" bubble, the bid bubble of the bottom seat (§9) | `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `last-trick`, `bid-bubble-bottom` |
-| `status` | `StatusArea.tsx`: status line (`aria-live`), "Last trick" toggle button, declarer summary line ("Anna won the bidding at 23 · took the Skat", §9), sitting-out line (4+ players: "Sitting out: X, Y · Dealer: Z") | `status-line`, `bid-summary`, `sitting-out` |
+| `table` | `TableCenter.tsx`: `SkatPile` (bidding, Skat decision, and the whole Ramsch: the Skat is public), `TrickArea` with three fixed positions (left = `oppL` player, right = `oppR` player, bottom = the viewer, or the third active player for sitting-out viewers; `game/trickPositions.ts`), each card's player name as a label on the card, the "last trick" bubble, the bid bubble of the bottom seat (§9) | `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `last-trick`, `bid-bubble-bottom` |
+| `status` | `StatusArea.tsx`: status line (`aria-live`), "Last trick" toggle button, declarer summary line ("Anna won the bidding at 23 · took the Skat", §9; in a Ramsch "Ramsch: everybody plays alone; fewest points win"), sitting-out line (4+ players: "Sitting out: X, Y · Dealer: Z") | `status-line`, `bid-summary`, `sitting-out` |
 | `phase` | phase panel (§3); not rendered during `playing`/`finished` | `phase-panel` |
 | `hand` | the viewer's `Hand`; "You are sitting out this game … Dealer: X." for sitting-out viewers | `hand-card-<ID>`, `sitting-out-you` |
 | overlay | `ResultDialog` when finished (after the trick hold) | `result-dialog` |
@@ -110,6 +110,10 @@ dialog comes first; the confirmed click sends `abort-game`, and the next game is
 A bottom sheet whose backdrop lets clicks through, so TopBar (Stats, Settings) stays usable.
 
 - Passed in: "Everybody passed".
+- Ramsch (`RamschResult.tsx`, table rule, skat-rules §12): headline "{names} lost the Ramsch" or
+  "{name} took every trick: Durchmarsch!"; a Jungfrau line when a player took no trick; a table with
+  name, card points and the score change of the selected system; the Skat chips (visible after a
+  Ramsch). No declarer, bid or calculation line.
 - Played: headline "{name} won/lost {game}", overbid line (bid vs value), calculation
   ("base × multiplier = value" or the Null value), card points declarer–defenders, tricks, Skat and
   discarded cards as `CardChips`.

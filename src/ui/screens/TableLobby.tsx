@@ -114,6 +114,28 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
         </ul>
       ) : null}
 
+      <section aria-label={t('lobby.rules')}>
+        <h3 className={styles.label}>{t('lobby.rules')}</h3>
+        {isHost ? (
+          <label>
+            <input
+              type="checkbox"
+              data-testid="rule-ramsch"
+              checked={table.rules.ramsch}
+              disabled={gameRunning}
+              onChange={(e) => {
+                connection.send({ type: 'set-rules', rules: { ...table.rules, ramsch: e.target.checked } });
+              }}
+            />{' '}
+            {t('lobby.ruleRamsch')}
+          </label>
+        ) : (
+          <p className={styles.hint}>
+            {t('lobby.ruleRamsch')}: {table.rules.ramsch ? t('lobby.ruleOn') : t('lobby.ruleOff')}
+          </p>
+        )}
+      </section>
+
       {isHost ? (
         <div className={styles.hostControls}>
           <button

@@ -10,4 +10,5 @@ export { nextBidValue } from './bidding';
 export * from './bidding';
 export * from './scoring';
 export * from './play';
+export * from './ramsch';
 export * from './game';

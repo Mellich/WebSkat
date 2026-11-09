@@ -25,7 +25,35 @@ function migrateBotLevel(parsed: unknown): void {
   }
 }
 
+/**
+ * Snapshots before the Ramsch rule (protocol 4) have no table `rules`, no engine `options` and
+ * `ramsch` flag (the engine would crash on the first pass-in), and records without a `ramsch` block.
+ */
+function migrateRamschRule(parsed: unknown): void {
+  if (typeof parsed !== 'object' || parsed === null || !('table' in parsed)) return;
+  const table = parsed.table;
+  if (typeof table !== 'object' || table === null) return;
+  const t = table as Record<string, unknown>;
+  if (!('rules' in t)) t.rules = { ramsch: false };
+  const game = t.game;
+  if (typeof game === 'object' && game !== null && 'engine' in game) {
+    const engine = game.engine;
+    if (typeof engine === 'object' && engine !== null) {
+      const e = engine as Record<string, unknown>;
+      if (!('options' in e)) e.options = { ramschOnPassIn: false };
+      if (!('ramsch' in e)) e.ramsch = false;
+    }
+  }
+  if (!Array.isArray(t.records)) return;
+  for (const record of t.records as unknown[]) {
+    if (typeof record === 'object' && record !== null && !('ramsch' in record)) {
+      (record as Record<string, unknown>).ramsch = null;
+    }
+  }
+}
+
 /** Runs every migration step on a parsed snapshot. */
 export function migrateSnapshot(parsed: unknown): void {
   migrateBotLevel(parsed);
+  migrateRamschRule(parsed);
 }

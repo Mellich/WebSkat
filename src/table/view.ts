@@ -40,6 +40,7 @@ export function viewFor(s: TableState, viewer: PlayerId): TableView {
       pending: s.pending.map((p) => publicPlayer(p, null)),
       nextDealerId: nextDealerId(s),
       readyIds: [...s.ready],
+      rules: s.rules,
     },
     you: youFor(s, viewer),
     game: s.game === null ? null : gameViewFor(s, s.game, viewer),

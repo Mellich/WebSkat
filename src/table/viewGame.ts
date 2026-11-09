@@ -2,6 +2,7 @@
 
 import {
   ROLES,
+  assertNever,
   countSpitzen,
   getLegal,
   type BidEvent,
@@ -37,10 +38,32 @@ function declarerSpitzen(game: ActiveGame, declarer: Role): DeclarerSpitzen {
   };
 }
 
+function byId(values: Readonly<Record<Role, number>>, idOf: (r: Role) => PlayerId): Record<PlayerId, number> {
+  return Object.fromEntries(ROLES.map((r) => [idOf(r), values[r]]));
+}
+
 function viewResult(result: GameResult, idOf: (r: Role) => PlayerId): ViewResult {
-  if (result.kind === 'passed-in') return { kind: 'passed-in' };
-  const { declarer, ...rest } = result;
-  return { ...rest, declarerId: idOf(declarer) };
+  switch (result.kind) {
+    case 'passed-in':
+      return { kind: 'passed-in' };
+    case 'played': {
+      const { declarer, ...rest } = result;
+      return { ...rest, declarerId: idOf(declarer) };
+    }
+    case 'ramsch':
+      return {
+        kind: 'ramsch',
+        points: byId(result.points, idOf),
+        tricks: byId(result.tricks, idOf),
+        skatToId: idOf(result.skatTo),
+        loserIds: result.losers.map(idOf),
+        jungfrau: result.jungfrau,
+        durchmarschId: result.durchmarsch === null ? null : idOf(result.durchmarsch),
+        scores: byId(result.scores, idOf),
+      };
+    default:
+      return assertNever(result);
+  }
 }
 
 function viewBid(ev: BidEvent, idOf: (r: Role) => PlayerId): ViewBidEvent {
@@ -71,7 +94,7 @@ export function gameViewFor(s: TableState, game: ActiveGame, viewer: PlayerId): 
   const declarer = e.declarer;
   const declarerId = declarer === null ? null : idOf(declarer);
   const turnId = e.turn === null ? null : idOf(e.turn);
-  const finishedPlayed = e.phase === 'finished' && declarer !== null;
+  const finishedPlayed = e.phase === 'finished' && (declarer !== null || e.ramsch);
   const skatVisible = declarer !== null && viewerRole === declarer && e.pickedUpSkat &&
     (e.phase === 'discarding' || e.phase === 'declaring');
   const lastTrick = e.tricks.at(-1);
@@ -83,6 +106,7 @@ export function gameViewFor(s: TableState, game: ActiveGame, viewer: PlayerId): 
   return {
     number: game.number,
     phase: e.phase,
+    ramsch: e.ramsch,
     dealerId: game.dealerId,
     roles: game.roles,
     sittingOut: game.sittingOut,

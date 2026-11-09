@@ -5,6 +5,7 @@ import type { Translator } from '../i18n';
 import { declarationLabel } from './labels';
 
 export function declarerSummary(game: GameView, nameOf: (id: string) => string, t: Translator): string | null {
+  if (game.ramsch) return t('summary.ramsch');
   if (game.declarerId === null || game.phase === 'bidding') return null;
   const name = nameOf(game.declarerId);
   const bid = game.bid ?? '';

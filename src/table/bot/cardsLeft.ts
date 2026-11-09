@@ -16,6 +16,7 @@ import {
 import type { EffectiveSuit, PlayView } from './knowledge';
 
 export function modeOfView(view: PlayView): PlayMode {
+  if (view.ramsch) return { kind: 'grand' };
   if (view.declaration === null) throw new Error('bot card play needs a declaration');
   return modeOf(view.declaration);
 }

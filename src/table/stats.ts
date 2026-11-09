@@ -36,6 +36,7 @@ export interface PlayerStats {
 export interface TableStats {
   readonly gamesTotal: number;
   readonly passedIn: number;
+  readonly ramsch: number; // Ramsch games (no declarer; their scores are in the totals)
   /** Sorted by the standard total, descending; the UI may re-sort by Seeger. */
   readonly players: readonly PlayerStats[];
   readonly byGame: Readonly<Record<GameKindLabel, { played: number; declarerWon: number }>>;
@@ -181,6 +182,7 @@ export function computeStats(
   return {
     gamesTotal: records.length,
     passedIn: records.filter((r) => r.outcome === 'passed-in').length,
+    ramsch: records.filter((r) => r.outcome === 'ramsch').length,
     players,
     byGame,
     series,

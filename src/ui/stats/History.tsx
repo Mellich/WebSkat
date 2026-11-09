@@ -13,6 +13,8 @@ export interface HistoryProps {
 
 function flags(r: GameRecord, t: Translator): string {
   const parts: string[] = [];
+  if (r.ramsch?.jungfrau) parts.push(t('game.jungfrau'));
+  if (r.ramsch?.durchmarschId) parts.push(t('game.durchmarsch'));
   if (r.schneider || r.announce === 'schneider') parts.push(t('game.schneider'));
   if (r.schwarz || r.announce === 'schwarz') parts.push(t('game.schwarz'));
   if (r.overbid) parts.push(t('stats.overbid'));
@@ -52,17 +54,18 @@ export function History({ records, players, scoring }: HistoryProps) {
           {newestFirst.map((r) => {
             const declarer = r.declarerId === null ? '' : (players.find((p) => p.playerId === r.declarerId)?.name ?? '?');
             const played = r.outcome === 'played';
+            const ramsch = r.outcome === 'ramsch';
             return (
-              <tr key={r.id} className={played ? undefined : styles.passed} data-testid="history-row">
+              <tr key={r.id} className={played || ramsch ? undefined : styles.passed} data-testid="history-row">
                 <td>{r.number}</td>
-                <td>{declarer}</td>
+                <td>{declarer || (ramsch ? '—' : '')}</td>
                 <td>
                   {gameLabel(r, t)}
                   {played && spitzen(r, t) !== '' ? ` · ${spitzen(r, t)}` : ''}
                 </td>
                 <td>{played ? String(r.bid) : '—'}</td>
                 <td>{played && r.declarerPoints !== null ? `${String(r.declarerPoints)} : ${String(120 - r.declarerPoints)}` : '—'}</td>
-                <td>{played ? flags(r, t) : ''}</td>
+                <td>{played || ramsch ? flags(r, t) : ''}</td>
                 <td>{played && r.declarerId !== null ? delta(r, r.declarerId, scoring) : '—'}</td>
                 {players.map((p) => (
                   <td key={p.playerId}>{delta(r, p.playerId, scoring)}</td>

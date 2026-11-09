@@ -68,6 +68,7 @@ describe('gameLabel', () => {
     overbid: false,
     won: true,
     scores: { standard: {}, seeger: {} },
+    ramsch: null,
   };
   const t = (key: Parameters<typeof translate>[1], params?: Parameters<typeof translate>[2]) =>
     translate('en', key, params);
@@ -77,6 +78,10 @@ describe('gameLabel', () => {
     expect(gameLabel({ ...base, game: 'grand', hand: true, announce: 'schneider', ouvert: true }, t)).toBe(
       'Grand Hand Schneider Ouvert',
     );
+  });
+
+  it('names a Ramsch by its own label', () => {
+    expect(gameLabel({ ...base, outcome: 'ramsch', declarerId: null, bid: null, game: null }, t)).toBe(en('game.ramsch'));
   });
 
   it('says passed in for a game that was not played', () => {

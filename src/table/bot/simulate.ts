@@ -42,6 +42,7 @@ function viewIn(sim: SimState, role: Role): PlayView {
     sim.declaration.ouvert && role !== sim.declarer ? { [sim.declarer]: sim.hands[sim.declarer] } : {};
   return {
     role,
+    ramsch: false,
     hand,
     declarer: sim.declarer,
     declaration: sim.declaration,

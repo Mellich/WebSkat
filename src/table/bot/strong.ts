@@ -39,6 +39,8 @@ export function sampleCount(playable: number): number {
 }
 
 export function strongCard(view: BotView, rand: () => number, samples = sampleCount(view.playable.length)): CardId {
+  // Sampling assumes a declarer; Ramsch has none, so the Normal heuristic plays it.
+  if (view.ramsch) return heuristicCard(view);
   const fallback = heuristicCard(view);
   if (view.playable.length <= 1) return fallback;
   const declarer = view.declarer;

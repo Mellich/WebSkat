@@ -95,6 +95,7 @@ After stage 2 the survivor of stage 2 is the **declarer**:
 - If `currentBid === null` (both middlehand and hindhand passed without any bid) → **claim
   stage**: the forehand may `claim` the game (declarer = forehand, `bid = 18`) or `pass`
   → game is **passed in** (*eingepasst*): no points, no cards played, next dealer.
+  (If the table rule *Ramsch* is on, a Ramsch game is played instead, §12.)
 
 `currentBid` semantic: the highest value that has been *bid by the caller and not rejected*.
 `bid` of the declarer is the final `currentBid`.
@@ -402,3 +403,38 @@ dealt → bidding ──(all passed)──▶ passed-in (finished, no result)
                                                           ▼
                                                        finished (GameResult)
 ```
+With the Ramsch rule, `passed-in` becomes `playing` (Ramsch, §12).
+
+## 12. Ramsch (table rule, off by default)
+
+### 12.1 When
+Only when the table rule "Ramsch" is on, and only instead of a passed-in game (§4.2: middlehand,
+hindhand and forehand all pass). There is no declarer and no bid.
+
+### 12.2 Play
+- Trumps: only the four Jacks, order `CJ SJ HJ DJ` (as in Grand, §6.1–§6.2). Suits `A 10 K Q 9 8 7`.
+- Following suit and trick winner as in Grand (§6.4–§6.5). Forehand leads the first trick.
+- All 10 tricks are played. Nobody picks up or looks at the Skat during play.
+
+### 12.3 Card points
+Each player's card points = the cards of the tricks they won. The Skat (2 cards) counts for the
+winner of the last trick (it is not a trick). The three totals add up to 120.
+
+### 12.4 Scoring (standard and Seeger–Fabian alike)
+- **Durchmarsch**: one player won all 10 tricks → that player scores **+120**, the others 0.
+- Otherwise the **loser(s)** = the player(s) with the most card points. Each loser scores
+  **−(own card points)**; everybody else 0. Ties for the most points: every tied player loses.
+- **Jungfrau**: if a player won no trick (and there is no Durchmarsch), the losers' scores are
+  doubled.
+- Sitting-out players (§9) score 0.
+
+### 12.5 Worked examples = test vectors
+
+| # | Points F/M/H | Tricks F/M/H | Result |
+|---|---|---|---|
+| R1 | 50 / 40 / 30 | 4 / 3 / 3 | F −50 |
+| R2 | 72 / 48 / 0 | 6 / 4 / 0 | Jungfrau: F −144 |
+| R3 | 120 / 0 / 0 | 10 / 0 / 0 | Durchmarsch: F +120 |
+| R4 | 45 / 45 / 30 | 4 / 3 / 3 | F −45, M −45 |
+| R5 | 40 / 40 / 40 | 4 / 3 / 3 | F −40, M −40, H −40 |
+| R6 | scripted | — | H wins the last trick, the Skat is `SA D7` (11 points): H's card points include these 11 |

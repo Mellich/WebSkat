@@ -11,6 +11,7 @@ export const dePanels: Record<keyof typeof enPanels, string> = {
   'stats.scoring': 'Wertung',
   'stats.seeger': 'Seeger–Fabian',
   'stats.standard': 'Standard',
+  'stats.ramsch': 'Ramsch',
   'stats.empty': 'Noch keine Spiele gespielt.',
   'stats.rank': '#',
   'stats.name': 'Name',
@@ -70,4 +71,8 @@ export const dePanels: Record<keyof typeof enPanels, string> = {
   'botLevel.normal': 'Normal',
   'botLevel.strong': 'Stark',
   'lobby.botLevel': 'Stärke von {name}',
+  'lobby.rules': 'Tischregeln',
+  'lobby.ruleRamsch': 'Ramsch, wenn alle passen',
+  'lobby.ruleOn': 'an',
+  'lobby.ruleOff': 'aus',
 };

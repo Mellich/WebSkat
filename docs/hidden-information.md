@@ -25,12 +25,14 @@ A `TableView` for player P may contain card identities only for:
 | Declarer's current hand when the game is **ouvert**, from the declaration on (phase `playing` and `finished`) | everyone | `game.openHands[declarerId]` |
 | The two Skat cards after the declarer picked them up (phases `discarding`, `declaring`) | declarer only | `game.skat` |
 | Skat and discarded cards when a **played** game is finished | everyone | `game.skat`, `game.discarded` |
+| Skat of a **Ramsch** (during and after the game; nobody picks it up) | everyone | `game.skat` |
 | Cards of the current trick and of the last completed trick | everyone | `game.trick`, `game.lastTrick` |
 | Other players' hands | **nobody**; only the count | `game.handCounts` |
 | Shuffle seed, `initialHands` | nobody (never in a view, record or message) | — |
 | Spitzen of the declarer's 12 cards (for the declaration hint) | declarer only, phase `declaring` | `game.declarerSpitzen` |
 
-Passed-in games reveal no Skat. The ouvert hand stays visible after an early Null end
+Passed-in games reveal no Skat. A Ramsch reveals it to everybody only once it is finished
+(the Skat is on the table during the Ramsch, but it is never picked up). The ouvert hand stays visible after an early Null end
 (`decisions.md` I21).
 
 **Takeover (plan 07, I125).** A replacement (`replace-player`) or an invite takes over exactly what

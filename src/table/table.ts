@@ -11,6 +11,7 @@ import {
 } from '../engine';
 import { makeRecord } from './records';
 import { replacePlayer } from './replace';
+import { DEFAULT_RULES, setRules } from './rules';
 import { pickFirstDealer, roleOf, rolesForDealer } from './rotation';
 import {
   MAX_SEATS,
@@ -70,6 +71,7 @@ export function createTable(args: {
     gameCounter: 0,
     game: null,
     ready: [],
+    rules: DEFAULT_RULES,
     records: [],
     seq: 0,
   };
@@ -93,7 +95,7 @@ export function dealNext(state: TableState, ctx: Ctx): TableState {
   const rotation = rolesForDealer(seated, dealerIdx);
   const game: ActiveGame = {
     number: s.gameCounter + 1,
-    engine: newGame(ctx.seed),
+    engine: newGame(ctx.seed, { ramschOnPassIn: s.rules.ramsch }),
     roles: rotation.roles,
     sittingOut: rotation.sittingOut,
     dealerId: rotation.dealerId,
@@ -251,6 +253,10 @@ export function applyCommand(
       return actor === s.hostId ? setBotLevel(s, c.playerId, c.level) : notHost();
     case 'leave':
       return leave(s, actor, ctx);
+    case 'set-rules': {
+      const set = setRules(s, actor, c.rules);
+      return set.ok ? plain(set.value) : set;
+    }
     default:
       return assertNever(c);
   }

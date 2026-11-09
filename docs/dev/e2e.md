@@ -82,7 +82,7 @@ viewer win the bidding.
 | Home | `create-table`, `join-key-input`, `join-invite-input`, `join-submit`, `public-table`, `public-join` |
 | Table screen / TopBar | `connection-banner`, `connection-status`, `open-stats`, `open-players`, `open-settings`, `leave-table`, `retry-join` |
 | Players dialog | `players-dialog`, `players-row-<i>`, `replace-<i>`, `replace-with`, `replace-level`, `replace-confirm`, `players-kick-<i>`, `reinvite-<i>`, `invite-code`, `invite-link`, `players-pending`, `players-abort-game` |
-| Lobby | `table-key`, `seat-<i>`, `bot-level-<i>`, `add-bot`, `start-game` |
+| Lobby | `table-key`, `seat-<i>`, `bot-level-<i>`, `rule-ramsch`, `add-bot`, `start-game` |
 | Game | `opponent-seat`, `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `trick-dismiss`, `last-trick`, `status-line`, `bid-summary`, `bid-bubble-left`, `bid-bubble-right`, `bid-bubble-bottom`, `sitting-out`, `sitting-out-you`, `phase-panel`, `hand-card-<CardId>`, `abort-game` (host, player on turn disconnected) |
 | Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass`, `bid-current`, `bid-turn` |
 | Skat / declare | `pickup`, `play-hand`, `discard-submit`, `declare-option-0..5` (♣ ♠ ♥ ♦ Grand Null), `declare-submit` |

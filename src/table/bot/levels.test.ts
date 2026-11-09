@@ -8,9 +8,9 @@ import { chooseBotAction, isLegalChoice } from './index';
 import { botViewOf } from './knowledge';
 
 /** Plays one game where every choice must already be legal (no fallback). */
-function playStrictly(seed: number, level: BotLevel): GameState {
+function playStrictly(seed: number, level: BotLevel, start: GameState = newGame(seed)): GameState {
   const rand = mulberry32(seed);
-  let state = newGame(seed);
+  let state = start;
   while (state.phase !== 'finished' && state.turn !== null) {
     const view = botViewOf(state, state.turn);
     const action = chooseBotAction(view, level, rand);
@@ -30,6 +30,28 @@ describe.each([
 ] as const)('%s bots', (level, games) => {
   it(`choose only legal actions in ${String(games)} games`, () => {
     for (let seed = 1; seed <= games; seed++) expect(playStrictly(seed * 31, level).phase).toBe('finished');
+  }, 120_000);
+});
+
+/** Everybody passes, so the game becomes a Ramsch (skat-rules §12). */
+function ramschStart(seed: number): GameState {
+  let state = newGame(seed, { ramschOnPassIn: true });
+  for (const role of ['middlehand', 'hindhand', 'forehand'] as const) {
+    const result = applyAction(state, role, { type: 'pass' });
+    if (!result.ok) throw new Error(result.error.message);
+    state = result.value;
+  }
+  return state;
+}
+
+describe.each(['easy', 'normal', 'strong'] as const)('%s bots in Ramsch', (level) => {
+  it('choose only legal cards in Ramsch games', () => {
+    const games = level === 'strong' ? 6 : 100;
+    for (let seed = 1; seed <= games; seed++) {
+      const start = ramschStart(seed * 37);
+      expect(start.ramsch).toBe(true);
+      expect(playStrictly(seed * 37, level, start).result?.kind).toBe('ramsch');
+    }
   }, 120_000);
 });
 

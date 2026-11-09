@@ -4,21 +4,21 @@ import { botAction, botStep, runBots } from './bot';
 import { seegerBonus } from './records';
 import { ctxFor, tableWith } from './testing';
 import { applyCommand } from './table';
-import type { GameRecord, TableState } from './types';
+import type { GameRecord, TableRules, TableState } from './types';
 
 const GAMES = 50;
 
 /** A table where every seat, the host included, is a bot: nobody has to press "ready". */
-function botTable(n: number): TableState {
+function botTable(n: number, rules: TableRules = { ramsch: false }): TableState {
   const base = tableWith(n);
-  return { ...base, players: base.players.map((p) => ({ ...p, isBot: true })) };
+  return { ...base, rules, players: base.players.map((p) => ({ ...p, isBot: true })) };
 }
 
 /** Plays bot-only games until `GAMES` records exist; the table keeps dealing by itself. */
-function playBotGames(n: number, seed: number): TableState {
+function playBotGames(n: number, seed: number, rules?: TableRules): TableState {
   const rand = mulberry32(seed);
   const ctx = () => ctxFor(Math.floor(rand() * 4294967296), 0);
-  const started = applyCommand(botTable(n), 'p0', { type: 'start' }, ctx());
+  const started = applyCommand(botTable(n, rules), 'p0', { type: 'start' }, ctx());
   if (!started.ok) throw new Error(started.error.message);
   let state = started.value.state;
   for (let steps = 0; state.records.length < GAMES; steps++) {
@@ -122,5 +122,14 @@ describe('per-bot strength', () => {
     const expected = botAction(game.engine, role, level, mulberry32(9));
     const last = botStep(state, () => ctxFor(4, 0), mulberry32(9))?.game?.engine.bidding.history.at(-1);
     expect(last).toEqual({ role, ...expected });
+  });
+});
+
+describe('bot-only table with the Ramsch rule', () => {
+  it(`plays ${String(GAMES)} games to the end, Ramsch games included`, () => {
+    const table = playBotGames(3, 303, { ramsch: true });
+    expect(table.records).toHaveLength(GAMES);
+    expect(table.records.filter((r) => r.outcome === 'ramsch').length).toBeGreaterThan(0);
+    expect(table.records.filter((r) => r.outcome === 'passed-in').length).toBe(0);
   });
 });

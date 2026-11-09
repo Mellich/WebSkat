@@ -5,7 +5,7 @@ self-contained plans. Each plan can be implemented by a smaller model **on its o
 the other, in the order below. When a plan is done, its file stays here as a record; the
 `docs/*.md` layer docs describe the new current state.
 
-**Status:** plans 01–07 are implemented. Plans 08–10 are still open. The
+**Status:** plans 01–08 are implemented. Plans 09–10 are still open. The
 "Lines now" and "baseline" figures below are from before plan 01 and are kept as a record.
 
 ## 1. Order (do not reorder)

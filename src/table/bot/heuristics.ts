@@ -27,6 +27,7 @@ import {
   winsNow,
 } from './cardsLeft';
 import type { PlayView } from './knowledge';
+import { ramschCard } from './ramsch';
 import { VALUABLE_TRICK } from './tuning';
 
 export function heuristicCard(view: PlayView): CardId {
@@ -34,6 +35,7 @@ export function heuristicCard(view: PlayView): CardId {
   const only = playable[0];
   if (only === undefined) throw new Error('no playable card');
   if (playable.length === 1) return only;
+  if (view.ramsch) return ramschCard(view);
   const mode = modeOfView(view);
   if (mode.kind === 'null') {
     return view.role === view.declarer ? nullDeclarer(view, mode) : nullDefender(view, mode);

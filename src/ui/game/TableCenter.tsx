@@ -30,7 +30,8 @@ export function TableCenter({ view, game, shown, showLast, cardBack, nameOf, lab
   const toSlot = (p: { readonly playerId: string; readonly card: CardId; readonly winner: boolean } | null): TrickSlot | null =>
     p === null ? null : { card: p.card, name: nameOf(p.playerId), winner: p.winner };
   const slots = { left: toSlot(placed.left), right: toSlot(placed.right), bottom: toSlot(placed.bottom) };
-  const showSkat = game.phase === 'bidding' || game.phase === 'skat-decision';
+  // The Skat lies on the table during bidding and is public during a Ramsch (skat-rules §12).
+  const showSkat = game.phase === 'bidding' || game.phase === 'skat-decision' || game.ramsch;
 
   return (
     <div className={styles.table}>

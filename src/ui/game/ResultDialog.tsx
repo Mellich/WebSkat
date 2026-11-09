@@ -7,6 +7,7 @@ import { CardChips } from '../components/CardChip';
 import { useT, type Translator } from '../i18n';
 import { signed } from '../stats/gameLabel';
 import { declarationLabel } from './labels';
+import { RamschResult } from './RamschResult';
 import { namesById } from './seats';
 import styles from './ResultDialog.module.css';
 
@@ -36,6 +37,13 @@ export function ResultDialog({ view, result, record, scoring, onContinue }: Resu
     return (
       <Shell {...shell}>
         <p>{t('result.passed')}</p>
+      </Shell>
+    );
+  }
+  if (result.kind === 'ramsch') {
+    return (
+      <Shell {...shell}>
+        <RamschResult view={view} result={result} record={record} scoring={scoring} />
       </Shell>
     );
   }

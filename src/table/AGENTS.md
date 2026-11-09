@@ -22,20 +22,21 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 |---|---|
 | `types.ts` | `PlayerId`, `BotLevel`, `Player`, `TableStatus`, `ActiveGame`, `TableState`, `TableCommand`, `ReplaceBy`, `Ctx`, `TableErrorCode`, `GameKindLabel`, `ScoreDeltas`, `GameRecord`, `SUIT_LABELS` |
 | `table.ts` | `createTable`, `applyCommand` (the reducer), `dealNext`, `tryDeal`, `CommandResult` |
+| `rules.ts` | `DEFAULT_RULES`, `setRules` (`set-rules`: host, no game running) |
 | `replace.ts` | `replacePlayer` (`replace-player`: a waiting player or a bot takes the seat, role, sitting-out and dealer slot) |
 | `seating.ts` | `MIN_SEATS`, `MAX_SEATS`, `MAX_NAME_LENGTH`, `allPlayers`, `touch`, `uniqueName`, `addPlayer`, `removePlayer`, `setConnected`, `markLeaving`, `removeLeavers` |
 | `rotation.ts` | `pickFirstDealer`, `sittingOutSeats`, `rolesForDealer`, `roleOf` (Geberskat) |
-| `records.ts` | `seegerBonus`, `gameKindOf`, `makeRecord` |
+| `records.ts` | `seegerBonus`, `gameKindOf`, `makeRecord` (played, passed-in and Ramsch records) |
 | `stats.ts` | `PlayerStats`, `TableStats`, `computeStats` |
 | `viewTypes.ts` | `TableView`, `GameView`, `PlayerPublic`, `ViewTrick`, `ViewLastTrick`, `ViewResult`, `ViewBidEvent`, `DeclarerSpitzen` |
 | `view.ts` | `viewFor(state, viewer)` (table part, `you`) |
 | `viewGame.ts` | `gameViewFor` (game part; the **allow-list** of visible cards) |
 | `bot.ts` | `botStep`, `runBots` (lets the bot on turn act at its own level) |
-| `bot/` | bot strategies, see `docs/bots.md` §3 for each file (`index.ts` dispatcher, `knowledge.ts` `BotView`, `easy.ts`, `evaluate.ts`, `auction.ts`, `heuristics.ts`, `cardsLeft.ts`, `sample.ts`, `simulate.ts`, `strong.ts`, `tuning.ts`, `arena.ts`) |
+| `bot/` | bot strategies, see `docs/bots.md` §3 for each file (`index.ts` dispatcher, `knowledge.ts` `BotView`, `easy.ts`, `evaluate.ts`, `auction.ts`, `heuristics.ts`, `ramsch.ts` (Ramsch card play), `cardsLeft.ts`, `sample.ts`, `simulate.ts`, `strong.ts`, `tuning.ts`, `arena.ts`) |
 | `index.ts` | public re-exports (also `BotView` type) |
 | `testing.ts` | `tableWith`, `ctxFor`, `randomStep`, `playUntilRecords`, `pickRandom` |
 | `fixtures.ts` | `finishedGame`, `GRAND_144`, `DIAMONDS_LOST`, `NULL_OUVERT_WON` |
-| `*.test.ts` | `table`, `leave`, `replace`, `seating`, `rotation`, `records`, `stats`, `view`, `view.redaction`, `bot`, `bot/*` |
+| `*.test.ts` | `table`, `leave`, `replace`, `seating`, `rotation`, `records`, `stats`, `view`, `view.redaction`, `rules`, `ramsch` (records, stats, views of a Ramsch), `bot`, `bot/*` (incl. `bot/ramsch`) |
 
 ## `view.ts` / `viewGame.ts` are the security boundary
 

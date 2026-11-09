@@ -41,8 +41,26 @@ const LegalSchema = z.object({
   playableCards: cards.optional(),
 });
 
+const RamschRecordSchema = z.object({
+  points: countsById,
+  tricks: countsById,
+  loserIds: playerIds,
+  jungfrau: z.boolean(),
+  durchmarschId: nullableId,
+});
+
 const ViewResultSchema: z.ZodType<ViewResult> = z.union([
   z.object({ kind: z.literal('passed-in') }),
+  z.object({
+    kind: z.literal('ramsch'),
+    points: countsById,
+    tricks: countsById,
+    skatToId: id,
+    loserIds: playerIds,
+    jungfrau: z.boolean(),
+    durchmarschId: nullableId,
+    scores: z.record(id, z.number().int()), // losers are negative
+  }),
   z.object({
     kind: z.literal('played'),
     declarerId: id,
@@ -69,6 +87,7 @@ const ViewResultSchema: z.ZodType<ViewResult> = z.union([
 const GameViewSchema: z.ZodType<GameView> = z.object({
   number: z.number().int().min(1),
   phase: z.enum(['bidding', 'skat-decision', 'discarding', 'declaring', 'playing', 'finished']),
+  ramsch: z.boolean(),
   dealerId: id,
   roles,
   sittingOut: playerIds,
@@ -121,6 +140,7 @@ export const TableViewSchema: z.ZodType<TableView> = z.object({
     pending: z.array(PlayerPublicSchema),
     nextDealerId: nullableId,
     readyIds: playerIds,
+    rules: z.object({ ramsch: z.boolean() }),
   }),
   you: z.object({
     id,
@@ -144,7 +164,7 @@ export const GameRecordSchema: z.ZodType<GameRecord> = z.object({
   roles,
   sittingOut: playerIds,
   names: z.record(id, z.string()),
-  outcome: z.enum(['passed-in', 'played']),
+  outcome: z.enum(['passed-in', 'played', 'ramsch']),
   declarerId: nullableId,
   bid: z.number().int().nullable(),
   game: z.enum(['clubs', 'spades', 'hearts', 'diamonds', 'grand', 'null']).nullable(),
@@ -163,5 +183,7 @@ export const GameRecordSchema: z.ZodType<GameRecord> = z.object({
   overbid: z.boolean(),
   won: z.boolean(),
   scores: ScoresSchema,
+  // records cached before the Ramsch rule have no block: they read as null
+  ramsch: RamschRecordSchema.nullable().default(null),
 });
 

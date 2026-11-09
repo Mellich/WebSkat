@@ -15,6 +15,7 @@ const KIND_KEYS: Readonly<Record<GameKindLabel, TranslationKey>> = {
 
 /** "Grand Hand Schneider Ouvert", or "Passed in" for a game that was not played. */
 export function gameLabel(record: GameRecord, t: Translator): string {
+  if (record.outcome === 'ramsch') return t('game.ramsch');
   if (record.outcome === 'passed-in' || record.game === null) return t('stats.passedIn');
   const parts = [t(KIND_KEYS[record.game])];
   if (record.hand) parts.push(t('game.hand'));

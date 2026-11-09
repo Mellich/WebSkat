@@ -33,10 +33,12 @@ interface TableState {
   gameCounter;            // games dealt so far
   game: ActiveGame | null;
   ready: PlayerId[];      // who pressed Continue after the finished game
+  rules: TableRules;      // table rules; changed by the host between games (skat-rules §12)
   records: GameRecord[];
   seq;                    // +1 on every change (`touch`)
 }
 
+interface TableRules { ramsch: boolean }    // default off; each deal passes it as GameOptions.ramschOnPassIn
 interface Ctx { now: number; seed: number }   // supplied by the host for every command
 ```
 
@@ -46,9 +48,10 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 
 | Function | File | Behavior |
 |---|---|---|
-| `createTable({key, name, isPublic, hostId, hostName, maxSeats?})` | `table.ts` | Lobby with the host seated; `maxSeats` clamped to 3..6, default 6 |
+| `createTable({key, name, isPublic, hostId, hostName, maxSeats?})` | `table.ts` | Lobby with the host seated; `maxSeats` clamped to 3..6, default 6; `rules = DEFAULT_RULES` |
 | `applyCommand(s, actor, command, ctx)` | `table.ts` | The reducer: `Result<{state, record}, TableErrorCode>` (§3) |
-| `dealNext(s, ctx)` | `table.ts` | Removes leavers first (`removeLeavers`), seats pending players; < 3 seated → back to lobby. Dealer = `nextDealerIdx % N`, pointer moves one seat on, `newGame(ctx.seed)`, roles from the rotation, `ready` = bots |
+| `dealNext(s, ctx)` | `table.ts` | Removes leavers first (`removeLeavers`), seats pending players; < 3 seated → back to lobby. Dealer = `nextDealerIdx % N`, pointer moves one seat on, `newGame(ctx.seed, { ramschOnPassIn: rules.ramsch })`, roles from the rotation, `ready` = bots |
+| `setRules(s, actor, rules)` | `rules.ts` | Host only, not while a game runs (lobby or finished game); sets `rules`. `DEFAULT_RULES = { ramsch: false }` |
 | `tryDeal(s, ctx)` | `table.ts` | Deals the next game when the game is finished and every **connected human** is in `ready` |
 | `addPlayer(s, {id, name, isBot?, botLevel?})` | `seating.ts` | Known id → reconnect (`connected = true`). Else validates the name (`INVALID_NAME`), checks `players + pending < maxSeats` (`TABLE_FULL`), makes the name unique, seats the player if `game === null`, otherwise adds to `pending` |
 | `removePlayer(s, id)` | `seating.ts` | Removes from seats or pending; keeps the pointer on the same upcoming dealer (a removed seat before the pointer shifts it down); drops the id from `ready` |
@@ -77,6 +80,7 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 | `replace-player {playerId, by}` | host | any time | `by = {kind:'pending', playerId}` (a waiting player) or `{kind:'bot', level}` (new bot `bot-<seq>`, always ready). The target leaves the table; its seat, role and dealer slot go to the newcomer (`replacePlayer`). A finished game may now be fully ready → `tryDeal` | `NOT_HOST`, `CANNOT_KICK_HOST` (target is the host), `UNKNOWN_PLAYER` (no such seated target, or no such waiting player) |
 | `add-bot` | host | no game or finished | adds `bot-<seq>` named `Bot`, `Bot (2)`, … at level `normal` | `NOT_HOST`, `GAME_RUNNING`, `TABLE_FULL` |
 | `set-bot-level {playerId, level}` | host | any time | sets that bot's level; used from its next action | `NOT_HOST`, `UNKNOWN_PLAYER`, `NOT_A_BOT` |
+| `set-rules {rules}` | host | no game or finished | `setRules`: replaces `rules` (`{ ramsch }`); applies from the next deal | `NOT_HOST`, `GAME_RUNNING` |
 | `leave` | anyone | — | pending → removed. Seated + game running → `markLeaving` (seat kept, removed at the next deal). Seated otherwise → removed (< 3 → lobby) | `HOST_CANNOT_LEAVE`, `UNKNOWN_PLAYER` |
 
 `TableErrorCode` = `GameErrorCode` + `NOT_HOST`, `NOT_SEATED`, `NOT_ACTIVE_PLAYER`,
@@ -91,6 +95,8 @@ Joining is not a command: the host calls `addPlayer` when a `join` message arriv
 
 - The dealer pointer moves **when a game is dealt**, so it also moves for passed-in and aborted
   games.
+- Table rules change only when no game runs, so every game is dealt under the rules it was
+  dealt with.
 - A player who leaves during a running game keeps the seat (`leaving`, disconnected) until the next
   deal; `dealNext` removes leavers first. Rejoining with the same id before that cancels the leave.
 - Pending players are seated only in `dealNext` (before roles are computed). New players are
@@ -113,10 +119,12 @@ seeger:   won  → declarer = gameValue + 50; others 0
           lost → declarer = declarerScore − 50; every other seated player = seegerBonus(seatsAtDeal)
           passed-in → all 0
 seegerBonus(N): 3 → 40, 4 → 30, 5 → 24, 6 → 20
+Ramsch (outcome 'ramsch'): standard = seeger = the engine's Ramsch scores (skat-rules §12.4), mapped to ids
 ```
 
 `names` holds the names at that time, so history stays readable after a kick. `id` is
-`<tableKey>-<number>`.
+`<tableKey>-<number>`. A Ramsch record has `declarerId`, `bid` and the declared-game fields `null`
+and the `ramsch` block: `points`, `tricks`, `loserIds`, `jungfrau`, `durchmarschId` (all by id).
 
 ## 6. Views (`view.ts`, `viewGame.ts`, `viewTypes.ts`)
 
@@ -125,21 +133,23 @@ seegerBonus(N): 3 → 40, 4 → 30, 5 → 24, 6 → 20
 - `seq`
 - `table`: `key`, `name`, `hostId`, `maxSeats`, `status`, `players` / `pending` as `PlayerPublic`
   (`id`, `name`, `connected`, `isBot`, `botLevel` (null for humans), `seat` (null while pending)),
-  `nextDealerId`, `readyIds`.
+  `nextDealerId`, `readyIds`, `rules` (`TableRules`, shown in the lobby).
 - `you`: `id`, `seat`, `role`: a `Role`, `'sitting-out'`, `'pending'` or `'lobby'` (also for
   unknown ids; never throws).
 - `game`: `GameView` or `null`.
 
-`GameView` fields: `number`, `phase`, `dealerId`, `roles` (Role → id), `sittingOut`, `turnId`,
+`GameView` fields: `number`, `phase`, `ramsch` (a Ramsch is played or was played: no declarer),
+`dealerId`, `roles` (Role → id), `sittingOut`, `turnId`,
 `waitingFor` (= `turnId` if that player is disconnected), `bidding` (`stage`, `callerId`,
 `listenerId`, `currentBid`, `history` with player ids), `declarerId`, `bid`, `pickedUpSkat`,
 `declaration`, `myHand`, `openHands`, `handCounts`, `skat`, `discarded`, `trick`
 (`leaderId`, `plays[{playerId, card}]`), `lastTrick` (+ `winnerId`), `tricksWon`, `legal` (the
 engine's `Legal` for the viewer, `{}` if not their turn), `result` (`ViewResult`: the
-`GameResult` with `declarerId` instead of the role), `declarerSpitzen` (declarer only, while
+`GameResult` with `declarerId` instead of the role; a Ramsch result maps its per-role fields to ids: `points`, `tricks`, `skatToId`, `loserIds`, `jungfrau`, `durchmarschId`, `scores`), `declarerSpitzen` (declarer only, while
 declaring: spitzen for Grand and each suit, for the floor-value hint).
 
-Which card fields each viewer gets: `hidden-information.md` §2.
+Which card fields each viewer gets: `hidden-information.md` §2. After a finished Ramsch the Skat is
+visible to everybody (`skat` and `discarded` as after a played game).
 
 ## 7. Bots on the table (`bot.ts`)
 

@@ -89,10 +89,22 @@ export interface GameState {
   readonly tricks: readonly CompletedTrick[]; // completed tricks, in order
   readonly turn: Role | null; // who must act now
   readonly result: GameResult | null; // set when phase = 'finished'
+  readonly options: GameOptions;
+  readonly ramsch: boolean; // true while/after a Ramsch game is played (skat-rules §12)
 }
 
 export type GameResult =
   | { readonly kind: 'passed-in' }
+  | {
+      readonly kind: 'ramsch';
+      readonly points: Readonly<Record<Role, number>>; // card points, incl. the Skat
+      readonly tricks: Readonly<Record<Role, number>>;
+      readonly skatTo: Role; // winner of the last trick
+      readonly losers: readonly Role[]; // empty on Durchmarsch
+      readonly jungfrau: boolean;
+      readonly durchmarsch: Role | null;
+      readonly scores: Readonly<Record<Role, number>>; // skat-rules §12.4
+    }
   | {
       readonly kind: 'played';
       readonly declarer: Role;
@@ -114,6 +126,12 @@ export type GameResult =
       readonly loseValue: number | null; // value that is doubled when lost; null when won
       readonly declarerScore: number; // standard counting, see skat-rules §10.5
     };
+
+/** Table rules that change how one game is dealt and played (skat-rules §12). */
+export interface GameOptions {
+  readonly ramschOnPassIn: boolean;
+}
+export const DEFAULT_GAME_OPTIONS: GameOptions = { ramschOnPassIn: false };
 
 export type GameErrorCode =
   | 'WRONG_PHASE'

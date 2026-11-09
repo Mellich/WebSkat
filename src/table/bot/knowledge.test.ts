@@ -124,7 +124,7 @@ describe('fairness: bots never use cards they cannot see', () => {
 });
 
 describe('voidsOf', () => {
-  const hearts = { kind: 'suit', trump: 'H', hand: false, announce: 'none', ouvert: false } as const;
+  const hearts = { kind: 'suit', trump: 'H' } as const;
 
   it('marks a player who does not follow the led suit', () => {
     const voids = voidsOf(

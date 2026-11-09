@@ -26,6 +26,9 @@ import { useShownTrick } from './useShownTrick';
 import { TableCenter } from './TableCenter';
 import styles from './GameScreen.module.css';
 
+/** Ramsch has no declaration; its hand is sorted in Grand order (only Jacks are trump). */
+const RAMSCH_ORDER: Declaration = { kind: 'grand', hand: false, announce: 'none', ouvert: false };
+
 export interface GameScreenProps {
   readonly view: TableView;
   readonly game: GameView;
@@ -237,7 +240,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
         {myRole === null ? null : (
           <Hand
             cards={game.myHand}
-            declaration={game.declaration}
+            declaration={game.declaration ?? (game.ramsch ? RAMSCH_ORDER : null)}
             legal={isDiscarding ? discardable : playable}
             showAll={game.phase === 'bidding'}
             paused={shown.holding}

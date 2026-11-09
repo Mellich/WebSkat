@@ -143,6 +143,7 @@ function playOneGame(seed: number, tally: Tally): void {
     tally.passedIn++;
     return;
   }
+  check(result.kind === 'played', label, 'default options never play a Ramsch');
   checkResult(state, result, label);
   tally.played++;
   tally.kinds[result.declaration.kind]++;

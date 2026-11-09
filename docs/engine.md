@@ -17,8 +17,9 @@ rules: `src/engine/AGENTS.md`. The public API is everything re-exported by
 | `GamePhase` | `'bidding' \| 'skat-decision' \| 'discarding' \| 'declaring' \| 'playing' \| 'finished'` |
 | `BiddingState` | `stage` (`1 \| 2 \| 'claim' \| 'done' \| 'passed-in'`), `caller`, `listener`, `awaiting`, `currentBid`, `history` |
 | `GameAction` | `bid{value}`, `hold`, `pass`, `claim`, `pickup-skat`, `play-hand`, `discard{cards:[a,b]}`, `declare{declaration}`, `play{card}` |
-| `GameState` | `phase`, `hands`, `initialHands` (as dealt), `skat` (as dealt, never changes), `bidding`, `declarer`, `bid`, `pickedUpSkat`, `discarded`, `declaration`, `trick`, `tricks`, `turn`, `result` |
-| `GameResult` | `{kind:'passed-in'}` or `{kind:'played', …}` with points, tricks, flags, `base`, `multiplier`, `gameValue`, `playedWon`, `overbid`, `won`, `loseValue`, `declarerScore` (standard counting) |
+| `GameState` | `phase`, `hands`, `initialHands` (as dealt), `skat` (as dealt, never changes), `bidding`, `declarer`, `bid`, `pickedUpSkat`, `discarded`, `declaration`, `trick`, `tricks`, `turn`, `result`, `options` (`GameOptions`), `ramsch` (true while/after a Ramsch) |
+| `GameOptions` | `{ ramschOnPassIn }`; `DEFAULT_GAME_OPTIONS` = off. Set per game at deal time from the table rules (`table.md` §1) |
+| `GameResult` | `{kind:'passed-in'}`, `{kind:'played', …}` with points, tricks, flags, `base`, `multiplier`, `gameValue`, `playedWon`, `overbid`, `won`, `loseValue`, `declarerScore` (standard counting), or `{kind:'ramsch', points, tricks, skatTo, losers, jungfrau, durchmarsch, scores}` (skat-rules §12) |
 | `Result<T, E>` | `{ok:true, value}` \| `{ok:false, error:{code, message}}`; helpers `ok()`, `err()`, `assertNever()` |
 
 ## 2. State machine
@@ -26,6 +27,7 @@ rules: `src/engine/AGENTS.md`. The public API is everything re-exported by
 ```
 newGame(seed): phase 'bidding', turn = middlehand (the first caller!)
 bidding ──(all pass, forehand passes in claim stage)──▶ finished (result passed-in)
+   │                                                     (options.ramschOnPassIn: ▶ playing, ramsch = true, §12)
    │ declarer + bid
    ▼
 skat-decision ──pickup-skat──▶ discarding ──discard──▶ declaring
@@ -37,19 +39,21 @@ declaring ──declare──▶ playing (leader = forehand) ──10 tricks, or
 ## 3. The reducer (`game.ts`)
 
 ```ts
-newGame(seed: number): GameState
+newGame(seed: number, options: GameOptions = DEFAULT_GAME_OPTIONS): GameState
 applyAction(state, role, action): Result<GameState, GameErrorCode>
-getLegal(state, role): Legal                 // {} when role is not on turn
-enumerateActions(state, role): GameAction[]  // derived from getLegal; [] when not on turn
+getLegal(state, role): Legal                 // {} when role is not on turn      (legal.ts)
+enumerateActions(state, role): GameAction[]  // derived from getLegal; [] when not on turn  (legal.ts)
 isFinished(state): boolean
 ```
+
+`legal.ts` holds `Legal`, `getLegal` and `enumerateActions` (re-exported from `game.ts`).
 
 Checks in `applyAction`: the phase first (an action that does not belong to the phase →
 `WRONG_PHASE`), then the role (`NOT_YOUR_TURN`), then the action itself.
 
 | Phase | Action | Effect |
 |---|---|---|
-| `bidding` | `bid`/`hold`/`pass`/`claim` | `applyBid` (§4). Outcome `declarer` → phase `skat-decision`, set `declarer`, `bid`, `turn = declarer`. Outcome `passed-in` → phase `finished`, `result = {kind:'passed-in'}`, `turn = null` |
+| `bidding` | `bid`/`hold`/`pass`/`claim` | `applyBid` (§4). Outcome `declarer` → phase `skat-decision`, set `declarer`, `bid`, `turn = declarer`. Outcome `passed-in` → phase `finished`, `result = {kind:'passed-in'}`, `turn = null`; with `options.ramschOnPassIn` instead: phase `playing`, `ramsch = true`, `trick` led by forehand, `turn = 'forehand'` (no declarer, no bid) |
 | `skat-decision` | `pickup-skat` | declarer's hand += Skat (12 cards), `pickedUpSkat = true`, phase `discarding` |
 | | `play-hand` | phase `declaring` |
 | `discarding` | `discard` | two distinct cards from the 12; removed from the hand, stored in `discarded`; phase `declaring`. Else `INVALID_DISCARD` |
@@ -103,10 +107,14 @@ playCard(state, role, card): Result<GameState, GameErrorCode>
 nextRole(role): Role                 // forehand → middlehand → hindhand → forehand
 ```
 
-`playCard`: phase `playing`, role on turn, card in hand and in `legalCards` (else
-`ILLEGAL_CARD`). After the third card: winner leads the next trick. The game finishes when 10
-tricks are done, or in Null when the declarer wins a trick. Finishing sets `phase = 'finished'`,
-`turn = null`, `result = scoreGame(state)`.
+`playCard`: phase `playing` with a play mode (`playModeOf`, below), role on turn, card in hand and
+in `legalCards` (else `ILLEGAL_CARD`). After the third card: winner leads the next trick. The game
+finishes when 10 tricks are done, or in Null when the declarer wins a trick. Finishing sets
+`phase = 'finished'`, `turn = null`, `result = scoreGame(state)`.
+
+`playModeOf(state)` (`ramsch.ts`): the declaration's mode; in a Ramsch (`declaration` null,
+`ramsch` true) it is `{kind:'grand'}`, so only the Jacks are trump; `null` outside card play. The
+reducer and `getLegal` use it instead of `state.declaration`.
 
 ## 6. Values and scoring (`values.ts`, `spitzen.ts`, `scoring.ts`, `declaration.ts`)
 
@@ -119,7 +127,9 @@ tricks are done, or in Null when the declarer wins a trick. Finishing sets `phas
 | `countSpitzen(twelve, mode)` | from the declarer's original 10 cards + the Skat; `null` for Null |
 | `validateDeclaration(d, hand)`, `declarationOptions(hand)` | §5.1 matrix; 7 options (not hand) / 22 (hand) |
 | `computeScore(input)` | pure number version used by the scoring tests (§10.7 vectors) |
-| `scoreGame(state)` | full `GameResult`; a state without declarer/bid/declaration gives `passed-in` |
+| `scoreGame(state)` | full `GameResult`; `state.ramsch` → `scoreRamsch`; a state without declarer/bid/declaration gives `passed-in` |
+| `scoreRamsch(state)` | Ramsch result: card points per player (the Skat counts for the last trick winner), tricks, losers, Jungfrau, Durchmarsch (`ramsch.ts`) |
+| `ramschScores(points, tricks)` | numbers in: losers, Jungfrau, Durchmarsch and scores (skat-rules §12.4); used by the R1–R5 tests |
 | `skatPointsForDeclarer(state)` | discarded cards if picked up, else the Skat |
 
 Other helpers: `cards.ts` (`ALL_CARDS`, `SUITS` = `['C','H','S','D']`, `RANKS`, `card`, `suitOf`,
@@ -142,3 +152,6 @@ Error codes (`GameErrorCode`): `WRONG_PHASE`, `NOT_YOUR_TURN`, `ILLEGAL_BID`, `C
 - Finished suit/grand games: `declarerPoints + defenderPoints === 120`.
 - Null games end at the declarer's first trick.
 - `declarerScore` matches `won` and `loseValue`.
+- Ramsch (`ramsch.fuzz.test.ts`, 500 seeds with `ramschOnPassIn`): all 10 tricks, card points add up
+  to 120, the Skat points go to the last trick winner, `scores` equal `ramschScores` of the result.
+- Default options never produce a Ramsch (`game.fuzz.test.ts`).
