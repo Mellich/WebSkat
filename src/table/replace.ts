@@ -2,17 +2,15 @@
 // The seat index, the roles and the engine state stay; only the person holding them changes.
 
 import { err, ok, type Result } from '../engine';
-import { allPlayers, touch, uniqueName } from './seating';
+import { botName } from './botNames';
+import { allPlayers, touch } from './seating';
 import type { ActiveGame, Player, PlayerId, ReplaceBy, TableErrorCode, TableState } from './types';
 
 function newcomer(s: TableState, by: ReplaceBy): Player | null {
   if (by.kind === 'bot') {
     return {
       id: `bot-${String(s.seq)}`,
-      name: uniqueName(
-        allPlayers(s).map((p) => p.name),
-        'Bot',
-      ),
+      name: botName(allPlayers(s).map((p) => p.name)),
       connected: true,
       isBot: true,
       botLevel: by.level,

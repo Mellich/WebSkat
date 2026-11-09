@@ -105,7 +105,7 @@ describe('log of a game', () => {
 describe('commands that change players', () => {
   it('logs a join by add-bot, with the bot name', () => {
     const s = run(tableWith(3), 'p0', { type: 'add-bot' });
-    expect(last(s)).toMatchObject({ kind: 'joined', isBot: true, pending: false, name: 'Bot' });
+    expect(last(s)).toMatchObject({ kind: 'joined', isBot: true, pending: false, name: 'Guguurz' });
   });
 
   it('logs a kick with the name from before the kick', () => {
@@ -138,7 +138,7 @@ describe('commands that change players', () => {
     const entry = last(s);
     if (entry.kind !== 'replaced') throw new Error('expected replaced');
     expect(entry.byId.startsWith('bot-')).toBe(true);
-    expect(entry.byName).toBe('Bot');
+    expect(entry.byName).toBe('Guguurz');
   });
 
   it('logs an aborted game, then the deal of the next one', () => {

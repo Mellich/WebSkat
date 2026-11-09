@@ -7,6 +7,12 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [0.9.0] - 2026-11-09
+
+### Changed
+
+- Bots get names instead of numbers: the first bot is always Guguurz, the next ones take the next free name from a list of cute names (Blubb, Kartoffel, …).
+
 ## [0.8.0] - 2026-11-09
 
 ### Added

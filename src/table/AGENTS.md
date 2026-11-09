@@ -24,6 +24,7 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 | `table.ts` | `createTable`, `applyCommand` (the reducer), `dealNext`, `tryDeal`, `CommandResult` |
 | `rules.ts` | `DEFAULT_RULES`, `setRules` (`set-rules`: host, no game running) |
 | `bock.ts` | `BOCK_GAMES`, `BOCK_FACTOR`, `triggersBock` (60 : 60), `nextBockGamesLeft` (Bockrunden, skat-rules §13) |
+| `botNames.ts` | `BOT_NAMES` (pool, first `Guguurz`), `botName` (first unused name, `Bot (n)` fallback) |
 | `replace.ts` | `replacePlayer` (`replace-player`: a waiting player or a bot takes the seat, role, sitting-out and dealer slot) |
 | `seating.ts` | `MIN_SEATS`, `MAX_SEATS`, `MAX_NAME_LENGTH`, `allPlayers`, `touch`, `uniqueName`, `addPlayer`, `removePlayer`, `setConnected`, `markLeaving`, `removeLeavers` |
 | `rotation.ts` | `pickFirstDealer`, `sittingOutSeats`, `rolesForDealer`, `roleOf` (Geberskat) |

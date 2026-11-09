@@ -10,6 +10,7 @@ import {
   type Result,
 } from '../engine';
 import { nextBockGamesLeft, triggersBock } from './bock';
+import { botName } from './botNames';
 import { appendLog } from './log';
 import { commandLog } from './logEvents';
 import { makeRecord } from './records';
@@ -25,7 +26,6 @@ import {
   removeLeavers,
   removePlayer,
   touch,
-  uniqueName,
 } from './seating';
 import type {
   ActiveGame,
@@ -206,11 +206,8 @@ function kick(s: TableState, actor: PlayerId, target: PlayerId, ctx: Ctx): Outco
 
 function addBot(s: TableState): Outcome {
   if (s.game !== null && s.game.engine.phase !== 'finished') return gameRunning();
-  const botName = uniqueName(
-    allPlayers(s).map((p) => p.name),
-    'Bot',
-  );
-  const added = addPlayer(s, { id: `bot-${String(s.seq)}`, name: botName, isBot: true, botLevel: 'normal' });
+  const name = botName(allPlayers(s).map((p) => p.name));
+  const added = addPlayer(s, { id: `bot-${String(s.seq)}`, name, isBot: true, botLevel: 'normal' });
   return added.ok ? plain(added.value) : err(added.error.code, added.error.message);
 }
 

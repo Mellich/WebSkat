@@ -157,10 +157,10 @@ describe('kick', () => {
 });
 
 describe('add-bot', () => {
-  it('seats a bot in the lobby and numbers it uniquely', () => {
+  it('seats a bot in the lobby and names it from the pool, Guguurz first', () => {
     const once = apply(tableWith(2), 'p0', { type: 'add-bot' });
     const twice = apply(once, 'p0', { type: 'add-bot' });
-    expect(twice.players.map((p) => p.name)).toEqual(['Host', 'Player 1', 'Bot', 'Bot (2)']);
+    expect(twice.players.map((p) => p.name)).toEqual(['Host', 'Player 1', 'Guguurz', 'Blubb']);
     expect(twice.players.filter((p) => p.isBot)).toHaveLength(2);
   });
 

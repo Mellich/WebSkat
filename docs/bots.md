@@ -237,7 +237,8 @@ therefore takes no `rand`. Skat decision, discard and declare as in §4.4. Card 
 
 - `src/table/types.ts`: `export type BotLevel = 'easy' | 'normal' | 'strong'`;
   `Player.botLevel?: BotLevel` (bots only; absent is read as `'normal'`). `add-bot` creates bots
-  with `'normal'`. New command `{ type: 'set-bot-level', playerId, level }`: host only, any time,
+  with `'normal'`, named by `botName` (`botNames.ts`): the first unused name of a fixed pool, the
+  first bot always `Guguurz`; a numbered `Bot (n)` only when the pool is used up. New command `{ type: 'set-bot-level', playerId, level }`: host only, any time,
   for seated or pending bots; errors `UNKNOWN_PLAYER`, `NOT_A_BOT`, `NOT_HOST`.
 - `src/table/bot.ts`: `botStep(s, ctx, rand)` calls `botAction(game.engine, role, bot.botLevel ??
   'normal', rand)`. `runBots` loops it. The host runs bots synchronously, so a strong
