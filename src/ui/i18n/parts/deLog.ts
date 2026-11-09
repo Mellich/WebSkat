@@ -1,0 +1,36 @@
+// German strings for enLog (same keys, checked by the type).
+
+import type { enLog } from './enLog';
+
+export const deLog: Record<keyof typeof enLog, string> = {
+  'log.open': 'Protokoll',
+  'log.title': 'Spielprotokoll',
+  'log.empty': 'Noch nichts passiert.',
+  'log.joined': '{name} ist beigetreten',
+  'log.joinedPending': '{name} ist beigetreten und wartet auf das nächste Spiel',
+  'log.botAdded': 'Bot {name} wurde hinzugefügt',
+  'log.reconnected': '{name} ist wieder da',
+  'log.disconnected': '{name} hat die Verbindung verloren',
+  'log.left': '{name} hat den Tisch verlassen',
+  'log.kicked': '{name} wurde entfernt',
+  'log.replaced': '{by} übernimmt den Platz von {name}',
+  'log.dealt': 'Spiel {number} — Geber: {name}',
+  'log.bid': '{name} reizt {value}',
+  'log.hold': '{name} sagt ja',
+  'log.pass': '{name} passt',
+  'log.claim': '{name} spielt mit {value}',
+  'log.skatTaken': '{name} nimmt den Skat auf',
+  'log.hand': '{name} spielt Hand',
+  'log.declared': '{name} sagt {game} an',
+  'log.aborted': 'Spiel {number} wurde abgebrochen',
+  'log.won': '{name} gewinnt {game} ({value}), Augen {declarer} : {defenders}',
+  'log.lost': '{name} verliert {game} ({value}), Augen {declarer} : {defenders}',
+  'log.wonNull': '{name} gewinnt {game} ({value})',
+  'log.lostNull': '{name} verliert {game} ({value})',
+  'log.passedIn': 'Spiel {number}: alle haben gepasst',
+  'log.dealtBock': 'Spiel {number} (Bock) — Geber: {name}',
+  'log.ramsch': 'Alle haben gepasst: Ramsch',
+  'log.ramschLost': 'Ramsch: {names} verliert',
+  'log.durchmarsch': 'Ramsch: Durchmarsch von {name}',
+  'log.bockStarted': '60 : 60 — die nächsten {games} Spiele sind Bockspiele',
+};

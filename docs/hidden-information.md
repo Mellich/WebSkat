@@ -30,6 +30,7 @@ A `TableView` for player P may contain card identities only for:
 | Other players' hands | **nobody**; only the count | `game.handCounts` |
 | Shuffle seed, `initialHands` | nobody (never in a view, record or message) | — |
 | Spitzen of the declarer's 12 cards (for the declaration hint) | declarer only, phase `declaring` | `game.declarerSpitzen` |
+| Game log (`TableView.log`): joins, bids, declarations, results. It holds no card ids; card plays and discards are never logged (plan 10, `table.md` §4a) | everyone | `log` |
 
 Passed-in games reveal no Skat. A Ramsch reveals it to everybody only once it is finished
 (the Skat is on the table during the Ramsch, but it is never picked up). The ouvert hand stays visible after an early Null end

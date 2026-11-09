@@ -28,6 +28,8 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 | `seating.ts` | `MIN_SEATS`, `MAX_SEATS`, `MAX_NAME_LENGTH`, `allPlayers`, `touch`, `uniqueName`, `addPlayer`, `removePlayer`, `setConnected`, `markLeaving`, `removeLeavers` |
 | `rotation.ts` | `pickFirstDealer`, `sittingOutSeats`, `rolesForDealer`, `roleOf` (Geberskat) |
 | `records.ts` | `seegerBonus`, `gameKindOf`, `makeRecord` (played, passed-in and Ramsch records) |
+| `log.ts` | `LOG_LIMIT`, `LOG_VIEW_LIMIT`, `LogEvent`, `LogEntry`, `appendLog` (game log, plan 10) |
+| `logEvents.ts` | `commandLog`: the log events of one successful command (`applyCommand` appends them) |
 | `stats.ts` | `PlayerStats`, `TableStats`, `computeStats` |
 | `viewTypes.ts` | `TableView`, `GameView`, `PlayerPublic`, `ViewTrick`, `ViewLastTrick`, `ViewResult`, `ViewBidEvent`, `DeclarerSpitzen` |
 | `view.ts` | `viewFor(state, viewer)` (table part, `you`) |
@@ -37,7 +39,7 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 | `index.ts` | public re-exports (also `BotView` type) |
 | `testing.ts` | `tableWith`, `ctxFor`, `randomStep`, `playUntilRecords`, `pickRandom` |
 | `fixtures.ts` | `finishedGame`, `GRAND_144`, `DIAMONDS_LOST`, `NULL_OUVERT_WON` |
-| `*.test.ts` | `table`, `leave`, `replace`, `seating`, `rotation`, `records` (incl. Bock doubling), `stats`, `view` (incl. Bock fields), `view.redaction`, `rules`, `ramsch` (records, stats, views of a Ramsch), `bock` (trigger, counter, table flow), `bot`, `bot/*` (incl. `bot/ramsch`) |
+| `*.test.ts` | `table`, `leave`, `replace`, `seating`, `rotation`, `records` (incl. Bock doubling), `stats`, `view` (incl. Bock fields), `view.redaction`, `rules`, `ramsch` (records, stats, views of a Ramsch), `bock` (trigger, counter, table flow), `log` (game log), `bot`, `bot/*` (incl. `bot/ramsch`) |
 
 ## `view.ts` / `viewGame.ts` are the security boundary
 

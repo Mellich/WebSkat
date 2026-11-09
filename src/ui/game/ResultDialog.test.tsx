@@ -16,6 +16,7 @@ const PLAYERS = [
 
 const view: TableView = {
   seq: 1,
+    log: [],
   table: {
     key: 'k',
     name: 'Table',

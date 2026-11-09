@@ -11,6 +11,7 @@ import type {
   Role,
   Suit,
 } from '../engine';
+import type { LogEntry } from './log';
 import type { BotLevel, PlayerId, TableRules, TableStatus } from './types';
 
 export interface PlayerPublic {
@@ -100,6 +101,7 @@ export interface GameView {
 
 export interface TableView {
   readonly seq: number;
+  readonly log: readonly LogEntry[]; // the newest LOG_VIEW_LIMIT entries, oldest first
   readonly table: {
     readonly key: string;
     readonly name: string;

@@ -80,7 +80,8 @@ viewer win the bidding.
 | Screen | Ids |
 |---|---|
 | Home | `create-table`, `join-key-input`, `join-invite-input`, `join-submit`, `public-table`, `public-join` |
-| Table screen / TopBar | `connection-banner`, `connection-status`, `open-stats`, `open-players`, `open-settings`, `leave-table`, `retry-join` |
+| Table screen / TopBar | `connection-banner`, `connection-status`, `open-stats`, `open-log`, `open-players`, `open-settings`, `leave-table`, `retry-join` |
+| Game log dialog | `log-dialog`, `log-list`, `log-entry` (one per entry, oldest first) |
 | Players dialog | `players-dialog`, `players-row-<i>`, `replace-<i>`, `replace-with`, `replace-level`, `replace-confirm`, `players-kick-<i>`, `reinvite-<i>`, `invite-code`, `invite-link`, `players-pending`, `players-abort-game` |
 | Lobby | `table-key`, `seat-<i>`, `bot-level-<i>`, `rule-ramsch`, `rule-bock`, `add-bot`, `start-game` |
 | Game | `bock-info`, `opponent-seat`, `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `trick-dismiss`, `last-trick`, `status-line`, `bid-summary`, `bid-bubble-left`, `bid-bubble-right`, `bid-bubble-bottom`, `sitting-out`, `sitting-out-you`, `phase-panel`, `hand-card-<CardId>`, `abort-game` (host, player on turn disconnected) |

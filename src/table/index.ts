@@ -3,6 +3,7 @@ export * from './rotation';
 export * from './seating';
 export * from './table';
 export * from './records';
+export * from './log';
 export * from './stats';
 export * from './viewTypes';
 export * from './view';

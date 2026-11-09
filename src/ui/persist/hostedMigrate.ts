@@ -80,9 +80,19 @@ function migrateBockRule(parsed: unknown): void {
   }
 }
 
+/** Snapshots from protocol version 6 have no game log: the table starts with an empty one. */
+function migrateLog(parsed: unknown): void {
+  if (typeof parsed !== 'object' || parsed === null || !('table' in parsed)) return;
+  const table = parsed.table;
+  if (typeof table !== 'object' || table === null) return;
+  const t = table as Record<string, unknown>;
+  if (!Array.isArray(t.log)) t.log = [];
+}
+
 /** Runs every migration step on a parsed snapshot. */
 export function migrateSnapshot(parsed: unknown): void {
   migrateBotLevel(parsed);
   migrateRamschRule(parsed);
   migrateBockRule(parsed);
+  migrateLog(parsed);
 }

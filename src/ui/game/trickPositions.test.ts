@@ -45,6 +45,7 @@ function gameWith(roles: GameView['roles'], sittingOut: readonly string[]): Game
 function viewOf(players: readonly PlayerPublic[], you: string, game: GameView | null): TableView {
   return {
     seq: 1,
+    log: [],
     table: {
       key: 'k',
       name: 'Table',

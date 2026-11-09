@@ -1,4 +1,4 @@
-// Always visible at the top of a table: name, key, connection status, statistics, settings, Leave.
+// Always visible at the top of a table: name, key, connection status, statistics, game log, players, settings, Leave.
 
 import { useMemo, useState } from 'react';
 import { formatKey } from '../../net';
@@ -9,6 +9,7 @@ import { navigate } from '../router';
 import { StatsPanel } from '../stats/StatsPanel';
 import { useSession } from '../store/session';
 import { ConfirmDialog } from './ConfirmDialog';
+import { GameLogDialog } from './GameLogDialog';
 import { PlayersDialog } from './PlayersDialog';
 import { SettingsDialog } from './SettingsDialog';
 import styles from './TopBar.module.css';
@@ -22,7 +23,7 @@ export function TopBar() {
   const connection = useSession((s) => s.connection);
   const host = useSession((s) => s.host);
   const [confirming, setConfirming] = useState(false);
-  const [panel, setPanel] = useState<'stats' | 'players' | 'settings' | null>(null);
+  const [panel, setPanel] = useState<'stats' | 'log' | 'players' | 'settings' | null>(null);
   const players = useMemo(
     () => (view === null ? [] : view.table.players.map((p) => ({ id: p.id, name: p.name }))),
     [view],
@@ -60,6 +61,18 @@ export function TopBar() {
         >
           <span className={styles.icon} aria-hidden="true">📊</span>
           <span className={styles.label}>{t('stats.open')}</span>
+        </button>
+        <button
+          type="button"
+          data-testid="open-log"
+          aria-label={t('log.open')}
+          title={t('log.open')}
+          onClick={() => {
+            setPanel('log');
+          }}
+        >
+          <span className={styles.icon} aria-hidden="true">📜</span>
+          <span className={styles.label}>{t('log.open')}</span>
         </button>
         <button
           type="button"
@@ -113,6 +126,14 @@ export function TopBar() {
           records={records}
           players={players}
           viewerId={view.you.id}
+          onClose={() => {
+            setPanel(null);
+          }}
+        />
+      ) : null}
+      {panel === 'log' && view !== null ? (
+        <GameLogDialog
+          entries={view.log}
           onClose={() => {
             setPanel(null);
           }}

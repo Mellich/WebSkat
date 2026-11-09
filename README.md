@@ -27,6 +27,10 @@ implemented are in `docs/skat-rules.md`. Contributors and coding agents read `AG
 
 Statistics (standings, history, charts, Seeger or standard scoring) are in the **Stats** dialog.
 
+The **Log** (📜) lists what happened at the table: joins and disconnects, bids, declared games,
+Ramsch and Bock games, and results. It is the same for everybody and includes events from before
+you joined.
+
 **If a player drops out:** a player whose browser lost the connection keeps its seat and can come
 back with the same browser. The host opens **Players** (👥) to see who is offline. If a player
 lost its browser data, the host can **Invite again** and send the link; that player opens it and

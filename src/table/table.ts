@@ -10,6 +10,8 @@ import {
   type Result,
 } from '../engine';
 import { nextBockGamesLeft, triggersBock } from './bock';
+import { appendLog } from './log';
+import { commandLog } from './logEvents';
 import { makeRecord } from './records';
 import { replacePlayer } from './replace';
 import { DEFAULT_RULES, setRules } from './rules';
@@ -76,6 +78,7 @@ export function createTable(args: {
     bockGamesLeft: 0,
     records: [],
     seq: 0,
+    log: [],
   };
 }
 
@@ -232,7 +235,15 @@ function leave(s: TableState, actor: PlayerId, ctx: Ctx): Outcome {
   return plain(tryDeal(toLobbyIfTooFew(removePlayer(s, actor)), ctx));
 }
 
-export function applyCommand(
+/** Applies a command and appends its log events. A rejected command changes nothing. */
+export function applyCommand(s: TableState, actor: PlayerId, c: TableCommand, ctx: Ctx): Outcome {
+  const result = reduce(s, actor, c, ctx);
+  if (!result.ok) return result;
+  const events = commandLog(s, result.value.state, actor, c, result.value.record);
+  return ok({ ...result.value, state: appendLog(result.value.state, events, ctx.now) });
+}
+
+function reduce(
   s: TableState,
   actor: PlayerId,
   c: TableCommand,

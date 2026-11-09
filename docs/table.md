@@ -37,6 +37,7 @@ interface TableState {
   rules: TableRules;      // table rules; changed by the host between games (skat-rules §12)
   records: GameRecord[];
   seq;                    // +1 on every change (`touch`)
+  log: LogEntry[];        // game log, newest last, at most 200 (§4a)
 }
 
 interface TableRules { ramsch: boolean; bock: boolean }    // default off; ramsch is passed as GameOptions.ramschOnPassIn; bock: §13
@@ -50,7 +51,9 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 | Function | File | Behavior |
 |---|---|---|
 | `createTable({key, name, isPublic, hostId, hostName, maxSeats?})` | `table.ts` | Lobby with the host seated; `maxSeats` clamped to 3..6, default 6; `rules = DEFAULT_RULES` |
-| `applyCommand(s, actor, command, ctx)` | `table.ts` | The reducer: `Result<{state, record}, TableErrorCode>` (§3) |
+| `applyCommand(s, actor, command, ctx)` | `table.ts` | The reducer: `Result<{state, record}, TableErrorCode>` (§3). Appends the log events of the command (`commandLog`, §4a); a rejected command changes nothing |
+| `appendLog(s, events, at)` | `log.ts` | Numbers the events (`n`, `at`) and keeps the last `LOG_LIMIT` (200). No events: same state |
+| `commandLog(before, after, actor, command, record)` | `logEvents.ts` | The log events of one successful command (§4a) |
 | `dealNext(s, ctx)` | `table.ts` | Removes leavers first (`removeLeavers`), seats pending players; < 3 seated → back to lobby. Dealer = `nextDealerIdx % N`, pointer moves one seat on, `newGame(ctx.seed, { ramschOnPassIn: rules.ramsch })`, roles from the rotation, `ready` = bots |
 | `setRules(s, actor, rules)` | `rules.ts` | Host only, not while a game runs (lobby or finished game); sets `rules`. Turning `bock` off sets `bockGamesLeft = 0`. `DEFAULT_RULES = { ramsch: false, bock: false }` |
 | `triggersBock(result)` | `bock.ts` | True for a played suit or Grand game with `declarerPoints === 60` (60 : 60; Null and Ramsch never) |
@@ -114,6 +117,26 @@ Joining is not a command: the host calls `addPlayer` when a `join` message arriv
   `tryDeal` also runs right after a game finishes.
 - Each finished game creates exactly one record (`ActiveGame.recorded`). Aborted games create none.
 
+## 4a. Game log (`log.ts`, `logEvents.ts`, plan 10)
+
+- The host keeps the log in `TableState.log` (part of the host snapshot). `LOG_LIMIT = 200`
+  entries are kept, `LOG_VIEW_LIMIT = 100` travel with each view (`TableView.log`, the newest).
+- An entry is `LogEvent & { n, at }`: `n` is a running number, `at` is `ctx.now`. Entries hold
+  ids, names and numbers, never cards; the UI translates them (`src/ui/log/logText.ts`).
+- Event kinds: `joined` (with `isBot`, `pending`), `reconnected`, `disconnected`, `left`,
+  `kicked`, `replaced` (`byId`/`byName`), `dealt` (game number, dealer, `bock`), `bid` (`bid` with
+  value, `hold`, `pass`, `claim` = 18), `skat` (`pickedUp`: Skat or Hand), `declared` (the
+  `Declaration`), `aborted`, `ramsch` (everybody passed, the game is a Ramsch), `bock-started`
+  (`games`: the 60 : 60 game starts the next `BOCK_GAMES` = 3 Bock games), `result` (`played`,
+  `passed-in` or `ramsch`; for a played game declarer, game kind, won, game value, card points,
+  none for Null; for a Ramsch `loserNames` and `durchmarschName`).
+- Not logged: card plays and discards (too noisy; views hold only the current and last trick).
+- Who writes: `applyCommand` derives the events of every successful command (`commandLog`), so bot
+  actions are logged too, in this order: the command's own events, `ramsch` if the command moved
+  the game into Ramsch, the `result` of a game it finished, `bock-started` if that game was a 60 : 60
+  trigger, the `dealt` of a game it started. The host controller logs `joined` (new peer),
+  `reconnected`/`disconnected` (a real change of the connection flag only, `net/hostLog.ts`).
+
 ## 5. Records (`records.ts`)
 
 `makeRecord` builds a `GameRecord` (fields: `statistics.md` §1). `scores` has an entry for every
@@ -142,6 +165,7 @@ and the `ramsch` block: `points`, `tricks`, `loserIds`, `jungfrau`, `durchmarsch
 `viewFor(state, viewer)` → `TableView`:
 
 - `seq`
+- `log`: the newest `LOG_VIEW_LIMIT` (100) entries of `TableState.log` (§4a); public, no cards.
 - `table`: `key`, `name`, `hostId`, `maxSeats`, `status`, `players` / `pending` as `PlayerPublic`
   (`id`, `name`, `connected`, `isBot`, `botLevel` (null for humans), `seat` (null while pending)),
   `nextDealerId`, `readyIds`, `rules` (`TableRules`, shown in the lobby), `bockGamesLeft`.

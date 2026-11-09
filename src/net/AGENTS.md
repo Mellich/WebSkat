@@ -38,9 +38,11 @@ Read first: `docs/networking.md` and `docs/architecture.md` §3–4. Visibility 
 | `fake.ts` | `createFakeNetwork()`: in-memory network with `flush`, `members`, `drop` (tests, `#/dev/local`) |
 | `schemaGame.ts` | `CardIdSchema`, `DeclarationSchema`, `GameActionSchema`, `TableCommandSchema` |
 | `schemaView.ts` | `TableViewSchema`, `GameRecordSchema` and nested schemas |
+| `schemaLog.ts` | `LogEntrySchema` (game log entries in views, one object per kind) |
 | `protocol.ts` | message schemas (`ClientMessageSchema`, `HostMessageSchema`, `AdSchema`, …), types, builders `cmdMessage`, `viewMessage`, `recordMessage` |
 | `connection.ts` | `ConnectionStatus`, `ConnectionEvent`, `GameConnection`, `createEmitter` (replays status/records/view) |
 | `host.ts` | `createHost` → `Host` (`connection`, `stop`, `getState`, `snapshot`, `invite`), `HostSnapshot`; joins (token or invite), kicked notices |
+| `hostLog.ts` | `logJoined`, `setConnectedLogged`: game-log entries for joins, reconnects and disconnects (plan 10) |
 | `peers.ts` | `createPeerMap()`: peer ↔ player bookkeeping (`bind`, `unbindPlayer`, `dropPeer`) |
 | `advertise.ts` | `startAdvertising({lobby, getState, hostId, now})`: lobby ads for public tables |
 | `invites.ts` | `createInvites(initial, newCode)`: single-use invite codes of disconnected players (`create`, `take`, `forget`, `toJSON`) |

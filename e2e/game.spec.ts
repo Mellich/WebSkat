@@ -33,6 +33,16 @@ test('three players play one game and everybody sees the result and the statisti
       await expect(page.getByTestId('history-row')).toHaveCount(1);
       await page.keyboard.press('Escape');
     }
+
+    // The game log (plan 10): the bids and the result, the same for every player. The view keeps
+    // only the newest 100 entries, so the joins of a long bidding are no longer visible here.
+    for (const page of pages) {
+      await page.getByTestId('open-log').click();
+      const entries = page.getByTestId('log-entry');
+      await expect(entries.filter({ hasText: /bids|holds|passes|plays at/ }).first()).toBeVisible();
+      await expect(entries.filter({ hasText: /won|lost|everybody passed/ })).toHaveCount(1);
+      await page.keyboard.press('Escape');
+    }
   } finally {
     await closeAll(players);
   }

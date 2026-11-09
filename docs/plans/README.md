@@ -5,7 +5,7 @@ self-contained plans. Each plan can be implemented by a smaller model **on its o
 the other, in the order below. When a plan is done, its file stays here as a record; the
 `docs/*.md` layer docs describe the new current state.
 
-**Status:** plans 01–09 are implemented. Plan 10 is still open. The
+**Status:** plans 01–10 are implemented. Plan 10 (game log) is on branch `plan-10`, rebased on `plan-08` (which holds plans 08 and 09), and not yet merged to `main`. The
 "Lines now" and "baseline" figures below are from before plan 01 and are kept as a record.
 
 ## 1. Order (do not reorder)

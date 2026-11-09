@@ -4,7 +4,7 @@
 import { normalizeKey } from './keys';
 
 export const APP_ID = 'webskat-v1-7c2f9a';
-export const PROTOCOL_VERSION = 6;
+export const PROTOCOL_VERSION = 7;
 export const LOBBY_ROOM = 'webskat-lobby-v1';
 export const AD_INTERVAL_MS = 5000;
 export const AD_TTL_MS = 15000;

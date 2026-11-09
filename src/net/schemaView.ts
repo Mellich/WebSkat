@@ -1,7 +1,8 @@
 // zod schemas for views and game records sent from the host (docs/networking.md §3).
 
 import { z } from 'zod';
-import type { GameRecord, GameView, TableView, ViewResult } from '../table';
+import { LOG_VIEW_LIMIT, type GameRecord, type GameView, type TableView, type ViewResult } from '../table';
+import { LogEntrySchema } from './schemaLog';
 import { CardIdSchema, DeclarationSchema } from './schemaGame';
 
 const id = z.string().min(1).max(64);
@@ -131,6 +132,7 @@ const GameViewSchema: z.ZodType<GameView> = z.object({
 
 export const TableViewSchema: z.ZodType<TableView> = z.object({
   seq: z.number().int().min(0),
+  log: z.array(LogEntrySchema).max(LOG_VIEW_LIMIT),
   table: z.object({
     key: z.string().min(1).max(16),
     name: z.string().min(1).max(40),

@@ -10,7 +10,6 @@ import {
   allPlayers,
   applyCommand,
   botStep,
-  setConnected,
   viewFor,
   type Ctx,
   type GameRecord,
@@ -24,6 +23,7 @@ import { type Emitter, type GameConnection, createEmitter } from './connection';
 import { createInvites, type Invites } from './invites';
 import { generateKey } from './keys';
 import { type HostMessage, type JoinMessage, ClientMessageSchema, recordMessage, viewMessage } from './protocol';
+import { logJoined, setConnectedLogged } from './hostLog';
 import { createPeerMap } from './peers';
 import { randomBytes, randomHex } from './random';
 import type { Channel, RoomHandle, Transport } from './transport';
@@ -185,7 +185,7 @@ export function createHost(opts: HostOptions): Host {
     }
     issueToken(id);
     peers.bind(peer, id);
-    state = setConnected(state, id, true);
+    state = setConnectedLogged(state, id, true, opts.now());
     return true;
   }
 
@@ -204,7 +204,7 @@ export function createHost(opts: HostOptions): Host {
     const known = token === undefined ? undefined : tokens.get(token);
     if (known !== undefined && allPlayers(state).some((p) => p.id === known)) {
       peers.bind(peer, known);
-      state = setConnected(state, known, true);
+      state = setConnectedLogged(state, known, true, opts.now());
       return true;
     }
     if (peers.playerOf(peer) !== undefined) return true;
@@ -214,7 +214,7 @@ export function createHost(opts: HostOptions): Host {
       sendTo(peer, { t: 'rejected', reason: added.error.code === 'TABLE_FULL' ? 'TABLE_FULL' : 'BAD_NAME' });
       return false;
     }
-    state = added.value;
+    state = logJoined(added.value, id, opts.now());
     issueToken(id);
     peers.bind(peer, id);
     return true;
@@ -242,7 +242,7 @@ export function createHost(opts: HostOptions): Host {
   function onPeerLeave(peer: string): void {
     const id = peers.dropPeer(peer);
     if (id === undefined) return;
-    state = setConnected(state, id, false);
+    state = setConnectedLogged(state, id, false, opts.now());
     broadcastViews();
     persist();
   }

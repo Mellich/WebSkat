@@ -63,9 +63,9 @@ exists, Home navigates to that table (`decisions.md` I80).
   state). During a game the screen is fixed to `100dvh` and never scrolls.
 
 `TopBar` (`components/TopBar.tsx`): table name, key, connection dot + text
-(`connection-status`, `data-state` ok/wait/bad), buttons Stats (`open-stats`), Players
+(`connection-status`, `data-state` ok/wait/bad), buttons Stats (`open-stats`), Log (`open-log`, plan 10), Players
 (`open-players`), Settings (`open-settings`), Leave (`leave-table`; asks for confirmation while a
-game runs). On narrow or compact-landscape screens the buttons show icons only (📊 👥 ⚙ ⎋) with
+game runs). On narrow or compact-landscape screens the buttons show icons only (📊 📜 👥 ⚙ ⎋) with
 `aria-label`s.
 
 `PlayersDialog` (`components/PlayersDialog.tsx`, Esc closes; split into `PlayerRow.tsx`,
@@ -182,6 +182,7 @@ blocked) and the `persist/*` modules. Values are validated on read.
 | `SpeechBubble` | bid bubble with a tail toward the speaker; positioned by `GameScreen` (`bid-bubble-*`), `aria-hidden` |
 | `SkatPile` | two backs during bidding / Skat decision |
 | `CardChip`, `CardChips` | card as text chip `♥10` with full name as `aria-label`/`title` |
+| `GameLogDialog` (`components/GameLogDialog.tsx`, plan 10) | Modal over `view.log` (the last 100 entries, oldest first; `log-list` / `log-entry`, `dealt` entries are separators). Scrolls to the newest entry when one arrives. Texts from `log/logText.ts` (pure, one `switch` over the entry kinds; strings in `i18n/parts/enLog.ts` / `deLog.ts`). Closes on Esc |
 | `TopBar`, `Toasts`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` | Dialogs close on Esc |
 | `stats/*` | `statistics.md` §3 |
 

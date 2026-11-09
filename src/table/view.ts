@@ -1,5 +1,6 @@
 // viewFor(state, viewer): the only thing that leaves the host towards a client (docs/hidden-information.md).
 
+import { LOG_VIEW_LIMIT } from './log';
 import { roleOf } from './rotation';
 import type { PlayerId, TableState } from './types';
 import { gameViewFor } from './viewGame';
@@ -30,6 +31,7 @@ function nextDealerId(s: TableState): PlayerId | null {
 export function viewFor(s: TableState, viewer: PlayerId): TableView {
   return {
     seq: s.seq,
+    log: s.log.slice(-LOG_VIEW_LIMIT),
     table: {
       key: s.key,
       name: s.name,

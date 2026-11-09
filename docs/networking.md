@@ -14,14 +14,15 @@ Browser ──WebRTC data channels (P2P, encrypted)── Browser
 One Trystero room per table (`tableRoom(key)` = `webskat-t-<KEY>`), plus one shared lobby room
 (`webskat-lobby-v1`) for the public table list.
 
-`constants.ts`: `APP_ID = 'webskat-v1-7c2f9a'`, `PROTOCOL_VERSION = 6`, `LOBBY_ROOM`,
+`constants.ts`: `APP_ID = 'webskat-v1-7c2f9a'`, `PROTOCOL_VERSION = 7`, `LOBBY_ROOM`,
 `AD_INTERVAL_MS = 5000`, `AD_TTL_MS = 15000`, `JOIN_TIMEOUT_MS = 15000`, `LEAVE_CLOSE_DELAY_MS = 500`.
 
 **Bump `PROTOCOL_VERSION`** whenever a message, command or view changes shape so that old
 browsers cannot talk to new ones. Version history: 1 initial, 2 table bot level (Phase 13),
 3 per-bot `botLevel` + `set-bot-level` (Phase 14), 4 `replace-player`, `join.invite`,
 `INVITE_INVALID` (plan 07), 5 `set-rules` command, `ramsch` in views and records, table `rules` (plan 08),
-6 `bock` in table rules, `bockGamesLeft`, `bock`/`bockTriggered` in views and records (plan 09).
+6 `bock` in table rules, `bockGamesLeft`, `bock`/`bockTriggered` in views and records (plan 09),
+7 `TableView.log` and the log entry kinds (game log, plan 10).
 
 ## 2. Transport (`transport.ts`, `trysteroTransport.ts`, `fake.ts`)
 
@@ -60,6 +61,7 @@ typed `z.ZodType<T>` against the table/engine types, so drift is a compile error
 |---|---|
 | `schemaGame.ts` | `CardIdSchema`, `DeclarationSchema`, `GameActionSchema` (bid value must be in `BID_VALUES`), `TableCommandSchema` |
 | `schemaView.ts` | `TableViewSchema`, `GameRecordSchema` (+ nested view/result schemas) |
+| `schemaLog.ts` | `LogEntrySchema`: one object per log event kind (`TableView.log`, at most `LOG_VIEW_LIMIT` = 100) |
 | `protocol.ts` | message envelopes below, `AdSchema` |
 
 Client → host (channel `cmd`):
@@ -107,6 +109,11 @@ removed. It travels only inside the invite link (`joinLink(key, base, invite)` �
 
 `onPeerLeave(peer)`: `setConnected(false)`, unmap, broadcast views, persist. The host's own player
 has no peer; it uses the loop-back connection.
+
+**Game log (plan 10):** the host appends `joined` for a new seat or queue entry, and
+`reconnected` / `disconnected` only when the connection flag really changes (`net/hostLog.ts`:
+`logJoined`, `setConnectedLogged`). A second tab of a connected player, and a peer that left with
+`leave` (already `connected: false`), add no entry. Views carry the log; no new message type.
 
 ## 5. Host controller (`createHost`, `host.ts`)
 

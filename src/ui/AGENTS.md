@@ -55,10 +55,11 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `game/seats.ts` | `opponentsOf` (seat order relative to the viewer), `namesById` |
 | `game/trickPositions.ts` | `trickSeats` (who is left / right / bottom), `placeTrick` (plays → positions) |
 | `game/labels.ts` | `cardName`, `cardShort`, `declarationLabel`, `spitzenLabel`, `suitKey`, `suitSymbol` |
-| `components/` | `Card` (`disabled` = button that cannot be clicked), `Hand` (interactive hands are all buttons), `OpponentSeat`, `TrickArea`, `SkatPile`, `SpeechBubble`, `CardChip(s)`, `ConnectionDot`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` (+ `PlayerRow`, `ReplaceChooser`, `InviteBox`; `PlayersDialog.module.css`) |
+| `components/` | `Card` (`disabled` = button that cannot be clicked), `Hand` (interactive hands are all buttons), `OpponentSeat`, `TrickArea`, `SkatPile`, `SpeechBubble`, `CardChip(s)`, `ConnectionDot`, `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` (+ `PlayerRow`, `ReplaceChooser`, `InviteBox`; `PlayersDialog.module.css`), `GameLogDialog` (`GameLogDialog.module.css`) |
 | `stats/` | `StatsPanel`, `Standings`, `History`, `ScoreChart`, `ByType`, `chartGeometry.ts`, `gameLabel.ts` |
 | `store/session.ts` | `useSession` (connection, host, status, view, records, toasts), `errorText` |
 | `store/settings.ts` | `useSettings` (settings + `update`) |
+| `log/logText.ts` | `logText(entry, t)`: the text of one game-log entry (plan 10) |
 | `persist/` | `storage.ts` (`browserStorage`), `settings.ts`, `session.ts`, `hosted.ts` (host snapshots), `hostedMigrate.ts` (`migrateSnapshot`, all snapshot upgrades), `records.ts` (record cache) |
 | `net/actions.ts` | `hostTable`, `openTable`, `resumeHostedTable`, `leaveTable` |
 | `net/transport.ts` | `getTransport()` (one Trystero transport per page) |

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { HostSnapshot } from '../../net';
-import { addPlayer, applyCommand, type TableState } from '../../table';
+import { addPlayer, appendLog, applyCommand, type TableState } from '../../table';
 import { tableWith } from '../../table/testing';
 import { listHostedKeys, loadHostSnapshot, removeHostSnapshot, resumableSnapshot, saveHostSnapshot } from './hosted';
 
@@ -128,6 +128,21 @@ describe('host snapshots in localStorage', () => {
   ])('loads nothing when %s', (_case, raw) => {
     const storage = memoryStorage(raw === null ? {} : { 'webskat.host.TESTKEY': raw });
     expect(loadHostSnapshot(storage, 'TESTKEY')).toBeNull();
+  });
+
+  it('gives a snapshot from before the game log an empty log', () => {
+    const storage = memoryStorage();
+    const old = JSON.parse(JSON.stringify(snapshotOf(tableWith(3)))) as { table: { log?: unknown } };
+    delete old.table.log;
+    storage.setItem('webskat.host.TESTKEY', JSON.stringify(old));
+    expect(loadHostSnapshot(storage, 'TESTKEY')?.table.log).toEqual([]);
+  });
+
+  it('keeps the game log of a snapshot', () => {
+    const storage = memoryStorage();
+    const table = appendLog(tableWith(3), [{ kind: 'left', playerId: 'p1', name: 'Anna' }], 5);
+    saveHostSnapshot(storage, snapshotOf(table));
+    expect(loadHostSnapshot(storage, 'TESTKEY')?.table.log).toEqual(table.log);
   });
 
   it('gives each bot of an older snapshot the table-wide strength it had', () => {
