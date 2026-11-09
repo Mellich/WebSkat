@@ -1,30 +1,14 @@
 // One row per game, newest first, with the score change of every player (docs/statistics.md §3).
 
 import type { GameRecord, PlayerId, PlayerStats } from '../../table';
-import { useT, type Translator } from '../i18n';
-import { gameLabel, signed } from './gameLabel';
+import { useT } from '../i18n';
+import { gameLabel, recordFlags as flags, signed, spitzenLabel as spitzen } from './gameLabel';
 import styles from './StatsPanel.module.css';
 
 export interface HistoryProps {
   readonly records: readonly GameRecord[];
   readonly players: readonly PlayerStats[];
   readonly scoring: 'seeger' | 'standard';
-}
-
-function flags(r: GameRecord, t: Translator): string {
-  const parts: string[] = [];
-  if (r.ramsch?.jungfrau) parts.push(t('game.jungfrau'));
-  if (r.ramsch?.durchmarschId) parts.push(t('game.durchmarsch'));
-  if (r.bock) parts.push(t('game.bock'));
-  if (r.schneider || r.announce === 'schneider') parts.push(t('game.schneider'));
-  if (r.schwarz || r.announce === 'schwarz') parts.push(t('game.schwarz'));
-  if (r.overbid) parts.push(t('stats.overbid'));
-  return parts.join(', ');
-}
-
-function spitzen(r: GameRecord, t: Translator): string {
-  if (r.spitzenCount === null || r.spitzenWith === null) return '';
-  return r.spitzenWith ? t('game.with', { count: r.spitzenCount }) : t('game.without', { count: r.spitzenCount });
 }
 
 function delta(r: GameRecord, id: PlayerId, scoring: 'seeger' | 'standard'): string {

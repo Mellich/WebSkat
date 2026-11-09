@@ -8,6 +8,7 @@ import { History } from './History';
 import { ScoreChart } from './ScoreChart';
 import { Standings } from './Standings';
 import { ByType } from './ByType';
+import { downloadCsv, historyCsv } from './csv';
 import styles from './StatsPanel.module.css';
 
 export interface StatsPanelProps {
@@ -47,7 +48,19 @@ export function StatsPanel({ records, players, viewerId, onClose }: StatsPanelPr
       <div className={styles.dialog} role="dialog" aria-modal="true" aria-label={t('stats.title')}>
         <header className={styles.header}>
           <h2>{t('stats.title')}</h2>
-          <button type="button" onClick={onClose}>{t('common.close')}</button>
+          <div>
+            <button
+              type="button"
+              data-testid="stats-export-csv"
+              disabled={records.length === 0}
+              onClick={() => {
+                downloadCsv('webskat-stats.csv', historyCsv(records, stats.players, t));
+              }}
+            >
+              {t('stats.exportCsv')}
+            </button>{' '}
+            <button type="button" onClick={onClose}>{t('common.close')}</button>
+          </div>
         </header>
 
         <div className={styles.toolbar}>

@@ -91,7 +91,7 @@ viewer win the bidding.
 | Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass`, `bid-current`, `bid-turn` |
 | Skat / declare | `pickup`, `play-hand`, `discard-submit`, `declare-option-0..5` (♣ ♠ ♥ ♦ Grand Null), `declare-submit` |
 | Result | `result-dialog`, `continue` |
-| Stats / settings | `stats-tab-standings`, `stats-tab-history`, `stats-tab-charts`, `history-row`, `setting-trick-display`, `setting-bid-bubble` |
+| Stats / settings | `stats-tab-standings`, `stats-tab-history`, `stats-tab-charts`, `history-row`, `stats-export-csv`, `setting-trick-display`, `setting-bid-bubble` |
 
 Find them all: `grep -rhoE 'data-testid=(\{`[^`]*`\}|"[^"]*")' src | sort -u`.
 

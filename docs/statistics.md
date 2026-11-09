@@ -61,6 +61,8 @@ toggle (the same `scoring` setting as in Settings) and three tabs (`stats-tab-<i
 | `history` | `History.tsx` | one row per game, newest first (`history-row`): number, time, declarer, game label (`gameLabel`, "Ramsch" for Ramsch), spitzen, bid, card points, flags, result, one delta column per player; passed-in rows greyed; a Ramsch row has no declarer, bid or result column and shows the flags Jungfrau/Durchmarsch; scrolls horizontally on phones |
 | `charts` | `ScoreChart.tsx`, `ByType.tsx` | SVG line chart of `series` (geometry in `chartGeometry.ts` `chartPlots`), games by type bars and the Ramsch count (`stats.ramsch`) |
 
+`StatsPanel` has a "Download CSV" button (`stats-export-csv`, disabled without games). `csv.ts` (`historyCsv`, `csvField`, `downloadCsv`) writes one row per game, oldest first: number, ISO date, declarer, game label, bid, card points, flags, then one Seeger and one Standard column per player. Fields are quoted; a leading `= + - @` gets a `'` prefix against spreadsheet formulas; the file has a UTF-8 BOM.
+
 Empty state: "No games played yet". The result dialog does **not** use these components
 (`ui-game-screen.md` §7); it shows the game's record delta for the selected system.
 

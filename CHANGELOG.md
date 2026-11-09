@@ -7,6 +7,14 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [0.8.0] - 2026-11-09
+
+### Added
+
+- The statistics dialog has a "Download CSV" button: one row per game, oldest first, with the
+  scores of both scoring systems. The file starts with a byte order mark, so Excel shows umlauts
+  correctly.
+
 ## [0.7.0] - 2026-11-09
 
 ### Added
