@@ -46,6 +46,7 @@ export const dePanels: Record<keyof typeof enPanels, string> = {
   'players.botLevel': 'Stärke des Bots',
   'players.confirm': 'Ersetzen',
   'players.reinvite': 'Erneut einladen',
+  'players.tableInvite': 'Zu diesem Tisch einladen',
   'players.inviteCode': 'Einladungscode',
   'players.inviteLink': 'Einladungslink',
   'players.copy': 'Kopieren',

@@ -7,6 +7,22 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [0.10.0] - 2026-11-10
+
+### Added
+
+- The player menu shows the table's invite code and join link to every player, with copy buttons, so anyone can invite friends.
+
+### Changed
+
+- New look: the app now feels like a westphalian Schänke. Dark oak planks with grain, smoke at the
+  edges and beer rings on the boards; the card table is worn green baize on an oak rim; panels,
+  buttons and the top bar look like old wood and brass. The logo stays prominent on the start page
+  under a pub lamp glow.
+- Headings use Pirata One, a blackletter-style font close to the logo's lettering (SIL Open Font
+  License, bundled in `public/fonts`); all other text stays in a plain, readable sans-serif.
+- The start page uses the width of wide screens: create and join sit side by side from 900 px on.
+
 ## [0.9.0] - 2026-11-09
 
 ### Changed

@@ -125,3 +125,13 @@
 .pending p {
   margin: 0;
 }
+
+.tableInvite {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tableInvite p {
+  margin: 0;
+}

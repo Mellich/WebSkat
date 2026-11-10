@@ -3,9 +3,9 @@
 .bubble {
   position: relative;
   padding: 2px 10px;
-  border: 2px solid var(--accent);
-  border-radius: 12px;
-  background: rgb(10 30 16 / 94%);
+  border: 2px solid var(--brass);
+  border-radius: 10px;
+  background: var(--panel-solid);
   color: var(--ink);
   font-size: 1.1rem;
   font-weight: 700;

@@ -44,6 +44,7 @@ export const enPanels = {
   'players.botLevel': 'Bot strength',
   'players.confirm': 'Replace',
   'players.reinvite': 'Invite again',
+  'players.tableInvite': 'Invite to this table',
   'players.inviteCode': 'Invite code',
   'players.inviteLink': 'Invite link',
   'players.copy': 'Copy',

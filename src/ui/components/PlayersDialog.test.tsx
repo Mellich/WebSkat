@@ -138,3 +138,34 @@ describe('PlayersDialog invites', () => {
     expect(screen.queryByTestId('reinvite-1')).toBeNull();
   });
 });
+
+describe('PlayersDialog table invite', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('shows the table code and the plain join link to every player', () => {
+    renderDialog(table({ started: true }), 'a');
+    expect(screen.getByTestId('table-invite-code').textContent).toBe('ABCD-EFGH');
+    const link = screen.getByTestId('table-invite-link').textContent;
+    expect(link).toContain('#/t/ABCD-EFGH');
+    expect(link).not.toContain('invite=');
+  });
+
+  it('copies the table code to the clipboard', async () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+    renderDialog(table({ started: false }), 'a');
+    fireEvent.click(screen.getByTestId('table-invite-copy-code'));
+    expect(writeText).toHaveBeenCalledWith('ABCD-EFGH');
+    expect(await screen.findByText('Copied')).toBeTruthy();
+  });
+
+  it('copies the table link to the clipboard', () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+    renderDialog(table({ started: false }), 'h');
+    fireEvent.click(screen.getByTestId('table-invite-copy-link'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('#/t/ABCD-EFGH'));
+  });
+});

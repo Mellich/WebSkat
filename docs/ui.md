@@ -89,7 +89,10 @@ connection; `invite` is `host.invite` for the host and `null` for guests.
   (`replace-with`: each waiting player, or Bot; `replace-level` picks the strength when Bot is chosen, default normal;
   `replace-confirm` sends `replace-player`). Otherwise **Kick** (`players-kick-<seat>`, confirm dialog).
 - Host, disconnected human: **Invite again** (`reinvite-<seat>`) → `invite-code` (formatted) and
-  `invite-link` with copy buttons; `null` → `players.inviteFailed`.
+  `invite-link` with copy buttons (`invite-copy-code`, `invite-copy-link`); `null` → `players.inviteFailed`.
+- Every player, first block: the table's invite code and plain join link (`table-invite`,
+  `InviteBox` with `idPrefix="table-invite"`: `table-invite-code`, `table-invite-link`, copy buttons
+  `table-invite-copy-code` / `table-invite-copy-link`). The code is the table key, as in the lobby.
 - Waiting players in `players-pending` with `players.pendingHint`.
 - Host, running game: the abort button (`players-abort-game`, plan 03's `AbortGameButton`).
 
@@ -199,8 +202,13 @@ blocked) and the `persist/*` modules. Values are validated on read.
 | `VersionBadge` | `v<version>` link bottom left on every screen, opens `#/changelog` in a new tab (§1) |
 | `stats/*` | `statistics.md` §3 |
 
-Styling: `styles/tokens.css` (colors, `--card-w` etc.), `styles/global.css` (includes a
-`prefers-reduced-motion` rule), one `X.module.css` per component. Dark green felt theme only.
+Styling: `styles/tokens.css` (palette, fonts, textures, `--card-w` etc.), `styles/global.css`
+(oak background with grain, scratches, beer rings and smoke; buttons and text fields; includes a
+`prefers-reduced-motion` rule), one `X.module.css` per component. The theme is a westphalian
+Schänke (dark oak, worn baize table, brass accents); dark only. Headings use `--font-display`
+(Pirata One, bundled as `public/fonts/PirataOne-latin-400.woff2` with its OFL text, `@font-face`
+in `global.css`; serif fallbacks), text uses `--font-body`
+(system sans). Panels are `--panel` with `--grain`; the card table is `--felt` on an oak rim.
 Buttons are ≥ 44 px tap targets. Image URLs come from `assets.ts` (`cardUrl`, `backUrl`,
 `logoUrl`, based on `import.meta.env.BASE_URL`). Card images are preloaded once per page when a
 table opens (`preload.ts`), so tricks and open hands show without delay.

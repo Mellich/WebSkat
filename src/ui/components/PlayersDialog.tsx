@@ -60,6 +60,7 @@ export function PlayersDialog({ view, connection, invite, onClose }: PlayersDial
   }, [onClose]);
 
   const { table, you } = view;
+  const tableLink = joinLink(table.key, `${window.location.origin}${window.location.pathname}`);
   const isHost = you.id === table.hostId;
   const gameRunning = view.game !== null && view.game.phase !== 'finished';
 
@@ -114,6 +115,11 @@ export function PlayersDialog({ view, connection, invite, onClose }: PlayersDial
           <h2>{t('players.title')}</h2>
           <button type="button" onClick={onClose}>{t('common.close')}</button>
         </header>
+
+        <section className={styles.tableInvite} data-testid="table-invite">
+          <p className={styles.label}>{t('players.tableInvite')}</p>
+          <InviteBox idPrefix="table-invite" code={table.key} link={tableLink} />
+        </section>
 
         <div className={styles.list}>
           {table.players.map((p, seat) => {

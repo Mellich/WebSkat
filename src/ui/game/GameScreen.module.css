@@ -75,7 +75,18 @@
   justify-content: center;
   gap: 6px;
   border-radius: 999px;
-  background: radial-gradient(ellipse at center, rgb(255 255 255 / 6%), transparent 70%);
+  /* Worn baize on an oak rim: lighter scuffs, darker edges. */
+  background-color: var(--felt);
+  background-image:
+    radial-gradient(ellipse at 28% 34%, var(--felt-worn), transparent 30%),
+    radial-gradient(ellipse at 74% 70%, var(--felt-worn), transparent 26%),
+    radial-gradient(ellipse at 50% 50%, transparent 52%, rgb(0 0 0 / 50%) 100%),
+    var(--grain);
+  box-shadow:
+    inset 0 0 0 7px var(--wood-light),
+    inset 0 0 0 9px var(--oak-edge),
+    inset 0 10px 26px rgb(0 0 0 / 55%),
+    0 4px 10px rgb(0 0 0 / 40%);
 }
 
 /* The last trick is a bubble over the table area, so it never pushes the hand off screen. */
@@ -92,8 +103,9 @@
   flex-direction: column;
   gap: 4px;
   border-radius: var(--radius);
-  background: var(--panel);
-  box-shadow: 0 4px 14px rgb(0 0 0 / 40%);
+  background-color: var(--panel-solid);
+  border: 1px solid var(--panel-edge);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 50%);
   white-space: nowrap;
   font-size: 0.9rem;
 }
@@ -116,7 +128,10 @@
   gap: 6px;
   padding: 8px 10px;
   border-radius: var(--radius);
-  background: var(--panel);
+  background-color: var(--panel);
+  background-image: var(--grain);
+  border: 1px solid var(--panel-edge);
+  box-shadow: inset 0 1px 0 rgb(255 230 180 / 12%), 0 6px 14px rgb(0 0 0 / 40%);
   min-height: 0;
   max-height: 45dvh;
   overflow: auto;
@@ -226,7 +241,7 @@
     align-self: center;
     z-index: 1;
     max-height: 100%;
-    background: rgb(10 30 16 / 94%);
+    background-color: var(--panel-solid);
   }
 
   .phase {

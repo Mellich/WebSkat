@@ -1,62 +1,74 @@
+/* Start page: the logo under a pub lamp, oak-board cards. One column on phones, two columns from 900px. */
+
 .home {
-  max-width: 640px;
+  width: 100%;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 16px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
 }
 
 .header {
+  grid-column: 1 / -1;
   text-align: center;
+  padding: 8px 0 4px;
+  background: radial-gradient(ellipse at center, rgb(255 200 120 / 20%), transparent 62%);
 }
 
 .logo {
   display: block;
-  width: min(100%, 660px);
-  max-height: 510px;
+  width: min(100%, 560px);
+  max-height: 460px;
   margin: 0 auto;
   object-fit: contain;
+  filter: drop-shadow(0 8px 14px rgb(0 0 0 / 55%));
 }
 
 .header h1 {
-  margin: 8px 0 0;
-  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  margin: 6px 0 0;
+  font-size: clamp(2rem, 6vw, 2.8rem);
 }
 
+/* An oak board with a beer-ring stain in the corner. */
 .card {
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 16px;
   border-radius: var(--radius);
-  background: var(--panel);
-  border: 1px solid rgb(255 255 255 / 10%);
+  background-color: var(--panel);
+  background-image:
+    radial-gradient(circle at 100% 0%, transparent 0 34px, rgb(150 90 40 / 22%) 35px 37px, transparent 39px),
+    var(--grain);
+  border: 1px solid var(--panel-edge);
+  box-shadow: inset 0 1px 0 rgb(255 230 180 / 12%), 0 6px 14px rgb(0 0 0 / 40%);
+}
+
+/* On wide screens the create and join forms sit side by side. */
+.half {
+  grid-column: 1 / -1;
 }
 
 .card h2 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.35rem;
 }
 
 .field {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .field input,
 .field select,
 .inline input,
 .card input[type='text'] {
-  min-height: var(--tap);
-  font: inherit;
-  padding: 0 12px;
-  border-radius: var(--radius);
-  border: 1px solid rgb(255 255 255 / 30%);
-  background: rgb(0 0 0 / 30%);
-  color: var(--ink);
+  width: 100%;
 }
 
 .check {
@@ -64,6 +76,13 @@
   align-items: center;
   gap: 8px;
   min-height: var(--tap);
+  font-size: 1rem;
+}
+
+.check input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
 }
 
 .inline {
@@ -74,9 +93,9 @@
 .inline input {
   flex: 1 1 0;
   min-width: 0;
-  width: 100%;
-  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .inline button {
@@ -108,6 +127,10 @@
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: rgb(0 0 0 / 22%);
+  border: 1px solid rgb(0 0 0 / 35%);
 }
 
 .rowName {
@@ -117,7 +140,8 @@
 }
 
 .localLink {
-  align-self: center;
+  grid-column: 1 / -1;
+  justify-self: center;
   color: var(--accent);
   min-height: var(--tap);
   display: inline-flex;
@@ -125,12 +149,29 @@
 }
 
 .footer {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   text-align: center;
   padding-bottom: 16px;
 }
 
 .footer p {
   margin: 0;
+  max-width: 60ch;
+}
+
+@media (min-width: 900px) {
+  .home {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    padding: 24px;
+  }
+
+  .half {
+    grid-column: auto;
+  }
 }

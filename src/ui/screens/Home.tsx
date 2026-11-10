@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createDirectory, isValidKey, normalizeKey, type Directory, type TableAd } from '../../net';
 import { AboutDialog } from '../components/AboutDialog';
+import { cls } from '../classNames';
 import { logoUrl } from '../assets';
 import { useT } from '../i18n';
 import { hostTable, resumeHostedTable } from '../net/actions';
@@ -150,7 +151,7 @@ export function Home() {
         </section>
       )}
 
-      <form className={styles.card} onSubmit={(e) => { void create(e); }}>
+      <form className={cls(styles.card, styles.half)} onSubmit={(e) => { void create(e); }}>
         <h2>{t('home.createTitle')}</h2>
         <label className={styles.field}>
           <span>{t('home.tableName')}</span>
@@ -163,7 +164,7 @@ export function Home() {
         <button type="submit" data-testid="create-table">{t('home.create')}</button>
       </form>
 
-      <form className={styles.card} onSubmit={join}>
+      <form className={cls(styles.card, styles.half)} onSubmit={join}>
         <h2>{t('home.joinTitle')}</h2>
         <div className={styles.inline}>
           <input

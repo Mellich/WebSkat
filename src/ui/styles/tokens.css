@@ -1,21 +1,48 @@
-/* Design tokens (docs/ui-game-screen.md §2). Dark theme only in v1. */
+/* Design tokens (docs/ui.md §5). A westphalian Schänke: dark oak, worn baize, brass and beer.
+   Dark theme only in v1. Keep text contrast ≥ 4.5:1 on every panel. */
 :root {
-  --felt: #1d5c2e;
-  --felt-dark: #123d1e;
-  --ink: #f4f1e8;
-  --muted: #b9c7b5;
-  --panel: rgb(10 30 16 / 72%);
-  --accent: #f2c14e;
+  /* Wood and tavern */
+  --wood-dark: #1f130a;
+  --wood: #3a2415;
+  --wood-light: #6a4426;
+  --oak-edge: #120a05;
+  --smoke: rgb(20 14 8 / 55%);
+
+  /* Baize (the worn card table) */
+  --felt: #2f4d2d;
+  --felt-dark: #172a16;
+  --felt-worn: rgb(214 186 120 / 9%);
+
+  /* Panels and text */
+  --panel: rgb(34 22 12 / 88%);
+  --panel-solid: #24160c;
+  --panel-edge: rgb(0 0 0 / 55%);
+  --ink: #f5ead2;
+  --muted: #d2bf9c;
+  --accent: #e8ad34;
+  --brass: #b8862b;
+  --pewter: #a9adb2;
   --danger: #e5484d;
-  --suit-red: #d12f2f;
-  --suit-black: #111;
+  --suit-red: #c8322a;
+  --suit-black: #17110c;
+
+  /* Type: headings in Pirata One (blackletter-style, bundled in public/fonts), text stays a readable sans. */
+  --font-display: 'Pirata One', 'Old English Text MT', 'Times New Roman', serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, Menlo, Consolas, monospace;
+
+  /* Textures, all generated in CSS (no image files). */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1  0 0 0 0 0.06  0 0 0 0 0.02  0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* Knife scratches on the oak, as a tiling SVG. */
+  --scratches: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='300'%3E%3Cg fill='none' stroke='%23f5d8a0' stroke-linecap='round' stroke-opacity='0.13'%3E%3Cpath d='M30 40 Q 90 36 150 52'/%3E%3Cpath d='M250 20 L 300 26'/%3E%3Cpath d='M360 150 Q 380 170 412 160' stroke-width='0.8'/%3E%3Cpath d='M60 210 Q 120 200 170 226' stroke-width='0.7'/%3E%3Cpath d='M220 250 L 330 240' stroke-width='1'/%3E%3Cpath d='M120 120 L 132 146' stroke-width='0.6'/%3E%3Cpath d='M300 90 Q 320 96 336 84' stroke-width='0.6'/%3E%3C/g%3E%3C/svg%3E");
 
   --card-w: clamp(44px, min((100vw - 24px) / 5.2, 17dvh), 100px);
   --card-h: calc(var(--card-w) * 178 / 128);
   --card-w-opponent: calc(var(--card-w) * 0.42);
   --card-w-trick: calc(var(--card-w) * 0.95);
 
-  --radius: 10px;
+  --radius: 6px;
   --gap: 8px;
   --tap: 44px;
 }
