@@ -12,7 +12,7 @@ import { strongCard, strongMaxBid } from './strong';
 
 /** The strategy's choice for a view; may in theory be illegal (checked by `botAction`). */
 export function chooseBotAction(view: BotView, level: BotLevel, rand: () => number): GameAction {
-  if (level === 'easy') return easyAction(view, rand);
+  if (level === 'easy' && view.phase !== 'doubling') return easyAction(view, rand);
   switch (view.phase) {
     case 'bidding':
       return auctionAction(view, level === 'strong' ? strongMaxBid(view) : maxBidOf(view.hand));
@@ -22,6 +22,9 @@ export function chooseBotAction(view: BotView, level: BotLevel, rand: () => numb
       return discardAction(view);
     case 'declaring':
       return declareAction(view);
+    case 'doubling':
+      // bots never say Kontra or Re (docs/bots.md §5)
+      return { type: 'no-double' };
     case 'playing':
       return { type: 'play', card: level === 'strong' ? strongCard(view, rand) : heuristicCard(view) };
     case 'finished':

@@ -10,7 +10,7 @@ function ramschState(
   turn: Role,
 ): GameState {
   return {
-    ...newGame(1, { ramschOnPassIn: true }),
+    ...newGame(1, { ramschOnPassIn: true, kontra: false }),
     phase: 'playing',
     ramsch: true,
     hands,

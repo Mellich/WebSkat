@@ -79,6 +79,7 @@ describe('scripted game: Null won without a trick', () => {
       won: true,
       loseValue: null,
       declarerScore: 23,
+      doubling: 1,
     });
   });
 });

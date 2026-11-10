@@ -22,6 +22,8 @@ export const deLog: Record<keyof typeof enLog, string> = {
   'log.skatTaken': '{name} nimmt den Skat auf',
   'log.hand': '{name} spielt Hand',
   'log.declared': '{name} sagt {game} an',
+  'log.kontra': '{name} sagt Kontra',
+  'log.re': '{name} sagt Re',
   'log.aborted': 'Spiel {number} wurde abgebrochen',
   'log.won': '{name} gewinnt {game} ({value}), Augen {declarer} : {defenders}',
   'log.lost': '{name} verliert {game} ({value}), Augen {declarer} : {defenders}',

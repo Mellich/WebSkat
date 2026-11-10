@@ -28,6 +28,7 @@ export type GamePhase =
   | 'skat-decision'
   | 'discarding'
   | 'declaring'
+  | 'doubling'
   | 'playing'
   | 'finished';
 
@@ -47,6 +48,9 @@ export interface BiddingState {
   readonly currentBid: number | null;
   readonly history: readonly BidEvent[];
 }
+
+/** Kontra doubles the game value, Re doubles it again; 1 = neither (skat-rules §14). */
+export type DoubleLevel = 1 | 2 | 4;
 
 export interface TrickPlay {
   readonly role: Role;
@@ -69,6 +73,9 @@ export type GameAction =
   | { readonly type: 'play-hand' }
   | { readonly type: 'discard'; readonly cards: readonly [CardId, CardId] }
   | { readonly type: 'declare'; readonly declaration: Declaration }
+  | { readonly type: 'kontra' }
+  | { readonly type: 're' }
+  | { readonly type: 'no-double' }
   | { readonly type: 'play'; readonly card: CardId };
 
 /** The actions that belong to the bidding phase. */
@@ -85,6 +92,8 @@ export interface GameState {
   readonly pickedUpSkat: boolean;
   readonly discarded: readonly CardId[]; // [] until discarded
   readonly declaration: Declaration | null;
+  readonly doubling: DoubleLevel; // 2 after Kontra, 4 after Re (skat-rules §14)
+  readonly doublePassed: readonly Role[]; // defenders who said no-double
   readonly trick: Trick; // current (possibly empty) trick
   readonly tricks: readonly CompletedTrick[]; // completed tricks, in order
   readonly turn: Role | null; // who must act now
@@ -125,13 +134,15 @@ export type GameResult =
       readonly won: boolean;
       readonly loseValue: number | null; // value that is doubled when lost; null when won
       readonly declarerScore: number; // standard counting, see skat-rules §10.5
+      readonly doubling: DoubleLevel; // Kontra/Re factor, not yet in gameValue or declarerScore (§14)
     };
 
 /** Table rules that change how one game is dealt and played (skat-rules §12). */
 export interface GameOptions {
   readonly ramschOnPassIn: boolean;
+  readonly kontra: boolean; // Kontra and Re after the declaration (skat-rules §14)
 }
-export const DEFAULT_GAME_OPTIONS: GameOptions = { ramschOnPassIn: false };
+export const DEFAULT_GAME_OPTIONS: GameOptions = { ramschOnPassIn: false, kontra: false };
 
 export type GameErrorCode =
   | 'WRONG_PHASE'

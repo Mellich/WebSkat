@@ -172,7 +172,7 @@ describe('Ramsch and Bock', () => {
     // Random bidding: scan seeds until everybody passes and the Ramsch rule plays the game.
     let found: TableState | null = null;
     for (let seed = 1; seed <= 200 && found === null; seed++) {
-      const ramschOn = run(tableWith(3), 'p0', { type: 'set-rules', rules: { ramsch: true, bock: false } });
+      const ramschOn = run(tableWith(3), 'p0', { type: 'set-rules', rules: { ramsch: true, bock: false, kontra: false } });
       const finished = playUntilRecords(run(ramschOn, 'p0', { type: 'start' }, seed), 1, ctxOf(seed), mulberry32(seed));
       if (finished.records[0]?.outcome === 'ramsch') found = finished;
     }
@@ -184,7 +184,7 @@ describe('Ramsch and Bock', () => {
   });
 
   it('marks the deal of a Bock game', () => {
-    const s: TableState = { ...tableWith(3), rules: { ramsch: false, bock: true }, bockGamesLeft: 2 };
+    const s: TableState = { ...tableWith(3), rules: { ramsch: false, bock: true, kontra: false }, bockGamesLeft: 2 };
     expect(last(run(s, 'p0', { type: 'start' }))).toMatchObject({ kind: 'dealt', number: 1, bock: true });
   });
 

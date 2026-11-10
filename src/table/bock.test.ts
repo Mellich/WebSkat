@@ -71,7 +71,7 @@ describe('nextBockGamesLeft (skat-rules §13 B4–B7)', () => {
 });
 
 describe('table flow with Bockrunden', () => {
-  const ON: TableRules = { ramsch: false, bock: true };
+  const ON: TableRules = { ramsch: false, bock: true, kontra: false };
 
   function withRules(s: TableState, rules: TableRules): TableState {
     const result = applyCommand(s, 'p0', { type: 'set-rules', rules }, ctxFor(1));
@@ -89,7 +89,7 @@ describe('table flow with Bockrunden', () => {
   it('turning the rule off clears the remaining Bock games', () => {
     let s = withRules(tableWith(3), ON);
     s = { ...s, bockGamesLeft: 2 };
-    s = withRules(s, { ramsch: false, bock: false });
+    s = withRules(s, { ramsch: false, bock: false, kontra: false });
     expect(s.bockGamesLeft).toBe(0);
   });
 

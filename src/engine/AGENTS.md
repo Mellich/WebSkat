@@ -37,6 +37,7 @@ API). Tests: `docs/dev/testing.md`.
 | `ramsch.ts` | `playModeOf` (Grand mode in a Ramsch), `ramschScores` (numbers in), `scoreRamsch` (skat-rules §12) |
 | `scoring.ts` | `computeScore` (numbers in, for tests), `scoreGame`, `skatPointsForDeclarer` |
 | `legal.ts` | `Legal`, `getLegal`, `enumerateActions` (re-exported by `game.ts`; not in `index.ts`) |
+| `doubling.ts` | `openDoubling`, `applyDoubling`, `defendersOf`: the Kontra/Re window after the declaration (skat-rules §14) |
 | `game.ts` | `newGame(seed, options)`, `applyAction` (the reducer), `isFinished` |
 | `index.ts` | public re-exports |
 | `testing.ts` | test helpers (`hand`, `stateWith`, `apply`, `run`, `afterBidding`, …) |

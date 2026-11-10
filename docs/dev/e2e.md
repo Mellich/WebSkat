@@ -48,7 +48,7 @@ npx playwright test -g "fits phone"    # tests whose title matches
   `startGame(host)`; `waitForHand(page)` (10 cards); `handCards(page)`; `storageKey`,
   `hasHostSnapshot`; `closeAll(players)`.
 - Robot clicker `robotStep(page)`: takes the first option the page offers, in this order:
-  Continue (if allowed), `pickup`, `play-hand`, discard (select two cards, then
+  Continue (if allowed), `pickup`, `play-hand`, `no-double` (doubling window), discard (select two cards, then
   `discard-submit`), declare (first enabled `declare-option-*`, then `declare-submit`),
   `bid-submit` / `bid-hold` / `bid-claim` / `bid-pass`, else the first **enabled** `hand-card-*`
   (illegal cards are disabled buttons).
@@ -86,10 +86,11 @@ viewer win the bidding.
 | Table screen / TopBar | `connection-banner`, `connection-status`, `open-stats`, `open-log`, `open-players`, `open-settings`, `leave-table`, `retry-join` |
 | Game log dialog | `log-dialog`, `log-list`, `log-entry` (one per entry, oldest first) |
 | Players dialog | `players-dialog`, `players-row-<i>`, `replace-<i>`, `replace-with`, `replace-level`, `replace-confirm`, `players-kick-<i>`, `reinvite-<i>`, `invite-code`, `invite-link`, `players-pending`, `players-abort-game` |
-| Lobby | `table-key`, `seat-<i>`, `bot-level-<i>`, `rule-ramsch`, `rule-bock`, `add-bot`, `start-game` |
+| Lobby | `table-key`, `seat-<i>`, `bot-level-<i>`, `rule-ramsch`, `rule-bock`, `rule-kontra`, `add-bot`, `start-game` |
 | Game | `bock-info`, `opponent-seat`, `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `trick-dismiss`, `last-trick`, `status-line`, `bid-summary`, `bid-bubble-left`, `bid-bubble-right`, `bid-bubble-bottom`, `sitting-out`, `sitting-out-you`, `phase-panel`, `hand-card-<CardId>`, `abort-game` (host, player on turn disconnected) |
 | Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass`, `bid-current`, `bid-turn` |
 | Skat / declare | `pickup`, `play-hand`, `discard-submit`, `declare-option-0..5` (♣ ♠ ♥ ♦ Grand Null), `declare-submit` |
+| Kontra / Re | `kontra`, `re`, `no-double` |
 | Result | `result-dialog`, `continue` |
 | Stats / settings | `stats-tab-standings`, `stats-tab-history`, `stats-tab-charts`, `history-row`, `stats-export-csv`, `setting-trick-display`, `setting-bid-bubble` |
 

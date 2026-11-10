@@ -22,6 +22,7 @@ interface ActiveGame {
   seatsAtDeal;            // N when dealt (Seeger bonus)
   recorded: boolean;      // record created
   bock: boolean;          // a Bock game (Bockrunden, skat-rules §13): points count double
+  doubling: 1 | 2 | 4;    // Kontra (2) / Re (4) of this game (skat-rules §14)
 }
 
 interface TableState {
@@ -50,12 +51,12 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 
 | Function | File | Behavior |
 |---|---|---|
-| `createTable({key, name, isPublic, hostId, hostName, maxSeats?})` | `table.ts` | Lobby with the host seated; `maxSeats` clamped to 3..6, default 6; `rules = DEFAULT_RULES` |
+| `createTable({key, name, isPublic, hostId, hostName, maxSeats?})` | `table.ts` | Lobby with the host seated; `maxSeats` clamped to 3..6, default 6; `rules = DEFAULT_RULES` (Kontra off; the host switches it in the lobby) |
 | `applyCommand(s, actor, command, ctx)` | `table.ts` | The reducer: `Result<{state, record}, TableErrorCode>` (§3). Appends the log events of the command (`commandLog`, §4a); a rejected command changes nothing |
 | `appendLog(s, events, at)` | `log.ts` | Numbers the events (`n`, `at`) and keeps the last `LOG_LIMIT` (200). No events: same state |
 | `commandLog(before, after, actor, command, record)` | `logEvents.ts` | The log events of one successful command (§4a) |
-| `dealNext(s, ctx)` | `table.ts` | Removes leavers first (`removeLeavers`), seats pending players; < 3 seated → back to lobby. Dealer = `nextDealerIdx % N`, pointer moves one seat on, `newGame(ctx.seed, { ramschOnPassIn: rules.ramsch })`, roles from the rotation, `ready` = bots |
-| `setRules(s, actor, rules)` | `rules.ts` | Host only, not while a game runs (lobby or finished game); sets `rules`. Turning `bock` off sets `bockGamesLeft = 0`. `DEFAULT_RULES = { ramsch: false, bock: false }` |
+| `dealNext(s, ctx)` | `table.ts` | Removes leavers first (`removeLeavers`), seats pending players; < 3 seated → back to lobby. Dealer = `nextDealerIdx % N`, pointer moves one seat on, `newGame(ctx.seed, { ramschOnPassIn: rules.ramsch, kontra: rules.kontra })`, roles from the rotation, `ready` = bots |
+| `setRules(s, actor, rules)` | `rules.ts` | Host only, not while a game runs (lobby or finished game); sets `ramsch`, `bock` and `kontra`. Turning `bock` off sets `bockGamesLeft = 0`. `DEFAULT_RULES = { ramsch: false, bock: false, kontra: false }` |
 | `triggersBock(result)` | `bock.ts` | True for a played suit or Grand game with `declarerPoints === 60` (60 : 60; Null and Ramsch never) |
 | `nextBockGamesLeft(left, wasBock, triggered)` | `bock.ts` | `max(0, left − (wasBock ? 1 : 0)) + (triggered ? 3 : 0)`; `BOCK_GAMES = 3`, `BOCK_FACTOR = 2` |
 | `tryDeal(s, ctx)` | `table.ts` | Deals the next game when the game is finished and every **connected human** is in `ready` |
@@ -86,7 +87,7 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 | `replace-player {playerId, by}` | host | any time | `by = {kind:'pending', playerId}` (a waiting player) or `{kind:'bot', level}` (new bot `bot-<seq>`, named by `botName`, always ready). The target leaves the table; its seat, role and dealer slot go to the newcomer (`replacePlayer`). A finished game may now be fully ready → `tryDeal` | `NOT_HOST`, `CANNOT_KICK_HOST` (target is the host), `UNKNOWN_PLAYER` (no such seated target, or no such waiting player) |
 | `add-bot` | host | no game or finished | adds `bot-<seq>` named by `botName` (first unused of the pool, `Guguurz` first) at level `normal` | `NOT_HOST`, `GAME_RUNNING`, `TABLE_FULL` |
 | `set-bot-level {playerId, level}` | host | any time | sets that bot's level; used from its next action | `NOT_HOST`, `UNKNOWN_PLAYER`, `NOT_A_BOT` |
-| `set-rules {rules}` | host | no game or finished | `setRules`: replaces `rules` (`{ ramsch }`); applies from the next deal | `NOT_HOST`, `GAME_RUNNING` |
+| `set-rules {rules}` | host | no game or finished | `setRules`: replaces `ramsch`, `bock` and `kontra`; applies from the next deal | `NOT_HOST`, `GAME_RUNNING` |
 | `leave` | anyone | — | pending → removed. Seated + game running → `markLeaving` (seat kept, removed at the next deal). Seated otherwise → removed (< 3 → lobby) | `HOST_CANNOT_LEAVE`, `UNKNOWN_PLAYER` |
 
 `TableErrorCode` = `GameErrorCode` + `NOT_HOST`, `NOT_SEATED`, `NOT_ACTIVE_PLAYER`,
@@ -126,7 +127,7 @@ Joining is not a command: the host calls `addPlayer` when a `join` message arriv
 - Event kinds: `joined` (with `isBot`, `pending`), `reconnected`, `disconnected`, `left`,
   `kicked`, `replaced` (`byId`/`byName`), `dealt` (game number, dealer, `bock`), `bid` (`bid` with
   value, `hold`, `pass`, `claim` = 18), `skat` (`pickedUp`: Skat or Hand), `declared` (the
-  `Declaration`), `aborted`, `ramsch` (everybody passed, the game is a Ramsch), `bock-started`
+  `Declaration`), `doubled` (`level` 2 = Kontra, 4 = Re; `no-double` is not logged), `aborted`, `ramsch` (everybody passed, the game is a Ramsch), `bock-started`
   (`games`: the 60 : 60 game starts the next `BOCK_GAMES` = 3 Bock games), `result` (`played`,
   `passed-in` or `ramsch`; for a played game declarer, game kind, won, game value, card points,
   none for Null; for a Ramsch `loserNames` and `durchmarschName`).

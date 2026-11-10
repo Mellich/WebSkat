@@ -56,6 +56,7 @@ export async function robotStep(page: Page, options: { continueAfterResult: bool
     return clickIfEnabled(page.getByTestId('declare-submit'));
   }
 
+  if (await clickIfEnabled(page.getByTestId('no-double'))) return true;
   for (const id of ['bid-submit', 'bid-hold', 'bid-claim', 'bid-pass']) {
     if (await clickIfEnabled(page.getByTestId(id))) return true;
   }

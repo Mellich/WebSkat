@@ -12,6 +12,9 @@ export interface Legal {
   canClaim?: boolean | undefined;
   canPickUp?: boolean | undefined;
   canPlayHand?: boolean | undefined;
+  canKontra?: boolean | undefined;
+  canRe?: boolean | undefined;
+  canNoDouble?: boolean | undefined;
   discardFrom?: CardId[] | undefined;
   declarations?: Declaration[] | undefined;
   playableCards?: CardId[] | undefined;
@@ -44,6 +47,10 @@ export function getLegal(state: GameState, role: Role): Legal {
       return { discardFrom: [...state.hands[role]] };
     case 'declaring':
       return { declarations: declarationOptions(!state.pickedUpSkat) };
+    case 'doubling':
+      return state.doubling === 1
+        ? { canKontra: true, canNoDouble: true }
+        : { canRe: true, canNoDouble: true };
     case 'playing': {
       const mode = playModeOf(state);
       return mode === null ? {} : { playableCards: legalCards(state.hands[role], state.trick, mode) };
@@ -76,6 +83,15 @@ export function enumerateActions(state: GameState, role: Role): GameAction[] {
   }
   if (legal.canPlayHand) {
     actions.push({ type: 'play-hand' });
+  }
+  if (legal.canKontra) {
+    actions.push({ type: 'kontra' });
+  }
+  if (legal.canRe) {
+    actions.push({ type: 're' });
+  }
+  if (legal.canNoDouble) {
+    actions.push({ type: 'no-double' });
   }
   const pool = legal.discardFrom ?? [];
   pool.forEach((a, i) => {

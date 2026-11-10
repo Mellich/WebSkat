@@ -78,8 +78,8 @@ describe('host snapshots in localStorage', () => {
     storage.setItem(key, JSON.stringify(old));
 
     const loaded = loadHostSnapshot(storage, 'TESTKEY');
-    expect(loaded?.table.rules).toEqual({ ramsch: false, bock: false });
-    expect(loaded?.table.game?.engine.options).toEqual({ ramschOnPassIn: false });
+    expect(loaded?.table.rules).toEqual({ ramsch: false, bock: false, kontra: false });
+    expect(loaded?.table.game?.engine.options).toEqual({ ramschOnPassIn: false, kontra: false });
     expect(loaded?.table.game?.engine.ramsch).toBe(false);
     expect(loaded?.table.records[0]?.ramsch).toBeNull();
   });
@@ -108,10 +108,34 @@ describe('host snapshots in localStorage', () => {
     storage.setItem(key, JSON.stringify(old));
 
     const loaded = loadHostSnapshot(storage, 'TESTKEY');
-    expect(loaded?.table.rules).toEqual({ ramsch: false, bock: false });
+    expect(loaded?.table.rules).toEqual({ ramsch: false, bock: false, kontra: false });
     expect(loaded?.table.bockGamesLeft).toBe(0);
     expect(loaded?.table.game?.bock).toBe(false);
     expect(loaded?.table.records[0]).toMatchObject({ bock: false, bockTriggered: false });
+  });
+
+  it('upgrades a snapshot from before Kontra and Re', () => {
+    const storage = memoryStorage();
+    const table = passedInTable();
+    saveHostSnapshot(storage, snapshotOf(table));
+    const key = storage.key(0);
+    if (key === null) throw new Error('nothing saved');
+    const old = JSON.parse(JSON.stringify(snapshotOf(table))) as {
+      table: {
+        game: { engine: { doubling?: unknown; doublePassed?: unknown } };
+        records: { doubling?: unknown }[];
+      };
+    };
+    delete old.table.game.engine.doubling;
+    delete old.table.game.engine.doublePassed;
+    for (const record of old.table.records) delete record.doubling;
+    storage.setItem(key, JSON.stringify(old));
+
+    const loaded = loadHostSnapshot(storage, 'TESTKEY');
+    expect(loaded?.table.game?.engine).toMatchObject({ doubling: 1, doublePassed: [] });
+    expect(loaded?.table.game?.engine.options.kontra).toBe(false);
+    expect(loaded?.table.rules.kontra).toBe(false);
+    expect(loaded?.table.records[0]?.doubling).toBe(1);
   });
 
   it('returns the snapshot that was saved', () => {

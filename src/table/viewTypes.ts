@@ -11,6 +11,7 @@ import type {
   Role,
   Suit,
 } from '../engine';
+import type { DoubleLevel } from '../engine';
 import type { LogEntry } from './log';
 import type { BotLevel, PlayerId, TableRules, TableStatus } from './types';
 
@@ -70,6 +71,7 @@ export interface GameView {
   readonly phase: GamePhase;
   readonly ramsch: boolean; // a Ramsch is played or was played (no declarer)
   readonly bock: boolean; // a Bock game: points count double (skat-rules §13)
+  readonly doubling: DoubleLevel; // 2 after Kontra, 4 after Re (skat-rules §14)
   readonly dealerId: PlayerId;
   readonly roles: Readonly<Record<Role, PlayerId>>;
   readonly sittingOut: readonly PlayerId[];

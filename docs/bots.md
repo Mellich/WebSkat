@@ -233,6 +233,8 @@ therefore takes no `rand`. Skat decision, discard and declare as in §4.4. Card 
 
 ## 7. Integration with table, protocol and UI
 
+Kontra and Re: every bot level answers the doubling window with `no-double` (`bot/index.ts`, `chooseBotAction`). Bots never say Kontra or Re, so the easy level is not random there.
+
 (Phase 13 first stored one strength per table; Phase 14 replaced it with one strength per bot.)
 
 - `src/table/types.ts`: `export type BotLevel = 'easy' | 'normal' | 'strong'`;

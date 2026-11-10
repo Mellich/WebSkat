@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { makeRecord, seegerBonus } from './records';
 import { DIAMONDS_LOST, GRAND_144, NULL_OUVERT_WON, finishedGame } from './fixtures';
 import { ctxFor, tableWith } from './testing';
+import type { DoubleLevel, GameResult } from '../engine';
+
+/** A played result with a Kontra/Re level (the fixtures are typed as the whole union). */
+function withDoubling(result: GameResult, doubling: DoubleLevel): GameResult {
+  if (result.kind !== 'played') throw new Error('test data: not a played game');
+  return { ...result, doubling };
+}
 
 describe('seegerBonus', () => {
   it.each([
@@ -148,5 +155,38 @@ describe('makeRecord Bock doubling (skat-rules §13.1 B1–B3)', () => {
     const record = makeRecord(table, bockGame(finishedGame(table, roles, { kind: 'passed-in' }, 6)), ctxFor(0));
     expect(record).toMatchObject({ bock: true, bockTriggered: false });
     expect(record.scores.standard).toEqual({ [a]: 0, [b]: 0, [c]: 0 });
+  });
+});
+
+describe('makeRecord with Kontra and Re (skat-rules §14)', () => {
+  const table = tableWith(3);
+  const [a, b, c] = table.players.map((p) => p.id) as [string, string, string];
+  const roles = { forehand: a, middlehand: b, hindhand: c };
+
+  it('Kontra doubles a won Grand: declarer +288 standard, +338 Seeger; the record keeps the level', () => {
+    const game = finishedGame(table, roles, withDoubling(GRAND_144, 2), 1);
+    const record = makeRecord(table, game, ctxFor(0));
+    expect(record.doubling).toBe(2);
+    expect(record.scores.standard).toEqual({ [a]: 288, [b]: 0, [c]: 0 });
+    expect(record.scores.seeger).toEqual({ [a]: 338, [b]: 0, [c]: 0 });
+  });
+
+  it('Re quadruples a lost Diamonds game; defenders keep the Seeger bonus of 40', () => {
+    const game = finishedGame(table, roles, withDoubling(DIAMONDS_LOST, 4), 2);
+    const record = makeRecord(table, game, ctxFor(0));
+    expect(record.doubling).toBe(4);
+    expect(record.scores.standard).toEqual({ [a]: -216, [b]: 0, [c]: 0 });
+    expect(record.scores.seeger).toEqual({ [a]: -266, [b]: 40, [c]: 40 });
+  });
+
+  it('Kontra in a Bock game multiplies both factors: 2 × 2 = 4', () => {
+    const game = { ...finishedGame(table, roles, withDoubling(GRAND_144, 2), 3), bock: true };
+    const record = makeRecord(table, game, ctxFor(0));
+    expect(record.scores.standard).toEqual({ [a]: 576, [b]: 0, [c]: 0 });
+  });
+
+  it('a game without Kontra has the factor 1', () => {
+    const record = makeRecord(table, finishedGame(table, roles, GRAND_144, 4), ctxFor(0));
+    expect(record.doubling).toBe(1);
   });
 });

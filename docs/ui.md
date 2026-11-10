@@ -41,8 +41,7 @@ Top to bottom:
 2. Name input (stored in settings; 1–20 chars; required for create/join).
 3. "Rejoin" card when a client session (`webskat.session`) or host snapshots
    (`webskat.host.*`) exist: "Rejoin table KEY" and "Resume hosted table KEY" buttons.
-4. **Create a table**: table name (default "<name>'s table", max 40) and "List publicly". No seat
-   count, no bot strength. Calls `hostTable` and opens `#/t/KEY` (`create-table`).
+4. **Create a table**: table name (default "<name>'s table", max 40), "List publicly". No seat count, no bot strength. Calls `hostTable` and opens `#/t/KEY` (`create-table`).
 5. **Join with a key**: input (`join-key-input`, upper-cased while typing) + optional invite code
    (`join-invite-input`, `home.inviteCode`) + Join (`join-submit`); invalid key → inline error
    `home.invalidKey`; invalid invite → `home.invalidInvite`; valid → `#/t/KEY?invite=CODE`.
@@ -68,7 +67,7 @@ exists, Home navigates to that table (`decisions.md` I80).
   joins again with the stored session. `INVITE_INVALID` has its own text.
 - `TableLobby` shows the key, the seats (bot strength per bot for the host), the "Table rules"
   section (`lobby.rules`: the host's checkboxes `rule-ramsch` ("Ramsch when everybody passes") and
-  `rule-bock` ("Bockrunden (60:60 → next 3 games count double)"); the others read "on"/"off"), and the host's Add bot / Start buttons. The rule checkbox is disabled while a
+  `rule-bock` ("Bockrunden (60:60 → next 3 games count double)") and `rule-kontra` ("Kontra and Re (doubling after the declaration)"); the others read "on"/"off"), and the host's Add bot / Start buttons. The rule checkbox is disabled while a
   game runs.
 - Shows `TableLobby` while `view.table.status === 'lobby'`, the viewer is `pending`, or there is
   no game; otherwise `GameScreen` (keyed by game number, so each game starts with fresh local

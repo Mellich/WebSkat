@@ -40,7 +40,7 @@ function migrateRamschRule(parsed: unknown): void {
     const engine = game.engine;
     if (typeof engine === 'object' && engine !== null) {
       const e = engine as Record<string, unknown>;
-      if (!('options' in e)) e.options = { ramschOnPassIn: false };
+      if (!('options' in e)) e.options = { ramschOnPassIn: false, kontra: false };
       if (!('ramsch' in e)) e.ramsch = false;
     }
   }
@@ -89,10 +89,49 @@ function migrateLog(parsed: unknown): void {
   if (!Array.isArray(t.log)) t.log = [];
 }
 
+/**
+ * Snapshots before Kontra and Re (protocol 8) have no Kontra table rule (off), no doubling window
+ * (level 1, no defender passed), and finished played results and records have factor 1.
+ */
+function migrateDoubling(parsed: unknown): void {
+  if (typeof parsed !== 'object' || parsed === null || !('table' in parsed)) return;
+  const table = parsed.table;
+  if (typeof table !== 'object' || table === null) return;
+  const t = table as Record<string, unknown>;
+  const rules = t.rules;
+  if (typeof rules === 'object' && rules !== null && !('kontra' in rules)) {
+    (rules as Record<string, unknown>).kontra = false;
+  }
+  const game = t.game;
+  if (typeof game === 'object' && game !== null && 'engine' in game) {
+    const engine = (game as Record<string, unknown>).engine;
+    if (typeof engine === 'object' && engine !== null) {
+      const e = engine as Record<string, unknown>;
+      const options = e.options;
+      if (typeof options === 'object' && options !== null && !('kontra' in options)) {
+        (options as Record<string, unknown>).kontra = false;
+      }
+      if (!('doubling' in e)) e.doubling = 1;
+      if (!('doublePassed' in e)) e.doublePassed = [];
+      const result = e.result;
+      if (typeof result === 'object' && result !== null && !('doubling' in result)) {
+        (result as Record<string, unknown>).doubling = 1;
+      }
+    }
+  }
+  if (!Array.isArray(t.records)) return;
+  for (const record of t.records as unknown[]) {
+    if (typeof record === 'object' && record !== null && !('doubling' in record)) {
+      (record as Record<string, unknown>).doubling = 1;
+    }
+  }
+}
+
 /** Runs every migration step on a parsed snapshot. */
 export function migrateSnapshot(parsed: unknown): void {
   migrateBotLevel(parsed);
   migrateRamschRule(parsed);
   migrateBockRule(parsed);
   migrateLog(parsed);
+  migrateDoubling(parsed);
 }

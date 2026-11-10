@@ -35,7 +35,7 @@ describe.each([
 
 /** Everybody passes, so the game becomes a Ramsch (skat-rules §12). */
 function ramschStart(seed: number): GameState {
-  let state = newGame(seed, { ramschOnPassIn: true });
+  let state = newGame(seed, { ramschOnPassIn: true, kontra: false });
   for (const role of ['middlehand', 'hindhand', 'forehand'] as const) {
     const result = applyAction(state, role, { type: 'pass' });
     if (!result.ok) throw new Error(result.error.message);

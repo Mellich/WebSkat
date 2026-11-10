@@ -50,8 +50,8 @@ All implementation phases 0–14 of the original plan are done (archive: `histor
 
 ## 4. Out of scope
 
-- Kontra/Re and other house rules (only ISkO rules, plus the strict bidding house rule, plus the
-  table rules Ramsch, `skat-rules.md` §12, and Bockrunden, `skat-rules.md` §13).
+- Other house rules. Only the ISkO rules, the strict bidding house rule, the table rules Ramsch
+  (`skat-rules.md` §12) and Bockrunden (§13), and Kontra/Re (§14) are implemented.
 - Accounts, server-side storage, chat, voice, spectators, host migration, turn timers, sounds.
 - Protection against a cheating **host** (the host's browser holds all cards).
 

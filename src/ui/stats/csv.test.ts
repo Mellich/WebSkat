@@ -17,6 +17,7 @@ const RECORD: GameRecord = {
   outcome: 'passed-in',
   bock: false,
   bockTriggered: false,
+  doubling: 1,
   declarerId: null,
   bid: null,
   game: null,

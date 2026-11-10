@@ -20,6 +20,8 @@ export const enLog = {
   'log.skatTaken': '{name} picks up the Skat',
   'log.hand': '{name} plays Hand',
   'log.declared': '{name} announces {game}',
+  'log.kontra': '{name} says Kontra',
+  'log.re': '{name} says Re',
   'log.aborted': 'Game {number} was aborted',
   'log.won': '{name} won {game} ({value}), card points {declarer} : {defenders}',
   'log.lost': '{name} lost {game} ({value}), card points {declarer} : {defenders}',

@@ -30,6 +30,8 @@ const TrickSchema = z.object({
   plays: z.array(z.object({ playerId: id, card: CardIdSchema })),
 });
 
+const DoubleLevelSchema = z.union([z.literal(1), z.literal(2), z.literal(4)]);
+
 const LegalSchema = z.object({
   bidValues: z.array(z.number().int()).optional(),
   canPassBid: z.boolean().optional(),
@@ -37,6 +39,9 @@ const LegalSchema = z.object({
   canClaim: z.boolean().optional(),
   canPickUp: z.boolean().optional(),
   canPlayHand: z.boolean().optional(),
+  canKontra: z.boolean().optional(),
+  canRe: z.boolean().optional(),
+  canNoDouble: z.boolean().optional(),
   discardFrom: cards.optional(),
   declarations: z.array(DeclarationSchema).optional(),
   playableCards: cards.optional(),
@@ -82,14 +87,16 @@ const ViewResultSchema: z.ZodType<ViewResult> = z.union([
     won: z.boolean(),
     loseValue: z.number().int().nullable(),
     declarerScore: z.number().int(),
+    doubling: DoubleLevelSchema,
   }),
 ]);
 
 const GameViewSchema: z.ZodType<GameView> = z.object({
   number: z.number().int().min(1),
-  phase: z.enum(['bidding', 'skat-decision', 'discarding', 'declaring', 'playing', 'finished']),
+  phase: z.enum(['bidding', 'skat-decision', 'discarding', 'declaring', 'doubling', 'playing', 'finished']),
   ramsch: z.boolean(),
   bock: z.boolean(),
+  doubling: DoubleLevelSchema,
   dealerId: id,
   roles,
   sittingOut: playerIds,
@@ -143,7 +150,7 @@ export const TableViewSchema: z.ZodType<TableView> = z.object({
     pending: z.array(PlayerPublicSchema),
     nextDealerId: nullableId,
     readyIds: playerIds,
-    rules: z.object({ ramsch: z.boolean(), bock: z.boolean() }),
+    rules: z.object({ ramsch: z.boolean(), bock: z.boolean(), kontra: z.boolean() }),
     bockGamesLeft: z.number().int().min(0),
   }),
   you: z.object({
@@ -192,5 +199,7 @@ export const GameRecordSchema: z.ZodType<GameRecord> = z.object({
   // records cached before the Bockrunden rule have no flags: they read as false
   bock: z.boolean().default(false),
   bockTriggered: z.boolean().default(false),
+  // records cached before Kontra and Re have no factor: they read as 1
+  doubling: DoubleLevelSchema.default(1),
 });
 

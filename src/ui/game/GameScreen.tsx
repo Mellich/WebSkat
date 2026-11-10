@@ -20,6 +20,7 @@ import { declarerSummary } from './declarerSummary';
 import { StatusArea } from './StatusArea';
 import { ResultDialog } from './ResultDialog';
 import { SkatDecision, DiscardPanel } from './SkatPanels';
+import { DoublingPanel } from './DoublingPanel';
 import { namesById, opponentsOf, type SeatedView } from './seats';
 import { useBidBubbles } from './useBidBubbles';
 import { useShownTrick } from './useShownTrick';
@@ -181,6 +182,15 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
             }}
           />
         ) : <p>{t('declare.waiting', { name: declarer })}</p>;
+      case 'doubling':
+        return (
+          <DoublingPanel
+            legal={game.legal}
+            isMine={myTurn}
+            waitingFor={game.turnId === null ? '' : nameOf(game.turnId)}
+            send={send}
+          />
+        );
       case 'playing':
       case 'finished':
         return null;

@@ -66,6 +66,8 @@ export function ResultDialog({ view, result, record, scoring, onContinue }: Resu
       ) : (
         <p>{t('result.calc', { base: result.base, multiplier: result.multiplier ?? 0, value: result.gameValue })}</p>
       )}
+      {result.doubling === 2 ? <p>{t('result.kontra')}</p> : null}
+      {result.doubling === 4 ? <p>{t('result.re')}</p> : null}
       <p>{t('result.points', { declarer: result.declarerPoints, defender: result.defenderPoints })}</p>
       <p>{t('result.tricks', { declarer: result.declarerTricks, defender: result.defenderTricks })}</p>
       {game?.skat === null || game?.skat === undefined ? null : (

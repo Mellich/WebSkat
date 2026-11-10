@@ -9,7 +9,7 @@ import type { GameRecord, TableRules, TableState } from './types';
 const GAMES = 50;
 
 /** A table where every seat, the host included, is a bot: nobody has to press "ready". */
-function botTable(n: number, rules: TableRules = { ramsch: false, bock: false }): TableState {
+function botTable(n: number, rules: TableRules = { ramsch: false, bock: false, kontra: false }): TableState {
   const base = tableWith(n);
   return { ...base, rules, players: base.players.map((p) => ({ ...p, isBot: true })) };
 }
@@ -127,7 +127,7 @@ describe('per-bot strength', () => {
 
 describe('bot-only table with the Ramsch rule', () => {
   it(`plays ${String(GAMES)} games to the end, Ramsch games included`, () => {
-    const table = playBotGames(3, 303, { ramsch: true, bock: false });
+    const table = playBotGames(3, 303, { ramsch: true, bock: false, kontra: false });
     expect(table.records).toHaveLength(GAMES);
     expect(table.records.filter((r) => r.outcome === 'ramsch').length).toBeGreaterThan(0);
     expect(table.records.filter((r) => r.outcome === 'passed-in').length).toBe(0);

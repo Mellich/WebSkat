@@ -7,7 +7,7 @@ import { apply, hand, PASS, run, stateWith } from './testing';
 import type { GameState, Role } from './types';
 import { DEFAULT_GAME_OPTIONS } from './types';
 
-const RAMSCH = { ramschOnPassIn: true };
+const RAMSCH = { ramschOnPassIn: true, kontra: false };
 
 function perRole(forehand: number, middlehand: number, hindhand: number): Record<Role, number> {
   return { forehand, middlehand, hindhand };

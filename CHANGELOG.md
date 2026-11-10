@@ -7,6 +7,16 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [0.11.0] - 2026-11-10
+
+### Added
+
+- Kontra and Re, an optional table rule (`skat-rules.md` §14). The host switches it in the lobby, like Ramsch and Bockrunden, between games. After the declaration the defenders may say Kontra (doubles the game, once), and the declarer may answer Re (doubles again). Either side may decline. Kontra and Re also multiply the scores of Bock games. Bots never say Kontra or Re.
+
+### Changed
+
+- Protocol version 8: the actions `kontra`, `re` and `no-double`, the phase `doubling`, the table rule `kontra` in the `set-rules` command and in views, and the Kontra/Re level in results, records and the game log. Old host snapshots are upgraded on load; clients of the previous version cannot join.
+
 ## [0.10.1] - 2026-11-10
 
 ### Fixed

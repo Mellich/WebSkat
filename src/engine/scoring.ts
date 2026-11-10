@@ -127,6 +127,7 @@ export function scoreGame(state: GameState): GameResult {
     defenderPoints,
     declarerTricks,
     defenderTricks,
+    doubling: state.doubling,
     ...score,
   };
 }

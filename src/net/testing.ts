@@ -23,6 +23,7 @@ export function nextCommand(view: TableView | null): TableCommand | null {
   }
   if (legal.canPassBid === true) return { type: 'game', action: { type: 'pass' } };
   if (legal.canPickUp === true) return { type: 'game', action: { type: 'pickup-skat' } };
+  if (legal.canNoDouble === true) return { type: 'game', action: { type: 'no-double' } };
   const discard = legal.discardFrom;
   if (discard !== undefined && discard.length >= 2) {
     const [a, b] = discard;

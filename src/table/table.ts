@@ -74,7 +74,7 @@ export function createTable(args: {
     gameCounter: 0,
     game: null,
     ready: [],
-    rules: DEFAULT_RULES,
+    rules: { ...DEFAULT_RULES },
     bockGamesLeft: 0,
     records: [],
     seq: 0,
@@ -100,7 +100,7 @@ export function dealNext(state: TableState, ctx: Ctx): TableState {
   const rotation = rolesForDealer(seated, dealerIdx);
   const game: ActiveGame = {
     number: s.gameCounter + 1,
-    engine: newGame(ctx.seed, { ramschOnPassIn: s.rules.ramsch }),
+    engine: newGame(ctx.seed, { ramschOnPassIn: s.rules.ramsch, kontra: s.rules.kontra }),
     roles: rotation.roles,
     sittingOut: rotation.sittingOut,
     dealerId: rotation.dealerId,

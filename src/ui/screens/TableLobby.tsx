@@ -142,6 +142,18 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
               />{' '}
               {t('lobby.ruleBock')}
             </label>
+            <label className={styles.rule}>
+              <input
+                type="checkbox"
+                data-testid="rule-kontra"
+                checked={table.rules.kontra}
+                disabled={gameRunning}
+                onChange={(e) => {
+                  connection.send({ type: 'set-rules', rules: { ...table.rules, kontra: e.target.checked } });
+                }}
+              />{' '}
+              {t('lobby.ruleKontra')}
+            </label>
           </>
         ) : (
           <>
@@ -150,6 +162,9 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
             </p>
             <p className={styles.hint}>
               {t('lobby.ruleBock')}: {table.rules.bock ? t('lobby.ruleOn') : t('lobby.ruleOff')}
+            </p>
+            <p className={styles.hint} data-testid="rule-kontra-status">
+              {t('lobby.ruleKontra')}: {table.rules.kontra ? t('lobby.ruleOn') : t('lobby.ruleOff')}
             </p>
           </>
         )}

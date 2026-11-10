@@ -56,6 +56,7 @@ bidding panel is two short lines; `DeclarationPicker` tiles are 3 × 2.
 | `skat-decision` | `SkatDecision`: **Pick up Skat** (`pickup`), **Play Hand** (`play-hand`) | "X won the bidding with N" |
 | `discarding` | `DiscardPanel`: "n of 2 selected" + **Discard** (`discard-submit`, enabled with exactly 2). The hand shows 12 cards, the two Skat cards highlighted; tapping toggles selection (max 2) | "Waiting for X" |
 | `declaring` | `DeclarationPicker` (§4) | "Waiting for X to declare the game…" |
+| `doubling` | `DoublingPanel` (`DoublingPanel.tsx`): **Kontra** (`kontra`, defenders, once), **Re** (`re`, declarer after Kontra), **No Kontra** / **No Re** (`no-double`) | "Waiting for X" |
 | `playing`, `finished` | no panel | — |
 
 During bidding the hand is shown at full brightness but not clickable (`showAll`).
@@ -113,7 +114,7 @@ dialog comes first; the confirmed click sends `abort-game`, and the next game is
 
 A Bock game (played or Ramsch, not passed in) shows "Bock game: points doubled."; a 60 : 60 game
 that starts Bock games shows "60 : 60 — the next 3 games are Bock games." Both lines come from the
-record (`bock`, `bockTriggered`), below the result text.
+record (`bock`, `bockTriggered`), below the result text. Kontra and Re add a line each ("Kontra: points doubled." / "Re: points quadrupled.") above the points.
 
 A bottom sheet whose backdrop lets clicks through, so TopBar (Stats, Settings) stays usable.
 

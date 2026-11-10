@@ -1,4 +1,5 @@
 import { applyBid, biddingOutcome, initialBidding } from './bidding';
+import { applyDoubling, openDoubling } from './doubling';
 import { validateDeclaration } from './declaration';
 import { deal } from './deck';
 import { playCard } from './play';
@@ -31,6 +32,8 @@ export function newGame(seed: number, options: GameOptions = DEFAULT_GAME_OPTION
     pickedUpSkat: false,
     discarded: [],
     declaration: null,
+    doubling: 1,
+    doublePassed: [],
     trick: { leader: 'forehand', plays: [] },
     tricks: [],
     turn: 'middlehand',
@@ -70,6 +73,8 @@ export function applyAction(
       return applyDiscarding(state, role, action);
     case 'declaring':
       return applyDeclaring(state, role, action);
+    case 'doubling':
+      return applyDoubling(state, role, action);
     case 'playing':
       return applyPlaying(state, role, action);
     case 'finished':
@@ -193,13 +198,10 @@ function applyDeclaring(
   if (!declared.ok) {
     return declared;
   }
-  return ok({
-    ...state,
-    declaration: declared.value,
-    phase: 'playing',
-    trick: { leader: 'forehand', plays: [] },
-    turn: 'forehand',
-  });
+  if (state.declarer === null) {
+    return wrongPhase();
+  }
+  return ok(openDoubling({ ...state, declaration: declared.value }, state.declarer));
 }
 
 function applyPlaying(

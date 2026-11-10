@@ -103,12 +103,12 @@ describe('views of a Ramsch', () => {
 
   it('hides the Skat while the Ramsch is still being played', () => {
     const table = tableWith(3);
-    const engine = { ...newGame(9, { ramschOnPassIn: true }), ramsch: true, phase: 'playing' as const, turn: 'forehand' as const };
+    const engine = { ...newGame(9, { ramschOnPassIn: true, kontra: false }), ramsch: true, phase: 'playing' as const, turn: 'forehand' as const };
     const game = { ...ramschGame(table, ROLES3), engine };
     expect(viewFor({ ...table, game }, 'p1').game?.skat).toBeNull();
   });
 
   it('gives the rules to the table view', () => {
-    expect(viewFor(tableWith(3), 'p1').table.rules).toEqual({ ramsch: false, bock: false });
+    expect(viewFor(tableWith(3), 'p1').table.rules).toEqual({ ramsch: false, bock: false, kontra: false });
   });
 });

@@ -78,5 +78,6 @@ export const enPanels = {
   'lobby.ruleRamsch': 'Ramsch when everybody passes',
   'lobby.ruleBock': 'Bockrunden (60:60 → next 3 games count double)',
   'lobby.ruleOn': 'on',
+  'lobby.ruleKontra': 'Kontra and Re (doubling after the declaration)',
   'lobby.ruleOff': 'off',
 } as const;

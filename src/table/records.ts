@@ -14,7 +14,7 @@ import {
 
 type RecordBase = Pick<
   GameRecord,
-  'id' | 'number' | 'timestamp' | 'tableSize' | 'dealerId' | 'roles' | 'sittingOut' | 'names' | 'bock' | 'bockTriggered'
+  'id' | 'number' | 'timestamp' | 'tableSize' | 'dealerId' | 'roles' | 'sittingOut' | 'names' | 'bock' | 'bockTriggered' | 'doubling'
 >;
 type PlayedResult = Extract<GameResult, { kind: 'played' }>;
 type RamschResult = Extract<GameResult, { kind: 'ramsch' }>;
@@ -52,7 +52,7 @@ function zeroes(ids: readonly PlayerId[]): Record<PlayerId, number> {
   return Object.fromEntries(ids.map((id) => [id, 0]));
 }
 
-/** Score deltas of a played game; `factor` doubles the game value part in a Bock game (§13). */
+/** Score deltas of a played game; `factor` is Bock (§13) times Kontra/Re (§14) on the game value part. */
 function scoresFor(
   ids: readonly PlayerId[],
   declarerId: PlayerId,
@@ -153,11 +153,12 @@ export function makeRecord(
   ctx: Ctx,
   bockTriggered = false,
 ): GameRecord {
-  const factor = game.bock ? BOCK_FACTOR : 1;
   const result = game.engine.result;
   if (result === null) {
     throw new Error('makeRecord needs a finished game');
   }
+  const doubling = result.kind === 'played' ? result.doubling : 1;
+  const factor = (game.bock ? BOCK_FACTOR : 1) * doubling;
   const ids = table.players.map((p) => p.id);
   const base: RecordBase = {
     id: `${table.key}-${String(game.number)}`,
@@ -170,6 +171,7 @@ export function makeRecord(
     names: Object.fromEntries(table.players.map((p) => [p.id, p.name])),
     bock: game.bock,
     bockTriggered,
+    doubling,
   };
   if (result.kind === 'passed-in') {
     return passedInRecord(base, ids);

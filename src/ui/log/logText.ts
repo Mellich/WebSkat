@@ -73,6 +73,8 @@ export function logText(entry: LogEntry, t: Translator): string {
       return t('log.ramsch');
     case 'bock-started':
       return t('log.bockStarted', { games: entry.games });
+    case 'doubled':
+      return t(entry.level === 2 ? 'log.kontra' : 'log.re', { name: entry.name });
     case 'aborted':
       return t('log.aborted', { number: entry.number });
     case 'result':

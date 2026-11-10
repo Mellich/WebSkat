@@ -36,7 +36,7 @@ function choose(actions: readonly GameAction[], random: () => number): GameActio
 function playOne(seed: number): { ramsch: boolean } {
   const label = `seed ${String(seed)}`;
   const random = mulberry32(seed * 104729 + 3);
-  let state: GameState = newGame(seed, { ramschOnPassIn: true });
+  let state: GameState = newGame(seed, { ramschOnPassIn: true, kontra: false });
   for (let step = 0; !isFinished(state); step++) {
     check(step < MAX_STEPS, label, 'game did not finish');
     const turn = state.turn;

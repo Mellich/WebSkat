@@ -1,8 +1,8 @@
 # Skat rules and scoring (single source of truth)
 
 Based on the International Skat Order (ISkO) and the German Wikipedia articles *Skat* and
-*Skatabrechnung*. **Implement exactly this.** The only house rule is the strictly ascending
-bidding of §4.1 (user request); do not add others. If a case is not covered, choose the simplest
+*Skatabrechnung*. **Implement exactly this.** The house rules are the strictly ascending
+bidding of §4.1, the table rules of §12–§13 and Kontra/Re of §14 (user requests); do not add others. If a case is not covered, choose the simplest
 behavior and record it in `decisions.md`. Never change a number here unless the user asks.
 
 Code comments and tests cite this file as `skat-rules §N` (e.g. `skat-rules §10.7`). **Do not
@@ -399,6 +399,8 @@ dealt → bidding ──(all passed)──▶ passed-in (finished, no result)
           │ hand                                          ▲
           └───────────────────────────────────────────────┘
                                                           ▼ declare
+                                                       doubling (Kontra / Re, §14)
+                                                          ▼ window closes
                                                        playing (10 tricks; Null may end early)
                                                           ▼
                                                        finished (GameResult)
@@ -463,3 +465,44 @@ winner of the last trick (it is not a trick). The three totals add up to 120.
 | B5 | Counter: 3 left, a Bock game without trigger | → 2 left | |
 | B6 | Counter: 2 left, a Bock game ending 60 : 60 | → 2 − 1 + 3 = 4 left | |
 | B7 | Counter: 1 left, a passed-in Bock game | → 0 left | |
+
+## 14. Kontra and Re (house rule, added on user request)
+
+Not part of the ISkO. A table rule, off by default: it is switched on only when the table is created
+(the host switches it in the lobby between games, like Ramsch and Bockrunden, `table.md` §2; "Allow Kontra and Re" in the create form sets the first value). When on, it is
+allowed in every declared game (suit, Grand, Null, Hand, ouvert). Not in Ramsch (§12).
+
+### 14.1 When
+After the declaration (§5.1) and before the first card is played. Nothing else happens in between.
+
+### 14.2 Who answers, in which order
+1. The two defenders (the roles other than the declarer) are asked in seat order: forehand,
+   middlehand, hindhand, skipping the declarer. Each says **Kontra** or **no Kontra**.
+2. The first Kontra ends the questions for the defenders: the other defender is not asked again.
+3. After Kontra the declarer says **Re** or **no Re**.
+4. The play starts when the window closes: after both defenders said no Kontra, or after the
+   declarer's answer to Kontra.
+
+Kontra can be said once, Re only after Kontra, and never twice.
+
+### 14.3 Scoring
+The **level** is 1 (none), 2 (Kontra) or 4 (Re). It multiplies the whole score of the game:
+
+```
+standard:       declarerScore × level                           (§10.5)
+Seeger–Fabian:  won:  gameValue × level + 50                    (§10.6)
+                lost: declarerScore × level − 50
+                other seated players: bonus(N), unchanged
+```
+
+The level combines with Bock (§13) by multiplication (Bock 2 × Kontra 2 = 4). Doubling changes
+neither whether the game was won nor whether it was overbid (§10.3–10.4 use the undoubled values).
+The `gameValue` shown in the result stays undoubled.
+
+### 14.4 Worked examples = test vectors
+
+| # | Situation | Standard | Seeger–Fabian |
+|---|---|---|---|
+| K1 | Won Grand, value 144 (§10.7 #1), Kontra (level 2) | declarer +288 | declarer +338, others 0 |
+| K2 | Lost Diamonds, value 27 (§10.7 #3), N = 3, Re (level 4) | declarer −216 | declarer −266, others +40 |
+| K3 | Bock game (§13), won Grand 144, Kontra (2 × 2 = 4) | declarer +576 | declarer +626, others 0 |

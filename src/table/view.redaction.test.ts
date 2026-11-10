@@ -69,7 +69,7 @@ describe('view redaction', () => {
       const seats = 3 + (g % 4);
       const ctx = ctxFor(Math.floor(rand() * 4294967296), 0);
       // Every second game is played with the Ramsch rule (the Skat is public after a Ramsch).
-      const rules = { ramsch: g % 2 === 0, bock: false };
+      const rules = { ramsch: g % 2 === 0, bock: false, kontra: false };
       const lobby = applyCommand(tableWith(seats), 'p0', { type: 'set-rules', rules }, ctx);
       if (!lobby.ok) throw new Error(lobby.error.code);
       const started = applyCommand(lobby.value.state, 'p0', { type: 'start' }, ctx);

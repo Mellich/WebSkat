@@ -52,6 +52,7 @@ describe('gameLabel', () => {
     outcome: 'played',
     bock: false,
     bockTriggered: false,
+    doubling: 1,
     declarerId: 'a',
     bid: 18,
     game: 'hearts',

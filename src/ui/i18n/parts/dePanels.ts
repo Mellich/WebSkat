@@ -80,5 +80,6 @@ export const dePanels: Record<keyof typeof enPanels, string> = {
   'lobby.ruleRamsch': 'Ramsch, wenn alle passen',
   'lobby.ruleBock': 'Bockrunden (60:60 → die nächsten 3 Spiele zählen doppelt)',
   'lobby.ruleOn': 'an',
+  'lobby.ruleKontra': 'Kontra und Re (Verdoppeln nach der Ansage)',
   'lobby.ruleOff': 'aus',
 };

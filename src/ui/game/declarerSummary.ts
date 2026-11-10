@@ -17,11 +17,14 @@ export function declarerSummary(game: GameView, nameOf: (id: string) => string, 
       return `${won} · ${t('summary.skatTaken')}`;
     case 'declaring':
       return `${won} · ${game.pickedUpSkat ? t('summary.skatTaken') : t('summary.hand')}`;
+    case 'doubling':
+      return won;
     case 'playing':
     case 'finished': {
       if (game.declaration === null) return null;
       const playing = t('summary.playing', { game: declarationLabel(game.declaration, t), name, bid });
-      return game.pickedUpSkat ? `${playing} · ${t('summary.skatTaken')}` : playing;
+      const doubled = game.doubling === 4 ? t('summary.re') : game.doubling === 2 ? t('summary.kontra') : null;
+      return [playing, game.pickedUpSkat ? t('summary.skatTaken') : null, doubled].filter((x) => x !== null).join(' · ');
     }
     default: {
       const unused: never = game.phase;

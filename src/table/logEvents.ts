@@ -39,6 +39,11 @@ function gameEvents(before: TableState, after: TableState, actor: PlayerId, acti
       const declaration = after.game?.engine.declaration ?? null;
       return declaration === null ? [] : [{ kind: 'declared', playerId: actor, name, declaration }];
     }
+    case 'kontra':
+      return [{ kind: 'doubled', playerId: actor, name, level: 2 }];
+    case 're':
+      return [{ kind: 'doubled', playerId: actor, name, level: 4 }];
+    case 'no-double':
     case 'discard':
     case 'play':
       return [];

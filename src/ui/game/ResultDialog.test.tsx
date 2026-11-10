@@ -27,7 +27,7 @@ const view: TableView = {
     pending: [],
     nextDealerId: null,
     readyIds: [],
-    rules: { ramsch: false, bock: false },
+    rules: { ramsch: false, bock: false, kontra: false },
     bockGamesLeft: 0,
   },
   you: { id: 'a', seat: 0, role: 'forehand' },
@@ -55,6 +55,7 @@ const lost: ViewResult = {
   won: false,
   loseValue: 27,
   declarerScore: -54,
+  doubling: 1,
 };
 
 const record: GameRecord = {
@@ -69,6 +70,7 @@ const record: GameRecord = {
   outcome: 'played',
   bock: false,
   bockTriggered: false,
+  doubling: 1,
   declarerId: 'a',
   bid: 18,
   game: 'diamonds',
@@ -144,6 +146,7 @@ describe('ResultDialog after a Ramsch', () => {
     outcome: 'ramsch',
     bock: false,
     bockTriggered: false,
+    doubling: 1,
     declarerId: null,
     bid: null,
     game: null,

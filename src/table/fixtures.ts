@@ -46,6 +46,7 @@ export const GRAND_144: GameResult = {
   won: true,
   loseValue: null,
   declarerScore: 144,
+  doubling: 1,
 };
 
 /** Lost Diamonds ohne 2 (value 27). */
@@ -69,6 +70,7 @@ export const DIAMONDS_LOST: GameResult = {
   won: false,
   loseValue: 27,
   declarerScore: -54,
+  doubling: 1,
 };
 
 /** Won Null Ouvert (value 46). */
@@ -92,4 +94,5 @@ export const NULL_OUVERT_WON: GameResult = {
   won: true,
   loseValue: null,
   declarerScore: 46,
+  doubling: 1,
 };

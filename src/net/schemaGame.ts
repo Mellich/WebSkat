@@ -43,6 +43,9 @@ export const GameActionSchema: z.ZodType<GameAction> = z.discriminatedUnion('typ
   z.object({ type: z.literal('play-hand') }),
   z.object({ type: z.literal('discard'), cards: z.tuple([CardIdSchema, CardIdSchema]) }),
   z.object({ type: z.literal('declare'), declaration: DeclarationSchema }),
+  z.object({ type: z.literal('kontra') }),
+  z.object({ type: z.literal('re') }),
+  z.object({ type: z.literal('no-double') }),
   z.object({ type: z.literal('play'), card: CardIdSchema }),
 ]);
 
@@ -63,5 +66,5 @@ export const TableCommandSchema: z.ZodType<TableCommand> = z.discriminatedUnion(
   z.object({ type: z.literal('add-bot') }),
   z.object({ type: z.literal('set-bot-level'), playerId: z.string().min(1).max(64), level: z.enum(['easy', 'normal', 'strong']) }),
   z.object({ type: z.literal('leave') }),
-  z.object({ type: z.literal('set-rules'), rules: z.object({ ramsch: z.boolean(), bock: z.boolean() }) }),
+  z.object({ type: z.literal('set-rules'), rules: z.object({ ramsch: z.boolean(), bock: z.boolean(), kontra: z.boolean() }) }),
 ]);

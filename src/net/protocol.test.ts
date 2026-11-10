@@ -51,7 +51,7 @@ describe('client messages', () => {
   });
 
   it('accepts the set-rules command and rejects a rule without a value', () => {
-    expect(TableCommandSchema.safeParse({ type: 'set-rules', rules: { ramsch: true, bock: false } }).success).toBe(true);
+    expect(TableCommandSchema.safeParse({ type: 'set-rules', rules: { ramsch: true, bock: false, kontra: false } }).success).toBe(true);
     expect(TableCommandSchema.safeParse({ type: 'set-rules', rules: {} }).success).toBe(false);
   });
 });
@@ -144,7 +144,7 @@ describe('real views and records from the table layer', () => {
       s = added.value;
     }
     const ctx = { now: 5, seed: 99 };
-    for (const command of [{ type: 'set-rules', rules: { ramsch: true, bock: false } }, { type: 'start' }] as const) {
+    for (const command of [{ type: 'set-rules', rules: { ramsch: true, bock: false, kontra: false } }, { type: 'start' }] as const) {
       const result = applyCommand(s, 'h', command, ctx);
       if (!result.ok) throw new Error(result.error.message);
       s = result.value.state;
@@ -157,7 +157,7 @@ describe('real views and records from the table layer', () => {
     }
     const view = viewFor(s, 'anna');
     expect(view.game?.ramsch).toBe(true);
-    expect(view.table.rules).toEqual({ ramsch: true, bock: false });
+    expect(view.table.rules).toEqual({ ramsch: true, bock: false, kontra: false });
     expect(TableViewSchema.safeParse(view).success).toBe(true);
 
     const record = {
@@ -187,8 +187,9 @@ describe('real views and records from the table layer', () => {
     expect(parsed.success && parsed.data).toMatchObject({ bock: false, bockTriggered: false });
   });
 
-  it('rejects a set-rules command whose rules lack the bock flag', () => {
+  it('rejects a set-rules command whose rules lack the bock or kontra flag', () => {
     expect(TableCommandSchema.safeParse({ type: 'set-rules', rules: { ramsch: true } }).success).toBe(false);
+    expect(TableCommandSchema.safeParse({ type: 'set-rules', rules: { ramsch: true, bock: false } }).success).toBe(false);
   });
 });
 

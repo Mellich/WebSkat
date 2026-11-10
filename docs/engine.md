@@ -14,12 +14,13 @@ rules: `src/engine/AGENTS.md`. The public API is everything re-exported by
 | `Role` | `'forehand' \| 'middlehand' \| 'hindhand'`; `ROLES` lists them in play order |
 | `Declaration` | `{kind:'suit', trump, hand, announce, ouvert}` \| `{kind:'grand', hand, announce, ouvert}` \| `{kind:'null', hand, ouvert}` |
 | `TrumpDeclaration` | the suit/grand members (have a multiplier) |
-| `GamePhase` | `'bidding' \| 'skat-decision' \| 'discarding' \| 'declaring' \| 'playing' \| 'finished'` |
+| `GamePhase` | `'bidding' \| 'skat-decision' \| 'discarding' \| 'declaring' \| 'doubling' \| 'playing' \| 'finished'` |
 | `BiddingState` | `stage` (`1 \| 2 \| 'claim' \| 'done' \| 'passed-in'`), `caller`, `listener`, `awaiting`, `currentBid`, `history` |
-| `GameAction` | `bid{value}`, `hold`, `pass`, `claim`, `pickup-skat`, `play-hand`, `discard{cards:[a,b]}`, `declare{declaration}`, `play{card}` |
-| `GameState` | `phase`, `hands`, `initialHands` (as dealt), `skat` (as dealt, never changes), `bidding`, `declarer`, `bid`, `pickedUpSkat`, `discarded`, `declaration`, `trick`, `tricks`, `turn`, `result`, `options` (`GameOptions`), `ramsch` (true while/after a Ramsch) |
-| `GameOptions` | `{ ramschOnPassIn }`; `DEFAULT_GAME_OPTIONS` = off. Set per game at deal time from the table rules (`table.md` §1) |
-| `GameResult` | `{kind:'passed-in'}`, `{kind:'played', …}` with points, tricks, flags, `base`, `multiplier`, `gameValue`, `playedWon`, `overbid`, `won`, `loseValue`, `declarerScore` (standard counting), or `{kind:'ramsch', points, tricks, skatTo, losers, jungfrau, durchmarsch, scores}` (skat-rules §12) |
+| `GameAction` | `bid{value}`, `hold`, `pass`, `claim`, `pickup-skat`, `play-hand`, `discard{cards:[a,b]}`, `declare{declaration}`, `kontra`, `re`, `no-double`, `play{card}` |
+| `DoubleLevel` | `1 \| 2 \| 4`: 2 after Kontra, 4 after Re (skat-rules §14) |
+| `GameState` | `phase`, `hands`, `initialHands` (as dealt), `skat` (as dealt, never changes), `bidding`, `declarer`, `bid`, `pickedUpSkat`, `discarded`, `declaration`, `trick`, `tricks`, `turn`, `result`, `options` (`GameOptions`), `ramsch` (true while/after a Ramsch), `doubling` (`DoubleLevel`), `doublePassed` (defenders who said no-double) |
+| `GameOptions` | `{ ramschOnPassIn, kontra }`; `DEFAULT_GAME_OPTIONS` = both off. `kontra` opens the Kontra/Re window after a declaration (§14). Set per game at deal time from the table rules (`table.md` §1) |
+| `GameResult` | `{kind:'passed-in'}`, `{kind:'played', …}` with points, tricks, flags, `base`, `multiplier`, `gameValue`, `playedWon`, `overbid`, `won`, `loseValue`, `declarerScore` (standard counting), `doubling` (`DoubleLevel`, not yet in the score), or `{kind:'ramsch', points, tricks, skatTo, losers, jungfrau, durchmarsch, scores}` (skat-rules §12) |
 | `Result<T, E>` | `{ok:true, value}` \| `{ok:false, error:{code, message}}`; helpers `ok()`, `err()`, `assertNever()` |
 
 ## 2. State machine
@@ -33,7 +34,7 @@ bidding ──(all pass, forehand passes in claim stage)──▶ finished (resu
 skat-decision ──pickup-skat──▶ discarding ──discard──▶ declaring
    │ play-hand                                            ▲
    └──────────────────────────────────────────────────────┘
-declaring ──declare──▶ playing (leader = forehand) ──10 tricks, or Null declarer takes a trick──▶ finished
+declaring ──declare──▶ doubling ──window closes (`doubling.ts`)──▶ playing (leader = forehand) ──10 tricks, or Null declarer takes a trick──▶ finished
 ```
 
 ## 3. The reducer (`game.ts`)
@@ -58,6 +59,7 @@ Checks in `applyAction`: the phase first (an action that does not belong to the 
 | | `play-hand` | phase `declaring` |
 | `discarding` | `discard` | two distinct cards from the 12; removed from the hand, stored in `discarded`; phase `declaring`. Else `INVALID_DISCARD` |
 | `declaring` | `declare` | `validateDeclaration(d, hand = !pickedUpSkat)`; phase `playing`, `trick = {leader:'forehand', plays:[]}`, `turn = 'forehand'` |
+| `doubling` | `kontra`, `re`, `no-double` | `doubling.ts`. Defenders in seat order may `kontra` (once, level 2; then only the declarer is asked); the declarer may `re` (level 4) after Kontra; `no-double` passes. When the window closes: phase `playing`, `trick = {leader:'forehand'}`, `turn = 'forehand'`. Wrong level → `WRONG_PHASE`; not your turn → `NOT_YOUR_TURN` |
 | `playing` | `play` | `playCard` (§5) |
 | `finished` | any | `WRONG_PHASE` |
 

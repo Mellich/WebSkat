@@ -17,6 +17,7 @@ export type LogEvent =
   | { readonly kind: 'bid'; readonly playerId: PlayerId; readonly name: string; readonly action: 'bid' | 'hold' | 'pass' | 'claim'; readonly value: number | null }
   | { readonly kind: 'skat'; readonly playerId: PlayerId; readonly name: string; readonly pickedUp: boolean }
   | { readonly kind: 'declared'; readonly playerId: PlayerId; readonly name: string; readonly declaration: Declaration }
+  | { readonly kind: 'doubled'; readonly playerId: PlayerId; readonly name: string; readonly level: 2 | 4 }
   | { readonly kind: 'ramsch' | 'aborted'; readonly number: number }
   | { readonly kind: 'bock-started'; readonly games: number }
   | {

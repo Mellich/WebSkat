@@ -19,6 +19,7 @@ One record per **finished** game (played or passed in). Aborted games create non
 | `outcome` | `'played'`, `'passed-in'` or `'ramsch'` (table rule, skat-rules §12) |
 | `bock` | this game was a Bock game (Bockrunden, skat-rules §13): its scores are already doubled |
 | `bockTriggered` | this 60 : 60 game started new Bock games (table rule on) |
+| `doubling` | Kontra/Re level: 1 (none), 2 (Kontra), 4 (Re). The scores already include it (skat-rules §14); records cached before protocol 8 read as 1 |
 | `declarerId`, `bid`, `game` (`clubs`…`null`), `hand`, `ouvert`, `announce` | the declared game (null/false/`none` when passed in) |
 | `spitzenWith`, `spitzenCount`, `multiplier`, `gameValue` | value calculation (null for Null where not applicable) |
 | `declarerPoints`, `defenderPoints` | card points; **null for Null games** |

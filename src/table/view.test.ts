@@ -202,10 +202,10 @@ describe('bot strength in the view', () => {
 
 describe('Bockrunden in views (skat-rules §13)', () => {
   it('shows the Bock rule and the games left to every seated player', () => {
-    let s = step(tableWith(3), 'p0', { type: 'set-rules', rules: { ramsch: false, bock: true } });
+    let s = step(tableWith(3), 'p0', { type: 'set-rules', rules: { ramsch: false, bock: true, kontra: false } });
     s = { ...s, bockGamesLeft: 2 };
     const view = viewFor(s, 'p1');
-    expect(view.table.rules).toEqual({ ramsch: false, bock: true });
+    expect(view.table.rules).toEqual({ ramsch: false, bock: true, kontra: false });
     expect(view.table.bockGamesLeft).toBe(2);
   });
 
