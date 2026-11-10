@@ -165,6 +165,6 @@ once somebody has won the bidding:
 | `skat-decision` | "Anna won the bidding at 23" |
 | `discarding` | "… · took the Skat" |
 | `declaring` | "… · took the Skat" or "… · plays Hand" |
-| `playing`, `finished` | "Grand Hand by Anna (bid 23)", plus "· took the Skat" when the Skat was taken |
+| `doubling`, `playing`, `finished` | "Grand Hand by Anna (bid 23)", plus "· took the Skat" when the Skat was taken, plus "· Kontra" or "· Re" once said |
 
 Nothing is shown during the bidding and for a round that was passed in.

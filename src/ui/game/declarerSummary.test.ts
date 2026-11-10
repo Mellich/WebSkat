@@ -43,6 +43,18 @@ describe('declarerSummary', () => {
       .toBe('Grand Hand by Anna (bid 23)');
   });
 
+  it('names the game already in the Kontra and Re window, so the doubling refers to it', () => {
+    expect(declarerSummary(game('doubling', { declaration: GRAND_HAND }), nameOf, t))
+      .toBe('Grand Hand by Anna (bid 23)');
+    expect(declarerSummary(game('doubling', { pickedUpSkat: true, declaration: GRAND }), nameOf, t))
+      .toBe('Grand by Anna (bid 23) · took the Skat');
+  });
+
+  it('adds Kontra to the game name once it is said during the doubling window', () => {
+    expect(declarerSummary(game('doubling', { doubling: 2, declaration: GRAND }), nameOf, t))
+      .toBe('Grand by Anna (bid 23) · Kontra');
+  });
+
   it('keeps the game name when the round is finished', () => {
     expect(declarerSummary(game('finished', { pickedUpSkat: true, declaration: GRAND }), nameOf, t))
       .toBe('Grand by Anna (bid 23) · took the Skat');

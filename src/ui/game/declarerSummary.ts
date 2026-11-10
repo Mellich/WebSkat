@@ -18,7 +18,6 @@ export function declarerSummary(game: GameView, nameOf: (id: string) => string, 
     case 'declaring':
       return `${won} · ${game.pickedUpSkat ? t('summary.skatTaken') : t('summary.hand')}`;
     case 'doubling':
-      return won;
     case 'playing':
     case 'finished': {
       if (game.declaration === null) return null;

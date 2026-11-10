@@ -7,6 +7,12 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [0.11.1] - 2026-11-10
+
+### Fixed
+
+- During the Kontra and Re question the status line above the cards names the game again (for example "Grand Hand by Anna (bid 23)"), so it is clear what Kontra would double. It shows "Kontra" or "Re" once said.
+
 ## [0.11.0] - 2026-11-10
 
 ### Added
