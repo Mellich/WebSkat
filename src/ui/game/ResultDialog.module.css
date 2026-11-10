@@ -17,7 +17,8 @@
   overflow: auto;
   padding: 16px 18px;
   border-radius: var(--radius);
-  background: #0f2615;
+  background-color: var(--panel-solid);
+  background-image: var(--grain);
   border: 1px solid rgb(255 255 255 / 22%);
   box-shadow: 0 -8px 24px rgb(0 0 0 / 45%);
   display: flex;

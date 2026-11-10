@@ -7,6 +7,13 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [0.10.1] - 2026-11-10
+
+### Fixed
+
+- A shadow no longer shows under the table's trick while a finished trick is held on screen.
+- The dialogs (about, settings, players, game log, stats, confirm and the game result) use the wood panel look again instead of the old dark green.
+
 ## [0.10.0] - 2026-11-10
 
 ### Added

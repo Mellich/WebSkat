@@ -12,7 +12,8 @@
   width: min(92vw, 380px);
   padding: 20px;
   border-radius: var(--radius);
-  background: #0f2615;
+  background-color: var(--panel-solid);
+  background-image: var(--grain);
   border: 1px solid rgb(255 255 255 / 20%);
 }
 

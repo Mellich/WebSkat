@@ -1,8 +1,19 @@
-.dismiss {
+/* The held trick is a button: undo the global button chrome (wood face, drop shadows, press
+   offset, tap-size minimums), otherwise a shadow shows under the cards until the trick is cleared.
+   The :active selector is listed too, because the global press rule is more specific. */
+.dismiss,
+.dismiss:active:not(:disabled) {
   border: 0;
+  border-radius: 0;
   padding: 0;
+  min-width: 0;
+  min-height: 0;
   color: inherit;
+  font: inherit;
   background: transparent;
+  background-image: none;
+  box-shadow: none;
+  transform: none;
   cursor: pointer;
 }
 

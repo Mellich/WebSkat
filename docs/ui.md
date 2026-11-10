@@ -208,7 +208,7 @@ Styling: `styles/tokens.css` (palette, fonts, textures, `--card-w` etc.), `style
 Schänke (dark oak, worn baize table, brass accents); dark only. Headings use `--font-display`
 (Pirata One, bundled as `public/fonts/PirataOne-latin-400.woff2` with its OFL text, `@font-face`
 in `global.css`; serif fallbacks), text uses `--font-body`
-(system sans). Panels are `--panel` with `--grain`; the card table is `--felt` on an oak rim.
+(system sans). Panels are `--panel` with `--grain`; dialogs are `--panel-solid` with `--grain`; the card table is `--felt` on an oak rim.
 Buttons are ≥ 44 px tap targets. Image URLs come from `assets.ts` (`cardUrl`, `backUrl`,
 `logoUrl`, based on `import.meta.env.BASE_URL`). Card images are preloaded once per page when a
 table opens (`preload.ts`), so tricks and open hands show without delay.
