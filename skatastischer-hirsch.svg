@@ -2,25 +2,24 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="210mm"
    height="297mm"
    viewBox="0 0 744.09448819 1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="Skatastischer Hirsch.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   sodipodi:docname="skatastischer-hirsch.svg"
    inkscape:export-filename="C:\Users\Thor Von Sten\Dropbox\Nicht Uni\Skatastischer Ordner\Skat\Skatastisches Logo\text4204-2.png"
    inkscape:export-xdpi="1500"
-   inkscape:export-ydpi="1500">
+   inkscape:export-ydpi="1500"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs4">
     <linearGradient
@@ -37,7 +36,7 @@
     </linearGradient>
     <linearGradient
        id="linearGradient4088"
-       osb:paint="gradient">
+       inkscape:swatch="gradient">
       <stop
          style="stop-color:#241f1c;stop-opacity:1"
          offset="0"
@@ -97,7 +96,7 @@
     </linearGradient>
     <linearGradient
        id="linearGradient4025"
-       osb:paint="gradient">
+       inkscape:swatch="gradient">
       <stop
          style="stop-color:#dcb830;stop-opacity:1"
          offset="0"
@@ -192,8 +191,8 @@
          style="stop-color:#ffffff;stop-opacity:0;" />
     </linearGradient>
     <linearGradient
-       osb:paint="gradient"
-       id="linearGradient4396">
+       id="linearGradient4396"
+       inkscape:swatch="gradient">
       <stop
          id="stop4398"
          offset="0"
@@ -265,7 +264,7 @@
     </pattern>
     <linearGradient
        id="linearGradient6031"
-       osb:paint="gradient">
+       inkscape:swatch="gradient">
       <stop
          id="stop6033"
          offset="0"
@@ -277,7 +276,7 @@
     </linearGradient>
     <linearGradient
        id="linearGradient5780"
-       osb:paint="gradient">
+       inkscape:swatch="gradient">
       <stop
          style="stop-color:#ee0000;stop-opacity:1"
          offset="0"
@@ -309,7 +308,7 @@
        is_visible="true" />
     <linearGradient
        id="linearGradient4184"
-       osb:paint="solid">
+       inkscape:swatch="solid">
       <stop
          style="stop-color:#00db75;stop-opacity:1;"
          offset="0"
@@ -317,7 +316,7 @@
     </linearGradient>
     <linearGradient
        id="linearGradient4456"
-       osb:paint="solid">
+       inkscape:swatch="solid">
       <stop
          style="stop-color:#0000fd;stop-opacity:1;"
          offset="0"
@@ -420,21 +419,29 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.71253969"
-     inkscape:cx="405.34134"
-     inkscape:cy="669.69638"
+     inkscape:cx="404.88973"
+     inkscape:cy="668.73468"
      inkscape:document-units="px"
-     inkscape:current-layer="layer14"
+     inkscape:current-layer="layer9"
      showgrid="false"
-     inkscape:window-width="1440"
-     inkscape:window-height="838"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-width="1745"
+     inkscape:window-height="915"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:snap-global="false"
-     showguides="false">
+     showguides="false"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
-       id="grid4207" />
+       id="grid4207"
+       originx="0"
+       originy="0"
+       spacingy="1"
+       spacingx="1"
+       units="px" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -663,7 +670,8 @@
            x="-28"
            y="264.36221" /></flowRegion><flowPara
          id="flowPara4202"
-         style="font-size:40px;line-height:1.25"> </flowPara></flowRoot>    <flowRoot
+         style="font-size:40px;line-height:1.25"> </flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot4195"
        style="font-style:normal;font-weight:normal;line-height:0.01%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -675,7 +683,8 @@
            x="-16"
            y="288.36221" /></flowRegion><flowPara
          id="flowPara4201"
-         style="font-size:40px;line-height:1.25"> </flowPara></flowRoot>    <path
+         style="font-size:40px;line-height:1.25"> </flowPara></flowRoot>
+    <path
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.99052167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 211.01463,321.50991 C 210.58381,447.06966 252.8316,528.89108 341.1451,598.89385 406.91052,540.44928 459.07122,485.73604 468.71885,371.74754"
        id="path4194-4"
@@ -722,7 +731,8 @@
            x="244.65895"
            y="491.62653" /></flowRegion><flowPara
          id="flowPara4997"
-         style="font-size:25px;line-height:1"> </flowPara></flowRoot>    <flowRoot
+         style="font-size:25px;line-height:1"> </flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot4999"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
@@ -733,7 +743,8 @@
            x="235.46655"
            y="367.17572" /></flowRegion><flowPara
          id="flowPara5005"
-         style="font-size:25px;line-height:1"> </flowPara></flowRoot>    <flowRoot
+         style="font-size:25px;line-height:1"> </flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot5013"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
@@ -744,7 +755,8 @@
            x="219.9102"
            y="346.66965" /></flowRegion><flowPara
          id="flowPara5019"
-         style="font-size:25px;line-height:1"> </flowPara></flowRoot>    <flowRoot
+         style="font-size:25px;line-height:1"> </flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot5021"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
@@ -755,7 +767,8 @@
            x="226.98128"
            y="347.37674" /></flowRegion><flowPara
          id="flowPara5027"
-         style="font-size:25px;line-height:1"> </flowPara></flowRoot>    <flowRoot
+         style="font-size:25px;line-height:1"> </flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot5029"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
@@ -766,7 +779,8 @@
            x="226.27417"
            y="323.33511" /></flowRegion><flowPara
          id="flowPara5035"
-         style="font-size:25px;line-height:1"> </flowPara></flowRoot>    <flowRoot
+         style="font-size:25px;line-height:1"> </flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot5037"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
@@ -777,7 +791,8 @@
            x="231.93103"
            y="349.49808" /></flowRegion><flowPara
          id="flowPara5043"
-         style="font-size:25px;line-height:1"> </flowPara></flowRoot>    <flowRoot
+         style="font-size:25px;line-height:1"> </flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot5045"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
@@ -788,7 +803,8 @@
            x="223.44574"
            y="345.96252" /></flowRegion><flowPara
          id="flowPara5051"
-         style="font-size:25px;line-height:1"> </flowPara></flowRoot>    <flowRoot
+         style="font-size:25px;line-height:1"> </flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot5071"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
@@ -799,7 +815,8 @@
            x="174.65538"
            y="347.37674" /></flowRegion><flowPara
          id="flowPara5077"
-         style="font-size:25px;line-height:1"> </flowPara></flowRoot>    <path
+         style="font-size:25px;line-height:1"> </flowPara></flowRoot>
+    <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.91213858px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 140.29629,341.47114 c -1.9279,68.4388 15.8162,137.3207 50.56987,196.31026 35.23133,59.80032 87.83634,109.22706 149.71349,140.66816"
        id="path4246"
@@ -1201,24 +1218,23 @@
      style="display:inline">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:49.99972534px;line-height:50%;font-family:AuldMagick;-inkscape-font-specification:'AuldMagick, Semi-Condensed';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:url(#linearGradient4096);fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:31.8647px;line-height:0%;font-family:'Pirata One';-inkscape-font-specification:'Pirata One, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:url(#linearGradient4096);fill-opacity:1;stroke:none;stroke-width:0.999756;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
        id="text4204-2"
        x="-171.24596"
        y="-360.90564"
-       transform="matrix(0.94148015,0,0,0.94148015,14.430852,-25.270448)"
-       sodipodi:linespacing="50%"><textPath
+       transform="matrix(0.94148015,0,0,0.94148015,14.430852,-25.270448)"><textPath
          xlink:href="#path4194-5"
          id="textPath4208-8"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:49.99972534px;line-height:50%;font-family:AuldMagick;-inkscape-font-specification:'AuldMagick, Semi-Condensed';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient4096)"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:31.8647px;line-height:50%;font-family:'Pirata One';-inkscape-font-specification:'Pirata One, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient4096);stroke-width:0.999756;stroke-dasharray:none"
          startOffset="0%"
-         dx="0 0 0 0 0 0 5.6568527"
-         dy="0 0 0 0 0 8"><tspan
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:49.99972534px;line-height:50%;font-family:AuldMagick;-inkscape-font-specification:'AuldMagick, Semi-Condensed';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient4096)"
-   id="tspan4989-4"
-   dy="0 0 0 0 0 -7.7781734"
-   dx="0 0 0 0 0 0 -0.70710677">     Die Skatastis</tspan><tspan
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:semi-condensed;font-size:49.99972534px;line-height:50%;font-family:AuldMagick;-inkscape-font-specification:'AuldMagick, Semi-Condensed';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient4096)"
-   id="tspan5009-9">chen!              Mediastrini omnes vincent!</tspan></textPath></text>
+         dx="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 5.6568527"
+         dy="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 8"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:31.8647px;line-height:50%;font-family:'Pirata One';-inkscape-font-specification:'Pirata One, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient4096);stroke-width:0.999756;stroke-dasharray:none"
+           id="tspan4989-4"
+           dy="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -7.7781734"
+           dx="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.70710677">                  Die Skatastis</tspan><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:31.8647px;line-height:50%;font-family:'Pirata One';-inkscape-font-specification:'Pirata One, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient4096);stroke-width:0.999756;stroke-dasharray:none"
+           id="tspan5009-9">chen!                       Mediastrini omnes vincent!</tspan></textPath></text>
   </g>
   <g
      inkscape:groupmode="layer"
