@@ -206,7 +206,7 @@ returns the Normal choice at once), because sampling assumes a declarer.
 
 ### 6.2 Choosing a card (PIMC)
 For each legal card `c` (skip sampling if only one is legal), for each of the sampled deals
-(`sampleCount` = `ROLLOUT_BUDGET / playable cards` = 120 / n, clamped to 12…40; generate the
+(`sampleCount` = `ROLLOUT_BUDGET / playable cards` = 250 / n, clamped to 12…150; generate the
 samples once and reuse them for every `c`): play `c`, then play out the rest of
 the game in `simulate.ts`. In the play-out, **every** player uses the Normal heuristics on its own
 (full-information-free) view of the sampled world. Build the `BotView` for each simulated player
@@ -219,8 +219,8 @@ team view:
 - Null: `100` if the bot's team wins the Null game in the play-out, else `0`.
 
 Pick the card with the highest mean. Ties go to the Normal heuristic's choice. Budget: one decision
-must take < 100 ms (median) on an idle mid-range laptop; measured ≈ 50 ms. If the perf test fails,
-lower `ROLLOUT_BUDGET` in `tuning.ts`.
+may take up to 500 ms (slowest decision) on an idle mid-range laptop; measured on an 8-core machine:
+median ≈ 110 ms, slowest ≈ 400 ms. If the perf test fails, lower `ROLLOUT_BUDGET` in `tuning.ts`.
 
 ### 6.3 Strong auction
 Same rules as §4.3, but `maxBid` is estimated with the Skat: draw `SKAT_SAMPLES = 16` random Skats
@@ -294,8 +294,8 @@ Kontra and Re: every bot level answers the doubling window with `no-double` (`bo
    - Record new measured results in `decisions.md` (I101) when tuning.
    - Run: `BOT_BENCH=1 npx vitest run src/table/bot`.
 9. Performance (`strong.test.ts`, only with `BOT_BENCH=1` because wall-clock limits are flaky while
-   the whole suite runs in parallel): one `strong` card decision < 100 ms (median of 20); one full
-   game with three strong bots < 5 s.
+   the whole suite runs in parallel): every `strong` card decision < 500 ms (slowest of 20); one full
+   game with three strong bots < 10 s.
 10. UI: `TableLobby.test.tsx` (host select per bot sends `set-bot-level`; others see the level;
     Start with 3 players or bots), `Home.test.tsx` (no seat count, no strength in the create form).
     The e2e scenarios play with humans only.

@@ -7,6 +7,12 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [0.12.0] - 2026-11-11
+
+### Changed
+
+- Strong bots play stronger: each card decision samples many more possible hidden-card deals (up to 150 instead of 40 per card), so they take up to half a second per decision instead of a fraction of one.
+
 ## [0.11.1] - 2026-11-10
 
 ### Fixed

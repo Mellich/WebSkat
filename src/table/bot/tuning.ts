@@ -30,10 +30,12 @@ export const VALUABLE_TRICK = 10;
 /**
  * Strong level: sampled deals per card decision (at most), the total rollout budget per decision
  * (samples = budget / playable cards, at least MIN_SAMPLES), and sampled Skats per auction decision.
+ * Measured with BOT_BENCH=1 on an 8-core machine: budget 250 gives a median card decision of about
+ * 110 ms and a slowest one of about 400 ms (budget 120: median 33 ms, slowest 230 ms).
  */
-export const SAMPLES = 40;
+export const SAMPLES = 150;
 export const MIN_SAMPLES = 12;
-export const ROLLOUT_BUDGET = 120;
+export const ROLLOUT_BUDGET = 250;
 export const SKAT_SAMPLES = 16;
 /** Strong auction: share of sampled Skats in which a game must be playable. */
 export const SKAT_CONFIDENCE = 0.6;
