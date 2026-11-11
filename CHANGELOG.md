@@ -7,6 +7,12 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [Unreleased]
+
+### Changed
+
+- The changelog screen shows changes that are not released yet under "Unreleased".
+
 ## [0.12.0] - 2026-11-11
 
 ### Changed

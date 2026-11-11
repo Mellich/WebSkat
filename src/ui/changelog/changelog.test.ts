@@ -3,9 +3,12 @@
 import { describe, expect, it } from 'vitest';
 import { APP_VERSION } from '../version';
 import { changelogText } from './changelogText';
-import { parseChangelog, parseSemver } from './parseChangelog';
+import { isUnreleased, parseChangelog, parseSemver } from './parseChangelog';
 
-const releases = parseChangelog(changelogText);
+const allReleases = parseChangelog(changelogText);
+// An optional `## [Unreleased]` section may come first; it has no version, date or fixed content.
+const unreleased = allReleases.filter((release) => isUnreleased(release.version));
+const releases = allReleases.filter((release) => !isUnreleased(release.version));
 
 function compare(a: readonly number[], b: readonly number[]): number {
   for (let i = 0; i < 3; i++) {
@@ -16,6 +19,11 @@ function compare(a: readonly number[], b: readonly number[]): number {
 }
 
 describe('CHANGELOG.md', () => {
+  it('has at most one Unreleased section and it is the first one', () => {
+    expect(unreleased.length).toBeLessThanOrEqual(1);
+    if (unreleased.length === 1) expect(allReleases[0]).toBe(unreleased[0]);
+  });
+
   it('has the package.json version as its newest release', () => {
     expect(parseSemver(APP_VERSION)).not.toBeNull();
     expect(releases[0]?.version).toBe(APP_VERSION);
@@ -36,7 +44,7 @@ describe('CHANGELOG.md', () => {
 
   it('uses only the Keep a Changelog section names', () => {
     const allowed = ['Added', 'Changed', 'Deprecated', 'Removed', 'Fixed', 'Security'];
-    for (const release of releases) {
+    for (const release of allReleases) {
       for (const section of release.sections) expect(allowed, `${release.version}: ${section.title}`).toContain(section.title);
     }
   });

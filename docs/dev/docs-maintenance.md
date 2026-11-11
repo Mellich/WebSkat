@@ -59,7 +59,7 @@ Write each fact in **one** place and link to it from elsewhere.
 - [ ] `dev/e2e.md` §6 if test ids changed; `dev/testing.md` §4 if a new test file was added.
 - [ ] `overview.md` §2 if an open item was closed or a new limitation appeared.
 - [ ] `decisions.md` row for every decision.
-- [ ] Version bumped in `package.json`/`package-lock.json` and a matching release at the top of
-      `CHANGELOG.md` (`dev/versioning.md`) for every code change.
+- [ ] Entry under `## [Unreleased]` in `CHANGELOG.md` (`dev/versioning.md`) for every code change;
+      no version bump.
 - [ ] `README.md` for user-visible changes.
 - [ ] Links still point to existing files: `grep -rnoE 'docs/[a-z/-]+\.md' AGENTS.md src e2e docs | sort -u` and check each exists.

@@ -58,8 +58,8 @@ TURN credentials.
 
 ## 5. Release checklist
 
-- [ ] Version bumped and `CHANGELOG.md` up to date (`dev/versioning.md`); the deployed app shows
-      the version bottom left
+- [ ] Released with `npm run release -- X.Y.Z` (`dev/versioning.md` §4: version, commit, tag,
+      `gh-pages` push); the deployed app shows the version bottom left
 - [ ] `npm run check` and `npm run e2e` green
 - [ ] `npm run build && npm run preview`; main JS chunk < 300 kB gzipped (last measured: 129 kB)
 - [ ] Create a table on a laptop, join from a phone on another network, play a full game

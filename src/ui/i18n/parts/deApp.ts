@@ -9,6 +9,7 @@ export const deApp: Record<keyof typeof enApp, string> = {
   'changelog.title': 'WebSkat-Änderungsprotokoll',
   'changelog.current': 'Du benutzt Version {version}.',
   'changelog.release': 'Version {version}',
+  'changelog.unreleased': 'Unveröffentlicht',
   'changelog.section.Added': 'Neu',
   'changelog.section.Changed': 'Geändert',
   'changelog.section.Deprecated': 'Veraltet',

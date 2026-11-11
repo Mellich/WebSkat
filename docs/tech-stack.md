@@ -46,6 +46,7 @@ i18n or test-assertion library such as jest-dom) unless the user agrees. Record 
 | `npm run relay` | Local signaling relay on port 8787 (`PORT` overrides) |
 | `npm run e2e` | Playwright tests (starts relay + dev server itself; `dev/e2e.md`) |
 | `npm run publish:pages` | Check, build and prepare a `gh-pages` commit (`deployment.md`) |
+| `npm run release -- X.Y.Z` | Release: version, release commit, tag `vX.Y.Z`, publish and push `gh-pages` (`dev/versioning.md` §4) |
 
 Run one test file: `npx vitest run src/engine/bidding.test.ts`. One test by name: add
 `-t "part of the name"`.

@@ -45,7 +45,7 @@ dependency, script, open item.
 
 ## 4. Check
 
-- Code changed → the version is bumped and `CHANGELOG.md` has a matching release at the top
+- Code changed → `CHANGELOG.md` has the change under `## [Unreleased]` (no version bump)
   (`docs/dev/versioning.md`); `npx vitest run src/ui/changelog` passes.
 - Links point to existing files:
   `grep -rnoE 'docs/[a-zA-Z/.-]+\.md' AGENTS.md src e2e docs .claude | sort -u` and check each path.

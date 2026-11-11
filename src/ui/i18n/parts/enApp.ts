@@ -7,6 +7,7 @@ export const enApp = {
   'changelog.title': 'WebSkat changelog',
   'changelog.current': 'You are using version {version}.',
   'changelog.release': 'Version {version}',
+  'changelog.unreleased': 'Unreleased',
   'changelog.section.Added': 'Added',
   'changelog.section.Changed': 'Changed',
   'changelog.section.Deprecated': 'Deprecated',

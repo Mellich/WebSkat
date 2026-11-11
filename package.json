@@ -20,6 +20,7 @@
     "check": "npm run typecheck && npm run lint && npm run test",
     "assets": "node scripts/make-assets.mjs",
     "publish:pages": "node scripts/publish-gh-pages.mjs",
+    "release": "node scripts/release.mjs",
     "relay": "node scripts/relay.mjs",
     "e2e": "playwright test"
   },

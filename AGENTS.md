@@ -10,7 +10,7 @@ maintaining and extending it. Bots (easy/normal/strong) can fill seats.
 2. The `AGENTS.md` of every folder you touch: rules, **file map**, recipes, pitfalls.
    `src/engine/`, `src/table/`, `src/net/`, `src/ui/`, `e2e/`.
 3. `docs/dev/workflow.md`: the step-by-step process for every change.
-4. `docs/dev/versioning.md`: how to bump the version and write the `CHANGELOG.md` entry.
+4. `docs/dev/versioning.md`: how to write the `CHANGELOG.md` entry (Unreleased) and how to release.
 
 Rules and scoring come only from `docs/skat-rules.md`. Do not invent rules or architecture. If
 something is ambiguous, pick the simplest option, write it into `docs/decisions.md`, and continue.
@@ -48,9 +48,11 @@ commands and receive per-player redacted views (`docs/architecture.md`).
 10. Files < 300 lines, one concept per file, tests next to the code.
 11. Never modify or delete anything in `assets/`. Generated images go to `public/`.
 12. Do not commit, push or create branches unless the user asks.
-13. **Every code change bumps the version and adds a `CHANGELOG.md` entry** (semver,
-    `docs/dev/versioning.md`). `package.json` `"version"` is the single source; the newest changelog
-    release must match it (`src/ui/changelog/changelog.test.ts` checks this).
+13. **Every code change adds a `CHANGELOG.md` entry under `## [Unreleased]`; it never bumps the
+    version.** Only when the user requests a release: pick the semver from the collected entries,
+    run `npm run release -- X.Y.Z` (release commit, tag `vX.Y.Z`, publish and push `gh-pages`;
+    `docs/dev/versioning.md` §4). `package.json` `"version"` is the single source; the newest
+    released changelog version must match it (`src/ui/changelog/changelog.test.ts` checks this).
 
 ## 4. How to work (summary of `docs/dev/workflow.md`)
 
@@ -61,9 +63,9 @@ commands and receive per-player redacted views (`docs/architecture.md`).
    changed.
 5. Update the docs in the same change (`docs/dev/docs-maintenance.md`) and log decisions in
    `docs/decisions.md`.
-6. Bump the version (`npm version <x.y.z> --no-git-tag-version`) and add the release to
-   `CHANGELOG.md` (`docs/dev/versioning.md`).
-7. Report what you changed, which files, the new version, and which checks ran with which result.
+6. Add the change to `## [Unreleased]` in `CHANGELOG.md` (`docs/dev/versioning.md`); do not bump the
+   version. If the user asks for a release, follow `docs/dev/versioning.md` §4.
+7. Report what you changed, which files, and which checks ran with which result.
    Never claim "done" without a green `npm run check`.
 
 ## 5. Commands
@@ -78,7 +80,8 @@ npx playwright test e2e/game.spec.ts one e2e spec
 npm run build / npm run preview      production build into dist/ / serve it
 npm run assets                       regenerate public/cards and public/backs
 npm run relay                        local signaling relay (port 8787)
-npm version X.Y.Z --no-git-tag-version   set the version (then add the CHANGELOG.md entry)
+npm run release -- X.Y.Z             release (only on request): version, commit, tag vX.Y.Z, publish + push gh-pages
+npm run publish:pages                build and prepare the gh-pages commit (no push)
 ```
 
 Dev pages (DEV builds): `#/dev/local?seed=N&players=3..6&bots=easy|normal|strong` (offline game
@@ -97,7 +100,7 @@ version label bottom left opens it).
 | `run-checks` | running `npm run check` / e2e and fixing typical failures |
 | `e2e-tests` | running, writing and debugging Playwright tests |
 | `change-protocol` | adding/changing a command, action, view field or message |
-| `update-docs` | bringing the docs in sync after a change, incl. changelog and version bump |
+| `update-docs` | bringing the docs in sync after a change, incl. changelog (Unreleased) |
 
 ## 7. Glossary (short; full list in `docs/overview.md` §6)
 

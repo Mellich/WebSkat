@@ -44,6 +44,6 @@ Write a test in that layer that fails because of the bug, named after the correc
 1. The new test passes; `npm run check` is green.
 2. `npm run e2e` if UI flow, layout or networking was involved.
 3. Update docs if documented behavior changed; add a `docs/decisions.md` row for any choice.
-4. Patch version bump + `### Fixed` item in `CHANGELOG.md` (`docs/dev/versioning.md`):
-   `npm version <x.y.z> --no-git-tag-version`; `npm run check` again.
-5. Report cause, fix, test added, new version, checks run.
+4. `### Fixed` item under `## [Unreleased]` in `CHANGELOG.md` (`docs/dev/versioning.md`), no
+   version bump; `npm run check` again.
+5. Report cause, fix, test added, checks run.

@@ -85,13 +85,14 @@ use `t('key', {param})`. Game terms: German names in `de.ts` (Reizen, Weg, Drüc
 
 1. Update the docs (`dev/docs-maintenance.md`): every fact you changed, in the file that owns it.
 2. Append decisions to `docs/decisions.md` (next `I` number).
-3. **Bump the version and add the changelog entry** (`dev/versioning.md`): pick patch / minor
-   (§2 there), run `npm version <x.y.z> --no-git-tag-version`, add `## [x.y.z] - YYYY-MM-DD` with
-   `Added`/`Changed`/`Fixed`/… items at the top of `CHANGELOG.md`. Only docs/tests/tooling
-   changes skip this.
-4. `npm run check` once more after the doc edits and the version bump (the changelog test checks
-   that `CHANGELOG.md` and `package.json` agree).
-5. Report: what changed, which files, the new version, which tests ran (and their result), what
+3. **Add the changelog entry** (`dev/versioning.md` §3): add `Added`/`Changed`/`Fixed`/… items
+   under `## [Unreleased]` at the top of `CHANGELOG.md`. Do not bump the version. Only
+   docs/tests/tooling changes skip this. A release happens only on the user's request
+   (`dev/versioning.md` §4, `npm run release -- X.Y.Z`).
+4. `npm run check` once more after the doc edits (the changelog test checks that the newest
+   released version in `CHANGELOG.md` and `package.json` agree).
+5. Report: what changed, which files, which tests ran (and their result), what
    was not verified.
    Do not claim success without a green `npm run check`.
-6. Do not commit, push or create branches unless the user asks. Never touch `assets/`.
+6. Do not commit, push or create branches unless the user asks (a release request allows the
+   commit, tag and `gh-pages` push of the release script). Never touch `assets/`.

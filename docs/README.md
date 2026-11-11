@@ -30,7 +30,7 @@ files you need for your task.
 | `dev/e2e.md` | Playwright end-to-end tests: setup, specs, robot clicker, test ids |
 | `dev/debugging.md` | Fixing bugs: reproduce, locate the layer, common pitfalls, dev tools |
 | `dev/docs-maintenance.md` | Which doc owns which fact; how to keep docs in sync |
-| `dev/versioning.md` | Semantic versioning, `CHANGELOG.md` entries, which number to bump |
+| `dev/versioning.md` | `CHANGELOG.md` entries (Unreleased), which number to bump, releasing |
 | `history/` | Archived plan (`implementation-plan.md`, phases 0–14) and the Phase 12 spec |
 | `plans/` | **Planned changes** (from `planned-changes.md`): ten step-by-step plans, to be done in order; start with `plans/README.md` |
 
@@ -54,7 +54,7 @@ Each source folder also has an `AGENTS.md` with its rules and a **file map** (on
 | Write or fix tests | `dev/testing.md`, `dev/e2e.md` |
 | Deploy | `deployment.md` |
 | Implement a planned change | `plans/README.md`, then the plan file it names |
-| Finish any change | `dev/docs-maintenance.md`, `dev/versioning.md` (version bump + changelog) |
+| Finish any change | `dev/docs-maintenance.md`, `dev/versioning.md` (changelog; release on request) |
 
 ## 3. Conventions in these docs
 

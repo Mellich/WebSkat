@@ -68,6 +68,11 @@ export function parseChangelog(text: string): readonly ChangelogRelease[] {
   return releases;
 }
 
+/** The heading `## [Unreleased]` collects changes that are not part of a release yet. */
+export function isUnreleased(version: string): boolean {
+  return version.toLowerCase() === 'unreleased';
+}
+
 /** Splits an item at backticks: odd parts are inline code. */
 export function splitInlineCode(text: string): readonly { readonly code: boolean; readonly text: string }[] {
   return text

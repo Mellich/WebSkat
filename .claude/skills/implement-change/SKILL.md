@@ -52,8 +52,7 @@ files < 300 lines, new file → line in the folder `AGENTS.md` file map.
 
 1. Docs updated (skill `update-docs`).
 2. Decisions logged in `docs/decisions.md`.
-3. Version bumped and `CHANGELOG.md` entry added (`docs/dev/versioning.md`): new feature or
-   visible behavior change → minor, fix only → patch;
-   `npm version <x.y.z> --no-git-tag-version`; then `npm run check` again.
-4. Report: what changed, files, new version, tests run + results, what was not verified.
-5. No commit/push/branch unless asked. Never touch `assets/`.
+3. `CHANGELOG.md` entry added under `## [Unreleased]` (`docs/dev/versioning.md`); no version bump;
+   then `npm run check` again. On a release request: `docs/dev/versioning.md` §4.
+4. Report: what changed, files, tests run + results, what was not verified.
+5. No commit/push/branch unless asked (a release request allows the release script's commit, tag and gh-pages push). Never touch `assets/`.

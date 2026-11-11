@@ -2,7 +2,7 @@
 // Headings go through t(); the release notes themselves are shown as written (English).
 
 import { changelogText } from '../changelog/changelogText';
-import { parseChangelog, splitInlineCode, type ChangelogRelease } from '../changelog/parseChangelog';
+import { isUnreleased, parseChangelog, splitInlineCode, type ChangelogRelease } from '../changelog/parseChangelog';
 import { useT, type Translator } from '../i18n';
 import type { TranslationKey } from '../i18n/en';
 import { APP_VERSION } from '../version';
@@ -34,7 +34,7 @@ function Release({ release, t }: { readonly release: ChangelogRelease; readonly 
   return (
     <section className={styles.release} data-testid="changelog-release">
       <h2>
-        {t('changelog.release', { version: release.version })}
+        {isUnreleased(release.version) ? t('changelog.unreleased') : t('changelog.release', { version: release.version })}
         {release.date === null ? null : <span className={styles.date}>{release.date}</span>}
       </h2>
       {release.sections.map((section) => (
