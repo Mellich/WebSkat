@@ -12,6 +12,10 @@ Versions before 0.7.0 were reconstructed from the git history.
 ### Changed
 
 - Strong bots play stronger: each card decision samples many more possible hidden-card deals (up to 150 instead of 40 per card), so they take up to half a second per decision instead of a fraction of one.
+- Visual rework of the dialogs. Every dialog (Statistics, Settings, Players, Game log, About) has the same title bar, and its close button is an icon (×) in the top right instead of a text button. Esc still closes.
+- The Statistics dialog switches its content with tabs (Standings, History, Charts). The scoring choice is a segmented control.
+- Settings has two tabs, "Display" (language, card back, timing) and "Play" (playing a card, scoring). Language, "Playing a card" and scoring are segmented controls.
+- The on/off choices (the lobby rules Ramsch, Bockrunden and Kontra and Re, "List publicly" on Home, and "Ouvert" when declaring) are switches instead of checkboxes.
 
 ## [0.11.1] - 2026-11-10
 

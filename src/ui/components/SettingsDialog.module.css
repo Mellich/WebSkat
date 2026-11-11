@@ -1,37 +1,4 @@
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgb(0 0 0 / 55%);
-  display: grid;
-  place-items: center;
-  z-index: 40;
-  padding: 8px;
-}
-
-.dialog {
-  width: min(96vw, 460px);
-  max-height: calc(100dvh - 16px);
-  overflow: auto;
-  padding: 16px;
-  border-radius: var(--radius);
-  background-color: var(--panel-solid);
-  background-image: var(--grain);
-  border: 1px solid rgb(255 255 255 / 20%);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header h2 {
-  margin: 0;
-  font-size: 1.15rem;
-}
+/* Settings dialog body (SettingsDialog.tsx). The shell and tabs are in Dialog and Tabs. */
 
 .field {
   display: flex;
@@ -40,6 +7,12 @@
   border: 0;
   padding: 0;
   margin: 0;
+  min-width: 0;
+}
+
+.field > span,
+.field legend {
+  font-weight: 600;
 }
 
 .field select {
@@ -58,21 +31,32 @@
   flex-wrap: wrap;
 }
 
-.backs button {
+/* Card backs are picture buttons: no wooden face, a brass frame when chosen. */
+.back,
+.picked {
   padding: 4px;
   min-width: 0;
   min-height: 0;
   background: transparent;
+  background-image: none;
+  box-shadow: none;
+  border-color: transparent;
+  border-radius: var(--radius);
+  opacity: 0.75;
+}
+
+.back:hover:not(:disabled) {
+  opacity: 1;
+  background-color: rgb(255 255 255 / 6%);
 }
 
 .picked {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
+  opacity: 1;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 10px rgb(0 0 0 / 40%);
 }
 
-.radio {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: var(--tap);
+.back:active:not(:disabled),
+.picked:active:not(:disabled) {
+  transform: none;
 }

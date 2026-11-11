@@ -54,6 +54,8 @@ export const dePanels: Record<keyof typeof enPanels, string> = {
   'players.pending': 'Wartend',
   'players.pendingHint': 'Sie sitzen ab dem nächsten Spiel am Tisch oder wenn der Gastgeber ihnen einen Platz gibt.',
   'settings.title': 'Einstellungen',
+  'settings.tabDisplay': 'Anzeige',
+  'settings.tabPlay': 'Spiel',
   'settings.language': 'Sprache',
   'settings.cardBack': 'Kartenrücken',
   'settings.confirm': 'Karte ausspielen',

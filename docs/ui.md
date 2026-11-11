@@ -66,8 +66,8 @@ exists, Home navigates to that table (`decisions.md` I80).
   `rejected TIMEOUT` also shows **Retry** (`retry-join`): it drops the connection, and the effect
   joins again with the stored session. `INVITE_INVALID` has its own text.
 - `TableLobby` shows the key, the seats (bot strength per bot for the host), the "Table rules"
-  section (`lobby.rules`: the host's checkboxes `rule-ramsch` ("Ramsch when everybody passes") and
-  `rule-bock` ("Bockrunden (60:60 → next 3 games count double)") and `rule-kontra` ("Kontra and Re (doubling after the declaration)"); the others read "on"/"off"), and the host's Add bot / Start buttons. The rule checkbox is disabled while a
+  section (`lobby.rules`: the host's switches `rule-ramsch` ("Ramsch when everybody passes") and
+  `rule-bock` ("Bockrunden (60:60 → next 3 games count double)") and `rule-kontra` ("Kontra and Re (doubling after the declaration)"); the others read "on"/"off"), and the host's Add bot / Start buttons. The rule switch is disabled while a
   game runs.
 - Shows `TableLobby` while `view.table.status === 'lobby'`, the viewer is `pending`, or there is
   no game; otherwise `GameScreen` (keyed by game number, so each game starts with fresh local
@@ -135,12 +135,16 @@ table (`closed` to everyone) and forgets its snapshot.
 
 ## 6. Settings (`persist/settings.ts`, `components/SettingsDialog.tsx`)
 
+The dialog has two tabs (`Display`: language, card back, trick and bid timing; `Play`: "Playing a
+card" and scoring). Language, "Playing a card" and scoring are `SegmentedControl`s; the two timing
+settings stay selects. Every change is saved at once.
+
 | Field | Values (default) | In the dialog |
 |---|---|---|
 | `name` | string ≤ 20 (`''`) | (Home input) |
 | `language` | `en` \| `de` (browser: `de*` → de) | yes |
 | `cardBack` | 0–3 (2) | yes, with previews |
-| `confirmPlay` | `auto` (two taps on touch) \| `always` \| `never` (`auto`) | yes |
+| `confirmPlay` | `auto` (two taps on touch) \| `always` \| `never` (`auto`) | yes (`setting-confirm`, segmented, tab Play) |
 | `trickDisplayMs` | 0, 300, 600, 1000, 2000 (600) | yes (`setting-trick-display`, "Show finished trick") |
 | `scoring` | `seeger` \| `standard` (`standard`) | yes (also the toggle in Stats; the result dialog reads it) |
 | `bidBubbleMs` | 0, 500, 1000, 2000, 3000 (1000) | yes (`setting-bid-bubble`, "Show bids as speech bubbles"); each viewer's own, no host pacing |
@@ -197,7 +201,11 @@ blocked) and the `persist/*` modules. Values are validated on read.
 | `SkatPile` | two backs during bidding / Skat decision |
 | `CardChip`, `CardChips` | card as text chip `♥10` with full name as `aria-label`/`title` |
 | `GameLogDialog` (`components/GameLogDialog.tsx`, plan 10) | Modal over `view.log` (the last 100 entries, oldest first; `log-list` / `log-entry`, `dealt` entries are separators). Scrolls to the newest entry when one arrives. Texts from `log/logText.ts` (pure, one `switch` over the entry kinds; strings in `i18n/parts/enLog.ts` / `deLog.ts`). Closes on Esc |
-| `TopBar`, `Toasts`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` | Dialogs close on Esc |
+| `Dialog` (`components/Dialog.tsx`) | Shared shell of every modal (`SettingsDialog`, `AboutDialog`, `GameLogDialog`, `PlayersDialog`, `StatsPanel`): title bar with an icon close button (×, `dialog-close`, `aria-label` "Close"), optional `actions` (buttons left of ×) and `toolbar` (non-scrolling row for tabs and segmented controls), scrolling body. Esc closes. Sizes `sm`/`md`/`lg` |
+| `Tabs` (`components/Tabs.tsx`) | Tab row for switching the content of a dialog: `role="tablist"`, roving tabindex, Left/Right/Home/End keys. Used by the Stats dialog (`stats-tab-*`) and Settings (`settings-tab-display`, `settings-tab-play`) |
+| `SegmentedControl` (`components/SegmentedControl.tsx`) | One choice out of two or three short options as joined pills; native radios underneath (`role="radiogroup"`). Used for the language, "Playing a card" and scoring settings and the scoring toggle in Stats |
+| `Switch` (`components/Switch.tsx`) | On/off toggle with a label; a native checkbox covers the whole row (the test id goes on the input). Used for the lobby rules, "List publicly" and "Ouvert" |
+| `TopBar`, `Toasts`, `ConfirmDialog`, `PlayersDialog`, `AboutDialog` | Dialogs close on Esc (`ConfirmDialog` keeps its Cancel / Confirm buttons; `ResultDialog` has only Continue) |
 | `VersionBadge` | `v<version>` link bottom left on every screen, opens `#/changelog` in a new tab (§1) |
 | `stats/*` | `statistics.md` §3 |
 

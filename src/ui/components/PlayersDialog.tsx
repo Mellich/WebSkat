@@ -1,7 +1,7 @@
 // Players dialog: the seats, the waiting players and, for the host, the player controls
 // (replace during a game, kick in the lobby, invite a disconnected human again). Docs: ui.md §3.
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ROLES, type Role } from '../../engine';
 import { joinLink, type GameConnection } from '../../net';
 import type { PlayerPublic, TableView } from '../../table';
@@ -9,6 +9,7 @@ import { AbortGameButton } from '../game/AbortGameButton';
 import { useT, type Translator } from '../i18n';
 import type { TranslationKey } from '../i18n/en';
 import { ConfirmDialog } from './ConfirmDialog';
+import { Dialog } from './Dialog';
 import { InviteBox } from './InviteBox';
 import { PlayerRow } from './PlayerRow';
 import { ReplaceChooser } from './ReplaceChooser';
@@ -48,16 +49,6 @@ export function PlayersDialog({ view, connection, invite, onClose }: PlayersDial
   const [kicking, setKicking] = useState<PlayerPublic | null>(null);
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [inviteFailed, setInviteFailed] = useState(false);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [onClose]);
 
   const { table, you } = view;
   const tableLink = joinLink(table.key, `${window.location.origin}${window.location.pathname}`);
@@ -109,12 +100,7 @@ export function PlayersDialog({ view, connection, invite, onClose }: PlayersDial
   );
 
   return (
-    <div className={styles.backdrop}>
-      <div className={styles.dialog} role="dialog" aria-modal="true" aria-label={t('players.title')} data-testid="players-dialog">
-        <header className={styles.header}>
-          <h2>{t('players.title')}</h2>
-          <button type="button" onClick={onClose}>{t('common.close')}</button>
-        </header>
+    <Dialog title={t('players.title')} onClose={onClose} testId="players-dialog">
 
         <section className={styles.tableInvite} data-testid="table-invite">
           <p className={styles.label}>{t('players.tableInvite')}</p>
@@ -181,7 +167,6 @@ export function PlayersDialog({ view, connection, invite, onClose }: PlayersDial
             }}
           />
         )}
-      </div>
-    </div>
+    </Dialog>
   );
 }

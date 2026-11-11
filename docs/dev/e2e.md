@@ -92,7 +92,8 @@ viewer win the bidding.
 | Skat / declare | `pickup`, `play-hand`, `discard-submit`, `declare-option-0..5` (♣ ♠ ♥ ♦ Grand Null), `declare-submit` |
 | Kontra / Re | `kontra`, `re`, `no-double` |
 | Result | `result-dialog`, `continue` |
-| Stats / settings | `stats-tab-standings`, `stats-tab-history`, `stats-tab-charts`, `history-row`, `stats-export-csv`, `setting-trick-display`, `setting-bid-bubble` |
+| Stats / settings | `stats-dialog`, `stats-tab-standings`, `stats-tab-history`, `stats-tab-charts`, `stats-scoring`, `history-row`, `stats-export-csv`, `settings-dialog`, `settings-tab-display`, `settings-tab-play`, `setting-language`, `setting-confirm`, `setting-scoring`, `setting-trick-display`, `setting-bid-bubble` |
+| Dialogs | `dialog-close` (the × of every `Dialog`), `log-dialog`, `players-dialog`, `about-dialog` |
 
 Find them all: `grep -rhoE 'data-testid=(\{`[^`]*`\}|"[^"]*")' src | sort -u`.
 

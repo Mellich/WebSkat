@@ -52,6 +52,8 @@ export const enPanels = {
   'players.pending': 'Waiting',
   'players.pendingHint': 'Seated when the next game starts, or when the host gives them a seat.',
   'settings.title': 'Settings',
+  'settings.tabDisplay': 'Display',
+  'settings.tabPlay': 'Play',
   'settings.language': 'Language',
   'settings.cardBack': 'Card back',
   'settings.confirm': 'Playing a card',

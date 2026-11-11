@@ -1,70 +1,16 @@
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgb(0 0 0 / 55%);
-  display: grid;
-  place-items: center;
-  z-index: 40;
-  padding: 8px;
-}
+/* Statistics content (StatsPanel.tsx and its children). The dialog shell is in components/Dialog. */
 
-.dialog {
-  width: min(96vw, 900px);
-  max-height: calc(100dvh - 16px);
+.content {
   display: flex;
   flex-direction: column;
-  border-radius: var(--radius);
-  background-color: var(--panel-solid);
-  background-image: var(--grain);
-  border: 1px solid rgb(255 255 255 / 20%);
-  overflow: hidden;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 14px;
-}
-
-.header h2 {
-  margin: 0;
-  font-size: 1.15rem;
-}
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
   gap: 8px;
-  padding: 0 14px 10px;
-}
-
-.tabs,
-.scoring {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.tabs button[aria-selected='true'],
-.active,
-.scoring button[aria-pressed='true'] {
-  background: var(--accent);
-  color: #1a1a1a;
-  border-color: var(--accent);
-}
-
-.body {
-  overflow: auto;
-  padding: 0 14px 16px;
 }
 
 .scroll {
   overflow-x: auto;
 }
 
-.body h3 {
+.content h3 {
   font-size: 1rem;
   margin: 16px 0 8px;
 }
@@ -76,15 +22,15 @@
 }
 
 .table,
-.body table {
+.content table {
   width: 100%;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
   font-size: 0.9rem;
 }
 
-.body th,
-.body td {
+.content th,
+.content td {
   padding: 6px 8px;
   border-bottom: 1px solid rgb(255 255 255 / 10%);
   text-align: left;

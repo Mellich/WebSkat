@@ -1,0 +1,49 @@
+/* Tabs (Tabs.tsx): an underlined row of text tabs; the selected one carries the brass bar. */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+  width: 100%;
+}
+
+.tab,
+.selected {
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: var(--muted);
+  font-weight: 600;
+  position: relative;
+}
+
+.tab:hover:not(:disabled) {
+  color: var(--ink);
+  background-color: rgb(255 255 255 / 6%);
+}
+
+.tab:active:not(:disabled),
+.selected:active:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+
+.selected {
+  color: var(--ink);
+}
+
+.selected::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}

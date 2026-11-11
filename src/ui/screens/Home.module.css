@@ -71,20 +71,6 @@
   width: 100%;
 }
 
-.check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: var(--tap);
-  font-size: 1rem;
-}
-
-.check input {
-  width: 22px;
-  height: 22px;
-  accent-color: var(--accent);
-}
-
 .inline {
   display: flex;
   gap: 8px;

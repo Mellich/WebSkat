@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createDirectory, isValidKey, normalizeKey, type Directory, type TableAd } from '../../net';
 import { AboutDialog } from '../components/AboutDialog';
+import { Switch } from '../components/Switch';
 import { cls } from '../classNames';
 import { logoUrl } from '../assets';
 import { useT } from '../i18n';
@@ -157,10 +158,7 @@ export function Home() {
           <span>{t('home.tableName')}</span>
           <input type="text" maxLength={40} value={tableName} onChange={(e) => { setTableName(e.target.value); }} />
         </label>
-        <label className={styles.check}>
-          <input type="checkbox" checked={isPublic} onChange={(e) => { setIsPublic(e.target.checked); }} />
-          <span>{t('home.public')}</span>
-        </label>
+        <Switch checked={isPublic} onChange={setIsPublic}>{t('home.public')}</Switch>
         <button type="submit" data-testid="create-table">{t('home.create')}</button>
       </form>
 

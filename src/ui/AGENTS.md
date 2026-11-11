@@ -59,8 +59,8 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `game/seats.ts` | `opponentsOf` (seat order relative to the viewer), `namesById` |
 | `game/trickPositions.ts` | `trickSeats` (who is left / right / bottom), `placeTrick` (plays → positions) |
 | `game/labels.ts` | `cardName`, `cardShort`, `declarationLabel`, `spitzenLabel`, `suitKey`, `suitSymbol` |
-| `components/` | `Card` (`disabled` = button that cannot be clicked), `Hand` (interactive hands are all buttons), `OpponentSeat`, `TrickArea`, `SkatPile`, `SpeechBubble`, `CardChip(s)`, `ConnectionDot`, `VersionBadge` (version link bottom left), `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog`, `AboutDialog`, `PlayersDialog` (+ `PlayerRow`, `ReplaceChooser`, `InviteBox` (copy box; table invite and per-player invite); `PlayersDialog.module.css`), `GameLogDialog` (`GameLogDialog.module.css`) |
-| `stats/` | `StatsPanel`, `Standings`, `History`, `ScoreChart`, `ByType`, `chartGeometry.ts`, `gameLabel.ts`, `csv.ts` (CSV export of the history) |
+| `components/` | `Card` (`disabled` = button that cannot be clicked), `Hand` (interactive hands are all buttons), `OpponentSeat`, `TrickArea`, `SkatPile`, `SpeechBubble`, `CardChip(s)`, `ConnectionDot`, `VersionBadge` (version link bottom left), `TopBar`, `Toast(s)`, `ConfirmDialog`, `SettingsDialog` (two tabs), `AboutDialog`, `PlayersDialog` (+ `PlayerRow`, `ReplaceChooser`, `InviteBox` (copy box; table invite and per-player invite); `PlayersDialog.module.css`), `GameLogDialog` (`GameLogDialog.module.css`), `Dialog` (shared modal shell with the × close button; `Dialog.module.css`), `Tabs`, `SegmentedControl`, `Switch` (each with its `.module.css`) |
+| `stats/` | `StatsPanel` (a `Dialog` with `Tabs`; scoring is a `SegmentedControl`), `Standings`, `History`, `ScoreChart`, `ByType`, `chartGeometry.ts`, `gameLabel.ts`, `csv.ts` (CSV export of the history) |
 | `store/session.ts` | `useSession` (connection, host, status, view, records, toasts), `errorText` |
 | `store/settings.ts` | `useSettings` (settings + `update`) |
 | `log/logText.ts` | `logText(entry, t)`: the text of one game-log entry (plan 10) |
@@ -82,6 +82,12 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 - `GameScreen` is keyed by the game number, so local state resets for each game.
 
 ## Recipes
+
+- **New dialog:** wrap the content in `<Dialog title size testId>` (`components/Dialog.tsx`). It
+  brings the title bar, the × button and Esc. Do not write a backdrop or a close button of your own.
+  Tab sets go in `toolbar` with `Tabs`; buttons beside × go in `actions`.
+- **New on/off setting or option:** `Switch` for a boolean; `SegmentedControl` for two or three
+  options; a `<select>` for longer lists.
 
 - **New button that sends a command:** read the permission from `view.game.legal` (or
   `view.table` / `view.you` for lobby actions), call `connection.send(...)`, add `data-testid`,

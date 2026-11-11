@@ -5,6 +5,7 @@ import { formatKey, joinLink, type GameConnection } from '../../net';
 import type { BotLevel, TableView } from '../../table';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { ConnectionDot } from '../components/ConnectionDot';
+import { Switch } from '../components/Switch';
 import { useT } from '../i18n';
 import styles from './TableLobby.module.css';
 
@@ -117,44 +118,38 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
       <section aria-label={t('lobby.rules')}>
         <h3 className={styles.label}>{t('lobby.rules')}</h3>
         {isHost ? (
-          <>
-            <label className={styles.rule}>
-              <input
-                type="checkbox"
-                data-testid="rule-ramsch"
-                checked={table.rules.ramsch}
-                disabled={gameRunning}
-                onChange={(e) => {
-                  connection.send({ type: 'set-rules', rules: { ...table.rules, ramsch: e.target.checked } });
-                }}
-              />{' '}
+          <div className={styles.rules}>
+            <Switch
+              testId="rule-ramsch"
+              checked={table.rules.ramsch}
+              disabled={gameRunning}
+              onChange={(checked) => {
+                connection.send({ type: 'set-rules', rules: { ...table.rules, ramsch: checked } });
+              }}
+            >
               {t('lobby.ruleRamsch')}
-            </label>
-            <label className={styles.rule}>
-              <input
-                type="checkbox"
-                data-testid="rule-bock"
-                checked={table.rules.bock}
-                disabled={gameRunning}
-                onChange={(e) => {
-                  connection.send({ type: 'set-rules', rules: { ...table.rules, bock: e.target.checked } });
-                }}
-              />{' '}
+            </Switch>
+            <Switch
+              testId="rule-bock"
+              checked={table.rules.bock}
+              disabled={gameRunning}
+              onChange={(checked) => {
+                connection.send({ type: 'set-rules', rules: { ...table.rules, bock: checked } });
+              }}
+            >
               {t('lobby.ruleBock')}
-            </label>
-            <label className={styles.rule}>
-              <input
-                type="checkbox"
-                data-testid="rule-kontra"
-                checked={table.rules.kontra}
-                disabled={gameRunning}
-                onChange={(e) => {
-                  connection.send({ type: 'set-rules', rules: { ...table.rules, kontra: e.target.checked } });
-                }}
-              />{' '}
+            </Switch>
+            <Switch
+              testId="rule-kontra"
+              checked={table.rules.kontra}
+              disabled={gameRunning}
+              onChange={(checked) => {
+                connection.send({ type: 'set-rules', rules: { ...table.rules, kontra: checked } });
+              }}
+            >
               {t('lobby.ruleKontra')}
-            </label>
-          </>
+            </Switch>
+          </div>
         ) : (
           <>
             <p className={styles.hint}>

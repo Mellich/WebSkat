@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { declarationFloorValue, type Declaration, type Suit } from '../../engine';
 import type { DeclarerSpitzen } from '../../table';
+import { Switch } from '../components/Switch';
 import { useT } from '../i18n';
 import { suitKey, suitSymbol } from './labels';
 
@@ -97,10 +98,7 @@ export function DeclarationPicker({ options, spitzen, bid, onDeclare }: Declarat
             </label>
           ))}
           {ouverts.includes(true) ? (
-            <label>
-              <input type="checkbox" checked={ouvert} onChange={(e) => { setOuvert(e.target.checked); }} />
-              {t('declare.ouvert')}
-            </label>
+            <Switch checked={ouvert} onChange={setOuvert}>{t('declare.ouvert')}</Switch>
           ) : null}
         </fieldset>
       ) : null}
