@@ -1,4 +1,4 @@
-import{c as e,d as t,l as n}from"./index-CgUQWr_3.js";var r=`# Changelog
+import{c as e,d as t,l as n}from"./index-cuOHY72_.js";var r=`# Changelog
 
 All notable changes to WebSkat are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
@@ -6,6 +6,20 @@ All notable changes to WebSkat are listed here. The format follows
 next version: \`docs/dev/versioning.md\`.
 
 Versions before 0.7.0 were reconstructed from the git history.
+
+## [0.15.0] - 2026-11-12
+
+### Added
+
+- The club logo is stamped into the felt: darker, slightly worn, as if pressed into leather.
+
+### Changed
+
+- The background is an old, used oak table top with uneven planks, knots, water marks, beer rings, burns and scratches.
+- Wide screens without much height (laptops, tablets and phones held sideways) put the opponents beside the felt, so the felt gets more height.
+- The Skat and the played cards always lie completely on the felt; they get smaller when the felt is small.
+- The bidding, Skat, discard, declare and Kontra/Re panels lie over the felt and the status line, so the felt no longer shrinks when a panel opens. The panel shows what it needs from the covered status line: who won the bidding and the declared game, the Bock line, a reconnect wait and the host's Abort button.
+- Long status lines (for example the declared game after taking the Skat on a phone) wrap instead of being cut off.
 
 ## [0.14.0] - 2026-11-12
 
