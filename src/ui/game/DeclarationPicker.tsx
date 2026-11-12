@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { declarationFloorValue, type Declaration, type Suit } from '../../engine';
 import type { DeclarerSpitzen } from '../../table';
+import { SegmentedControl } from '../components/SegmentedControl';
 import { Switch } from '../components/Switch';
 import { useT } from '../i18n';
 import { suitKey, suitSymbol } from './labels';
@@ -35,6 +36,8 @@ function announceOf(d: Declaration): 'none' | 'schneider' | 'schwarz' {
 
 export function DeclarationPicker({ options, spitzen, bid, onDeclare }: DeclarationPickerProps) {
   const t = useT();
+  const announceLabel = (a: 'none' | 'schneider' | 'schwarz'): string =>
+    a === 'none' ? t('declare.normal') : a === 'schneider' ? t('declare.schneider') : t('declare.schwarz');
   const [choice, setChoice] = useState<GameChoice | null>(null);
   const [announce, setAnnounce] = useState<'none' | 'schneider' | 'schwarz'>('none');
   const [ouvert, setOuvert] = useState(false);
@@ -91,12 +94,13 @@ export function DeclarationPicker({ options, spitzen, bid, onDeclare }: Declarat
       {choice !== null && (announces.length > 1 || ouverts.length > 1) ? (
         <fieldset>
           <legend>{t('declare.extras')}</legend>
-          {announces.map((a) => (
-            <label key={a}>
-              <input type="radio" name="announce" checked={announce === a} onChange={() => { setAnnounce(a); }} />
-              {a === 'none' ? t('declare.normal') : a === 'schneider' ? t('declare.schneider') : t('declare.schwarz')}
-            </label>
-          ))}
+          <SegmentedControl
+            label={t('declare.extras')}
+            testId="declare-announce"
+            options={announces.map((a) => ({ value: a, label: announceLabel(a) }))}
+            value={announce}
+            onChange={setAnnounce}
+          />
           {ouverts.includes(true) ? (
             <Switch checked={ouvert} onChange={setOuvert}>{t('declare.ouvert')}</Switch>
           ) : null}

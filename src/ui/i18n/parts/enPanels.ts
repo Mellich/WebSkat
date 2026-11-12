@@ -11,6 +11,8 @@ export const enPanels = {
   'stats.standard': 'Standard',
   'stats.ramsch': 'Ramsch',
   'stats.empty': 'No games played yet.',
+  'stats.gameCount': '{played} / {limit} games',
+  'stats.gameCountOpen': '{played} games played (no limit)',
   'stats.rank': '#',
   'stats.name': 'Name',
   'stats.total': 'Total',

@@ -42,6 +42,7 @@ describe('DeclarationPicker', () => {
 
     render(<DeclarationPicker options={declarationOptions(true)} spitzen={NO_SPITZEN} bid={18} onDeclare={() => undefined} />);
     fireEvent.click(screen.getByRole('button', { name: '♥ Hearts' }));
+    expect(screen.getByRole('radiogroup', { name: 'Announcements' })).toBeTruthy();
     expect(screen.getByRole('radio', { name: 'Normal' })).toBeTruthy();
     expect(screen.getByRole('radio', { name: 'Schneider announced' })).toBeTruthy();
     expect(screen.getByRole('radio', { name: 'Schwarz announced' })).toBeTruthy();

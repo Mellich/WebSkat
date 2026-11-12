@@ -18,12 +18,14 @@ export interface StatsPanelProps {
   readonly records: readonly GameRecord[];
   readonly players: readonly { readonly id: PlayerId; readonly name: string }[];
   readonly viewerId: PlayerId;
+  /** Games to play in the series; 0 = unlimited (docs/statistics.md §3). */
+  readonly gameLimit: number;
   readonly onClose: () => void;
 }
 
 type Tab = 'standings' | 'history' | 'charts';
 
-export function StatsPanel({ records, players, viewerId, onClose }: StatsPanelProps) {
+export function StatsPanel({ records, players, viewerId, gameLimit, onClose }: StatsPanelProps) {
   const t = useT();
   const scoring = useSettings((s) => s.scoring);
   const update = useSettings((s) => s.update);
@@ -73,6 +75,11 @@ export function StatsPanel({ records, players, viewerId, onClose }: StatsPanelPr
       }
     >
       <div className={styles.content}>
+        <p className={styles.progress} data-testid="stats-games">
+          {gameLimit > 0
+            ? t('stats.gameCount', { played: records.length, limit: gameLimit })
+            : t('stats.gameCountOpen', { played: records.length })}
+        </p>
         {records.length === 0 ? <p className={styles.empty}>{t('stats.empty')}</p> : null}
         {records.length > 0 && tab === 'standings' ? (
           <Standings stats={stats} scoring={scoring} viewerId={viewerId} />

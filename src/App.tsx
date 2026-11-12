@@ -2,9 +2,14 @@ import { Suspense, lazy } from 'react';
 import { Toasts } from './ui/components/Toast';
 import { VersionBadge } from './ui/components/VersionBadge';
 import { useRoute } from './ui/router';
-import { ChangelogScreen } from './ui/screens/ChangelogScreen';
 import { Home } from './ui/screens/Home';
 import { TableScreen } from './ui/screens/TableScreen';
+
+// The changelog screen bundles CHANGELOG.md; it is loaded only when its route opens.
+const ChangelogScreen = lazy(async () => {
+  const module = await import('./ui/screens/ChangelogScreen');
+  return { default: module.ChangelogScreen };
+});
 
 // Development-only screens. The conditions are constants in production builds, so the lazy
 // imports are removed from the bundle.

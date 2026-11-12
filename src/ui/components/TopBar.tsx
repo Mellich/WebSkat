@@ -1,18 +1,23 @@
 // Always visible at the top of a table: name, key, connection status, statistics, game log, players, settings, Leave.
 
-import { useMemo, useState } from 'react';
+import { Suspense, lazy, useMemo, useState } from 'react';
 import { formatKey } from '../../net';
 import { cls } from '../classNames';
 import { useT } from '../i18n';
 import { leaveTable } from '../net/actions';
 import { navigate } from '../router';
-import { StatsPanel } from '../stats/StatsPanel';
 import { useSession } from '../store/session';
 import { ConfirmDialog } from './ConfirmDialog';
 import { GameLogDialog } from './GameLogDialog';
 import { PlayersDialog } from './PlayersDialog';
 import { SettingsDialog } from './SettingsDialog';
 import styles from './TopBar.module.css';
+
+// The statistics panel (with its charts) is loaded the first time it is opened.
+const StatsPanel = lazy(async () => {
+  const module = await import('../stats/StatsPanel');
+  return { default: module.StatsPanel };
+});
 
 export function TopBar() {
   const t = useT();
@@ -122,14 +127,17 @@ export function TopBar() {
         />
       ) : null}
       {panel === 'stats' && view !== null ? (
-        <StatsPanel
-          records={records}
-          players={players}
-          viewerId={view.you.id}
-          onClose={() => {
-            setPanel(null);
-          }}
-        />
+        <Suspense fallback={null}>
+          <StatsPanel
+            records={records}
+            players={players}
+            viewerId={view.you.id}
+            gameLimit={view.table.gameLimit}
+            onClose={() => {
+              setPanel(null);
+            }}
+          />
+        </Suspense>
       ) : null}
       {panel === 'log' && view !== null ? (
         <GameLogDialog

@@ -71,3 +71,11 @@
 .barLabel {
   color: var(--muted);
 }
+
+/* Games played of the series, e.g. "3 / 12 games", above the tabs' content. */
+.progress {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

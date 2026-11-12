@@ -192,6 +192,15 @@
   font-size: 0.95rem;
 }
 
+/* The game currently chosen in the declare picker is lit like the chosen segment of a segmented control. */
+.phase :global(.declare-games) button[aria-pressed='true'],
+.phase :global(.declare-games) button[aria-pressed='true']:hover {
+  color: #1a1a1a;
+  font-weight: 700;
+  background: linear-gradient(180deg, #f3c96a, var(--accent));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 40%), inset 0 1px 0 rgb(255 255 255 / 40%);
+}
+
 .phase :global(h3) {
   margin: 0;
   font-size: 1rem;

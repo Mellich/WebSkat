@@ -7,6 +7,19 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [Unreleased]
+
+### Changed
+
+- The game type chosen when declaring (suit, Grand, Null) is highlighted in brass, so it is visible before pressing Declare.
+- The announcement choice (Normal / Schneider announced / Schwarz announced) when declaring a game is a segmented control like the settings, instead of radio buttons.
+- The statistics dialog shows the games played as a fraction of the series limit (e.g. "3 / 12 games"), or the count when the series is unlimited.
+- The changelog screen and the statistics dialog are loaded on first use, so the main bundle is smaller and the build no longer warns about a chunk over 500 kB.
+
+### Fixed
+
+- The dropdown for the number of games in the lobby uses the dark theme (its options and popup were white).
+
 ## [0.13.0] - 2026-11-12
 
 ### Added

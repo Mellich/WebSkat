@@ -13,6 +13,8 @@ export const dePanels: Record<keyof typeof enPanels, string> = {
   'stats.standard': 'Standard',
   'stats.ramsch': 'Ramsch',
   'stats.empty': 'Noch keine Spiele gespielt.',
+  'stats.gameCount': '{played} / {limit} Spiele',
+  'stats.gameCountOpen': '{played} Spiele gespielt (unbegrenzt)',
   'stats.rank': '#',
   'stats.name': 'Name',
   'stats.total': 'Summe',

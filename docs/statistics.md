@@ -54,7 +54,8 @@ when the declarer loses; passed-in records add 0. A Ramsch record adds its engin
 ## 3. UI (`src/ui/stats/`)
 
 `StatsPanel` opens from the TopBar (`open-stats`) as a modal (Esc closes) with a Seeger/Standard
-toggle (the same `scoring` setting as in Settings) and three tabs (`stats-tab-<id>`):
+toggle (the same `scoring` setting as in Settings) and three tabs (`stats-tab-<id>`). Above the tabs
+`stats-games` shows games played as a fraction of the series limit ("3 / 12 games"), or "3 games played (no limit)" when `gameLimit` is 0:
 
 | Tab | Component | Content |
 |---|---|---|

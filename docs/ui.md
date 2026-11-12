@@ -30,6 +30,8 @@ over the content without taking layout space). It is a link to `#/changelog` wit
 (`changelog.current`), then one panel per release of `CHANGELOG.md` (`changelog-release`), newest
 first. The file is bundled with `?raw` (`changelog/changelogText.ts`) and parsed by
 `changelog/parseChangelog.ts` (releases, Keep a Changelog sections, items; backticks → `<code>`).
+Both the changelog screen (`App.tsx`) and the Stats dialog (`TopBar.tsx`) are `React.lazy` imports, so
+their code is a separate chunk loaded on first use; keeps the main bundle under the 500 kB warning limit.
 Section titles are translated (`changelog.section.<Name>`); the items are shown as written in
 `CHANGELOG.md` (English).
 
@@ -203,7 +205,7 @@ blocked) and the `persist/*` modules. Values are validated on read.
 | `GameLogDialog` (`components/GameLogDialog.tsx`, plan 10) | Modal over `view.log` (the last 100 entries, oldest first; `log-list` / `log-entry`, `dealt` entries are separators). Scrolls to the newest entry when one arrives. Texts from `log/logText.ts` (pure, one `switch` over the entry kinds; strings in `i18n/parts/enLog.ts` / `deLog.ts`). Closes on Esc |
 | `Dialog` (`components/Dialog.tsx`) | Shared shell of every modal (`SettingsDialog`, `AboutDialog`, `GameLogDialog`, `PlayersDialog`, `StatsPanel`): title bar with an icon close button (×, `dialog-close`, `aria-label` "Close"), optional `actions` (buttons left of ×) and `toolbar` (non-scrolling row for tabs and segmented controls), scrolling body. Esc closes. Sizes `sm`/`md`/`lg` |
 | `Tabs` (`components/Tabs.tsx`) | Tab row for switching the content of a dialog: `role="tablist"`, roving tabindex, Left/Right/Home/End keys. Used by the Stats dialog (`stats-tab-*`) and Settings (`settings-tab-display`, `settings-tab-play`) |
-| `SegmentedControl` (`components/SegmentedControl.tsx`) | One choice out of two or three short options as joined pills; native radios underneath (`role="radiogroup"`). Used for the language, "Playing a card" and scoring settings and the scoring toggle in Stats |
+| `SegmentedControl` (`components/SegmentedControl.tsx`) | One choice out of two or three short options as joined pills; native radios underneath (`role="radiogroup"`). Used for the language, "Playing a card" and scoring settings, the scoring toggle in Stats and the announcements in the declaration picker |
 | `Switch` (`components/Switch.tsx`) | On/off toggle with a label; a native checkbox covers the whole row (the test id goes on the input). Used for the lobby rules, "List publicly" and "Ouvert" |
 | `TopBar`, `Toasts`, `ConfirmDialog`, `PlayersDialog`, `AboutDialog` | Dialogs close on Esc (`ConfirmDialog` keeps its Cancel / Confirm buttons; `ResultDialog` has only Continue) |
 | `VersionBadge` | `v<version>` link bottom left on every screen, opens `#/changelog` in a new tab (§1) |

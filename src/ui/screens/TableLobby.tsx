@@ -129,6 +129,7 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
             <label className={styles.limit}>
               <span>{t('series.limit')}</span>
               <select
+                className={styles.level}
                 data-testid="game-limit"
                 value={table.gameLimit}
                 disabled={gameRunning}

@@ -64,9 +64,10 @@ During bidding the hand is shown at full brightness but not clickable (`showAll`
 ## 4. DeclarationPicker (`DeclarationPicker.tsx`)
 
 1. Six game tiles `declare-option-0..5`: ♣ Clubs, ♠ Spades, ♥ Hearts, ♦ Diamonds, Grand, Null.
-   A tile is disabled when no entry of `legal.declarations` has that game.
-2. Extras appear when the chosen game offers more than one variant: radio buttons Normal /
-   Schneider announced / Schwarz announced, and an Ouvert checkbox (only the combinations present
+   A tile is disabled when no entry of `legal.declarations` has that game. The chosen tile has
+   `aria-pressed="true"` and is lit in brass (`GameScreen.module.css`, `.declare-games button[aria-pressed='true']`).
+2. Extras appear when the chosen game offers more than one variant: a `SegmentedControl`
+   (`declare-announce`) with Normal / Schneider announced / Schwarz announced, and an Ouvert switch (only the combinations present
    in `legal.declarations`, e.g. Ouvert for suit/Grand only with Hand + Schwarz).
 3. Hint line: "minimum value N" from `declarationFloorValue(option, spitzen)` (spitzen from
    `game.declarerSpitzen`) and, if below the bid, a warning that the game would be overbid. The
