@@ -9,6 +9,10 @@ Versions before 0.7.0 were reconstructed from the git history.
 
 ## [Unreleased]
 
+### Added
+
+- The game result dialog has a "Show all cards" button. After a game it shows every player's dealt cards and the Skat (protocol version 9).
+
 ### Changed
 
 - The changelog screen shows changes that are not released yet under "Unreleased".

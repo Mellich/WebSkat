@@ -31,6 +31,7 @@ function gameWith(roles: GameView['roles'], sittingOut: readonly string[]): Game
     declaration: null,
     myHand: [],
     openHands: {},
+    initialHands: null,
     handCounts: {},
     skat: null,
     discarded: null,

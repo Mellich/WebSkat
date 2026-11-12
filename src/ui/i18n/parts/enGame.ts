@@ -110,6 +110,8 @@ export const enGame = {
   'result.discarded': 'Discarded',
   'result.changeIn': 'Score change ({system})',
   'result.continue': 'Continue',
+  'result.showAllCards': 'Show all cards',
+  'result.hideAllCards': 'Hide all cards',
   'result.waitingFor': 'Waiting for {names}',
   'result.waitingOthers': 'Waiting for the others…',
   'trick.last': 'Last trick',

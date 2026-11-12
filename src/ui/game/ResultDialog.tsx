@@ -6,9 +6,11 @@ import type { GameRecord, TableView, ViewResult } from '../../table';
 import { CardChips } from '../components/CardChip';
 import { useT, type Translator } from '../i18n';
 import { signed } from '../stats/gameLabel';
+import { AllCards } from './AllCards';
 import { declarationLabel } from './labels';
 import { RamschResult } from './RamschResult';
 import { namesById } from './seats';
+import { revealedHands } from './revealedHands';
 import styles from './ResultDialog.module.css';
 
 export interface ResultDialogProps {
@@ -26,9 +28,11 @@ export function ResultDialog({ view, result, record, scoring, onContinue }: Resu
   const names = namesById(view);
   const readyIds = new Set(view.table.readyIds);
   const waiting = view.table.players.filter((p) => !p.isBot && p.connected && !readyIds.has(p.id));
+  const dealt = revealedHands(view);
   const shell = {
     t,
     onContinue,
+    allCards: dealt === null ? null : <AllCards hands={dealt} />,
     iAmReady: readyIds.has(view.you.id),
     waiting: waiting.map((p) => p.name),
     // a passed-in game has no score to double, so it gets no Bock note
@@ -97,10 +101,12 @@ interface ShellProps {
   readonly iAmReady: boolean;
   readonly waiting: readonly string[];
   readonly record: GameRecord | null;
+  /** The "show all cards" button, or null while the game is not finished. */
+  readonly allCards: ReactNode;
   readonly children: ReactNode;
 }
 
-function Shell({ t, onContinue, iAmReady, waiting, record, children }: ShellProps) {
+function Shell({ t, onContinue, iAmReady, waiting, record, allCards, children }: ShellProps) {
   const status = waiting.length > 0
     ? t('result.waitingFor', { names: waiting.join(', ') })
     : t('result.waitingOthers');
@@ -111,6 +117,7 @@ function Shell({ t, onContinue, iAmReady, waiting, record, children }: ShellProp
         {children}
         {record?.bock ? <p>{t('result.bock')}</p> : null}
         {record?.bockTriggered ? <p>{t('result.bockTriggered')}</p> : null}
+        {allCards}
         {iAmReady ? <p className={styles.waiting}>{status}</p> : null}
         <button type="button" onClick={onContinue} disabled={iAmReady} data-testid="continue">{t('result.continue')}</button>
       </div>

@@ -179,14 +179,14 @@ and the `ramsch` block: `points`, `tricks`, `loserIds`, `jungfrau`, `durchmarsch
 `dealerId`, `roles` (Role → id), `sittingOut`, `turnId`,
 `waitingFor` (= `turnId` if that player is disconnected), `bidding` (`stage`, `callerId`,
 `listenerId`, `currentBid`, `history` with player ids), `declarerId`, `bid`, `pickedUpSkat`,
-`declaration`, `myHand`, `openHands`, `handCounts`, `skat`, `discarded`, `trick`
+`declaration`, `myHand`, `openHands`, `initialHands` (every dealt hand, by player id, once the game is finished; null before), `handCounts`, `skat`, `discarded`, `trick`
 (`leaderId`, `plays[{playerId, card}]`), `lastTrick` (+ `winnerId`), `tricksWon`, `legal` (the
 engine's `Legal` for the viewer, `{}` if not their turn), `result` (`ViewResult`: the
 `GameResult` with `declarerId` instead of the role; a Ramsch result maps its per-role fields to ids: `points`, `tricks`, `skatToId`, `loserIds`, `jungfrau`, `durchmarschId`, `scores`), `declarerSpitzen` (declarer only, while
 declaring: spitzen for Grand and each suit, for the floor-value hint).
 
 Which card fields each viewer gets: `hidden-information.md` §2. After a finished Ramsch the Skat is
-visible to everybody (`skat` and `discarded` as after a played game).
+visible to everybody (`skat` and `discarded` as after a played game). Once any game is finished (played, passed in or Ramsch), `initialHands` shows the three dealt hands to everybody (decision I175); a running game sends `null`.
 
 ## 7. Bots on the table (`bot.ts`)
 

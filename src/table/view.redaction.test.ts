@@ -40,6 +40,9 @@ function allowedCards(s: TableState, viewer: PlayerId): Set<CardId> {
     add(e.discarded);
     for (const t of e.tricks) add(t.plays.map((p) => p.card));
   }
+  if (e.phase === 'finished') {
+    for (const r of ROLES) add(e.initialHands[r]);
+  }
   return allowed;
 }
 
@@ -48,8 +51,11 @@ function assertRedacted(s: TableState, viewers: readonly PlayerId[]): number {
   const leaks: string[] = [];
   let shown = 0;
   for (const viewer of viewers) {
-    const json = JSON.stringify(viewFor(s, viewer));
-    if (json.includes('"seed"') || json.includes('initialHands')) leaks.push(`${viewer}: secret key`);
+    const view = viewFor(s, viewer);
+    const json = JSON.stringify(view);
+    if (json.includes('"seed"')) leaks.push(`${viewer}: secret key`);
+    // The dealt hands are shown only once the game is finished (null before).
+    if (view.game?.initialHands != null && s.game?.engine.phase !== 'finished') leaks.push(`${viewer}: early initialHands`);
     const allowed = allowedCards(s, viewer);
     for (const card of json.match(CARD_PATTERN) ?? []) {
       shown++;

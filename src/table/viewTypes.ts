@@ -90,6 +90,7 @@ export interface GameView {
   readonly declaration: Declaration | null;
   readonly myHand: readonly CardId[];
   readonly openHands: Readonly<Record<PlayerId, readonly CardId[]>>; // ouvert declarer only
+  readonly initialHands: Readonly<Record<PlayerId, readonly CardId[]>> | null; // everybody when finished, else null
   readonly handCounts: Readonly<Record<PlayerId, number>>;
   readonly skat: readonly CardId[] | null; // declarer while discarding/declaring; everybody when finished
   readonly discarded: readonly CardId[] | null; // everybody when finished

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mulberry32, type Role } from '../engine';
+import { ROLES, mulberry32, type Role } from '../engine';
 import { addPlayer, setConnected } from './seating';
 import { ctxFor, randomStep, tableWith } from './testing';
 import { applyCommand } from './table';
@@ -21,6 +21,12 @@ function game(s: TableState): NonNullable<TableState['game']> {
 
 function idOf(s: TableState, role: Role): PlayerId {
   return game(s).roles[role];
+}
+
+/** The dealt hands of every seated role, keyed by player id (as the view shows them). */
+function initialHandsById(s: TableState): Record<PlayerId, readonly string[]> {
+  const g = game(s);
+  return Object.fromEntries(ROLES.map((r) => [g.roles[r], g.engine.initialHands[r]]));
 }
 
 const started = (n = 3): TableState => step(tableWith(n), 'p0', { type: 'start' });
@@ -169,6 +175,7 @@ describe('finished games', () => {
     expect(view.game?.result).toEqual({ kind: 'passed-in' });
     expect(view.game?.skat).toBeNull();
     expect(view.game?.discarded).toBeNull();
+    expect(view.game?.initialHands).toEqual(initialHandsById(s));
   });
 
   it('reveals the Skat and the discards to a stranger once a played game ends', () => {
@@ -187,6 +194,13 @@ describe('finished games', () => {
     expect(view.game?.skat).toHaveLength(2);
     expect(view.game?.discarded).toHaveLength(2);
     expect(view.game?.lastTrick).not.toBeNull();
+    expect(view.game?.initialHands).toEqual(initialHandsById(s));
+  });
+
+  it('hides the initial hands of a game that is still running', () => {
+    const s = declarerPickedUp();
+    expect(viewFor(s, 'stranger').game?.initialHands).toBeNull();
+    expect(viewFor(s, 'p2').game?.initialHands).toBeNull();
   });
 });
 

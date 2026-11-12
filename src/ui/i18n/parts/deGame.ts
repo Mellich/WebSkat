@@ -112,6 +112,8 @@ export const deGame: Record<keyof typeof enGame, string> = {
   'result.discarded': 'Gedrückt',
   'result.changeIn': 'Punkteänderung ({system})',
   'result.continue': 'Weiter',
+  'result.showAllCards': 'Alle Karten zeigen',
+  'result.hideAllCards': 'Karten ausblenden',
   'result.waitingFor': 'Warte auf {names}',
   'result.waitingOthers': 'Warte auf die anderen…',
   'trick.last': 'Letzter Stich',

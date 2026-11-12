@@ -86,6 +86,13 @@ function openHands(game: ActiveGame, declarerId: PlayerId | null): Record<Player
   return { [declarerId]: e.hands[declarer] };
 }
 
+/** Every dealt hand of the finished game (all three roles), by player id; null while it runs. */
+function initialHandsOf(game: ActiveGame): Record<PlayerId, readonly CardId[]> | null {
+  const e = game.engine;
+  if (e.phase !== 'finished') return null;
+  return Object.fromEntries(ROLES.map((r) => [game.roles[r], e.initialHands[r]]));
+}
+
 /** The game as seen by `viewer`. Every field is chosen explicitly. */
 export function gameViewFor(s: TableState, game: ActiveGame, viewer: PlayerId): GameView {
   const e = game.engine;
@@ -127,6 +134,7 @@ export function gameViewFor(s: TableState, game: ActiveGame, viewer: PlayerId): 
     declaration: e.declaration,
     myHand: viewerRole === null ? [] : e.hands[viewerRole],
     openHands: openHands(game, declarerId),
+    initialHands: initialHandsOf(game),
     handCounts: Object.fromEntries(ROLES.map((r) => [idOf(r), e.hands[r].length])),
     skat: skatVisible || finishedPlayed ? e.skat : null,
     discarded: finishedPlayed ? e.discarded : null,

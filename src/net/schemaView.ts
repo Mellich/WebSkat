@@ -121,6 +121,7 @@ const GameViewSchema: z.ZodType<GameView> = z.object({
   declaration: DeclarationSchema.nullable(),
   myHand: cards,
   openHands: cardsById,
+  initialHands: cardsById.nullable(),
   handCounts: countsById,
   skat: cards.nullable(),
   discarded: cards.nullable(),

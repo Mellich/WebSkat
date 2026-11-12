@@ -91,7 +91,7 @@ viewer win the bidding.
 | Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass`, `bid-current`, `bid-turn` |
 | Skat / declare | `pickup`, `play-hand`, `discard-submit`, `declare-option-0..5` (♣ ♠ ♥ ♦ Grand Null), `declare-submit` |
 | Kontra / Re | `kontra`, `re`, `no-double` |
-| Result | `result-dialog`, `continue` |
+| Result | `result-dialog`, `continue`, `show-all-cards`, `all-cards` |
 | Stats / settings | `stats-dialog`, `stats-tab-standings`, `stats-tab-history`, `stats-tab-charts`, `stats-scoring`, `history-row`, `stats-export-csv`, `settings-dialog`, `settings-tab-display`, `settings-tab-play`, `setting-language`, `setting-confirm`, `setting-scoring`, `setting-trick-display`, `setting-bid-bubble` |
 | Dialogs | `dialog-close` (the × of every `Dialog`), `log-dialog`, `players-dialog`, `about-dialog` |
 

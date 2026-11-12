@@ -28,7 +28,8 @@ A `TableView` for player P may contain card identities only for:
 | Skat of a **Ramsch** (during and after the game; nobody picks it up) | everyone | `game.skat` |
 | Cards of the current trick and of the last completed trick | everyone | `game.trick`, `game.lastTrick` |
 | Other players' hands | **nobody**; only the count | `game.handCounts` |
-| Shuffle seed, `initialHands` | nobody (never in a view, record or message) | — |
+| All dealt hands (`initialHands`) of a **finished** game (played, passed in, Ramsch) | everyone | `game.initialHands` (null while the game runs) |
+| Shuffle seed | nobody (never in a view, record or message) | — |
 | Spitzen of the declarer's 12 cards (for the declaration hint) | declarer only, phase `declaring` | `game.declarerSpitzen` |
 | Game log (`TableView.log`): joins, bids, declarations, results. It holds no card ids; card plays and discards are never logged (plan 10, `table.md` §4a) | everyone | `log` |
 
@@ -58,7 +59,7 @@ invite link; they are never in a view, record or broadcast.
 
 | Test | Checks |
 |---|---|
-| `src/table/view.redaction.test.ts` | Random games; after every action, for every viewer (active, sitting out, pending, stranger), every card id in `JSON.stringify(view)` is in the allowed set; the JSON never contains `"seed"` or `"initialHands"` |
+| `src/table/view.redaction.test.ts` | Random games; after every action, for every viewer (active, sitting out, pending, stranger), every card id in `JSON.stringify(view)` is in the allowed set; the JSON never contains `"seed"`; `initialHands` is non-null only in a finished game (a row of the table in §2) |
 | `src/table/view.test.ts` | Field-level cases (Skat visibility, ouvert, spitzen, legal only for the viewer) |
 | `src/net/integration.test.ts`, `src/net/host.test.ts` | Messages received by each client contain no foreign cards (`CARD_PATTERN` in `src/net/testing.ts`); a payload claiming another player id has no effect |
 | `src/table/bot/knowledge.test.ts` | Swapping cards a bot cannot see changes neither its `BotView` nor its chosen action |

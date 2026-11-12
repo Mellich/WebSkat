@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { GameRecord, TableView, ViewResult } from '../../table';
 import { ResultDialog } from './ResultDialog';
+import { finishedGameFixture, tableViewFixture } from './viewFixtures';
 
 afterEach(() => {
   cleanup();
@@ -202,5 +203,27 @@ describe('ResultDialog Bock notes (skat-rules §13)', () => {
   it('shows no Bock note for an ordinary game', () => {
     render(<ResultDialog view={view} result={lost} record={record} scoring="standard" onContinue={() => undefined} />);
     expect(screen.queryByText(/Bock/)).toBeNull();
+  });
+});
+
+describe('ResultDialog show all cards', () => {
+  it('offers the button only when the finished game carries the dealt hands', () => {
+    const { unmount } = render(
+      <ResultDialog view={tableViewFixture(finishedGameFixture())} result={lost} record={record} scoring="standard" onContinue={() => undefined} />,
+    );
+    expect(screen.queryByTestId('show-all-cards')).toBeNull();
+    unmount();
+
+    render(
+      <ResultDialog
+        view={tableViewFixture(finishedGameFixture({ initialHands: { a: ['C7'], b: ['H9'], c: ['D10'] }, skat: ['CA', 'SK'] }))}
+        result={lost}
+        record={record}
+        scoring="standard"
+        onContinue={() => undefined}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('show-all-cards'));
+    expect(screen.getByTestId('all-cards').textContent).toContain('Cem');
   });
 });
