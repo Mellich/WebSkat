@@ -7,7 +7,7 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
-## [Unreleased]
+## [0.13.0] - 2026-11-12
 
 ### Added
 
