@@ -21,9 +21,11 @@ export interface ResultDialogProps {
   /** The scoring system chosen in Settings; the table shows its deltas. */
   readonly scoring: 'seeger' | 'standard';
   readonly onContinue: () => void;
+  /** Host only: add a round after the last game of the series. */
+  readonly onAddRounds: () => void;
 }
 
-export function ResultDialog({ view, result, record, scoring, onContinue }: ResultDialogProps) {
+export function ResultDialog({ view, result, record, scoring, onContinue, onAddRounds }: ResultDialogProps) {
   const t = useT();
   const names = namesById(view);
   const readyIds = new Set(view.table.readyIds);
@@ -33,6 +35,9 @@ export function ResultDialog({ view, result, record, scoring, onContinue }: Resu
     t,
     onContinue,
     allCards: dealt === null ? null : <AllCards hands={dealt} />,
+    onAddRounds: view.you.id === view.table.hostId ? onAddRounds : null,
+    lastGame: view.table.gameLimit > 0 && view.table.gamesPlayed >= view.table.gameLimit,
+    seats: view.table.players.length,
     iAmReady: readyIds.has(view.you.id),
     waiting: waiting.map((p) => p.name),
     // a passed-in game has no score to double, so it gets no Bock note
@@ -98,6 +103,9 @@ export function ResultDialog({ view, result, record, scoring, onContinue }: Resu
 interface ShellProps {
   readonly t: Translator;
   readonly onContinue: () => void;
+  readonly onAddRounds: (() => void) | null;
+  readonly lastGame: boolean;
+  readonly seats: number;
   readonly iAmReady: boolean;
   readonly waiting: readonly string[];
   readonly record: GameRecord | null;
@@ -106,7 +114,7 @@ interface ShellProps {
   readonly children: ReactNode;
 }
 
-function Shell({ t, onContinue, iAmReady, waiting, record, allCards, children }: ShellProps) {
+function Shell({ t, onContinue, onAddRounds, lastGame, seats, iAmReady, waiting, record, allCards, children }: ShellProps) {
   const status = waiting.length > 0
     ? t('result.waitingFor', { names: waiting.join(', ') })
     : t('result.waitingOthers');
@@ -118,8 +126,14 @@ function Shell({ t, onContinue, iAmReady, waiting, record, allCards, children }:
         {record?.bock ? <p>{t('result.bock')}</p> : null}
         {record?.bockTriggered ? <p>{t('result.bockTriggered')}</p> : null}
         {allCards}
+        {lastGame ? <p>{t('series.lastGame')}</p> : null}
         {iAmReady ? <p className={styles.waiting}>{status}</p> : null}
-        <button type="button" onClick={onContinue} disabled={iAmReady} data-testid="continue">{t('result.continue')}</button>
+        {lastGame && onAddRounds !== null ? (
+          <button type="button" onClick={onAddRounds} data-testid="add-rounds">{t('series.addRound', { games: seats })}</button>
+        ) : null}
+        <button type="button" onClick={onContinue} disabled={iAmReady} data-testid="continue">
+          {lastGame ? t('series.finalStandings') : t('result.continue')}
+        </button>
       </div>
     </div>
   );

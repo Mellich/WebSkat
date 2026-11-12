@@ -60,6 +60,26 @@ describe('TableLobby bot strength', () => {
   });
 });
 
+describe('TableLobby game limit', () => {
+  it('lets the host pick the number of games', () => {
+    useSettings.getState().update({ language: 'en' });
+    const { connection, send } = connectionMock();
+    render(<TableLobby view={viewFor(lobby(), 'h')} connection={connection} tableKey="ABCDEFGH" />);
+    fireEvent.change(screen.getByTestId('game-limit'), { target: { value: '12' } });
+    expect(send).toHaveBeenCalledWith({ type: 'set-game-limit', limit: 12 });
+  });
+
+  it('shows the limit as text to other players', () => {
+    useSettings.getState().update({ language: 'en' });
+    const s = run(lobby(), 'h', { type: 'set-game-limit', limit: 18 });
+    const joined = { ...s, players: s.players.map((p, i) => (i === 1 ? { ...p, isBot: false, id: 'g' } : p)) };
+    const { connection } = connectionMock();
+    render(<TableLobby view={viewFor(joined, 'g')} connection={connection} tableKey="ABCDEFGH" />);
+    expect(screen.getByTestId('game-limit-status').textContent).toContain('18');
+    expect(screen.queryByTestId('game-limit')).toBeNull();
+  });
+});
+
 describe('TableLobby table rules', () => {
   it('lets the host switch Ramsch on and sends the whole rule set', () => {
     useSettings.getState().update({ language: 'en' });

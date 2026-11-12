@@ -22,6 +22,7 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 |---|---|
 | `types.ts` | `PlayerId`, `BotLevel`, `Player`, `TableStatus`, `ActiveGame`, `TableState`, `TableCommand`, `ReplaceBy`, `Ctx`, `TableErrorCode`, `GameKindLabel`, `ScoreDeltas`, `GameRecord`, `SUIT_LABELS` |
 | `table.ts` | `createTable`, `applyCommand` (the reducer), `dealNext`, `tryDeal`, `CommandResult` |
+| `series.ts` | `seriesDone`, `setGameLimit` (`set-game-limit`), `addRounds` (`add-rounds`), `MAX_GAME_LIMIT` |
 | `rules.ts` | `DEFAULT_RULES`, `setRules` (`set-rules`: host, no game running) |
 | `bock.ts` | `BOCK_GAMES`, `BOCK_FACTOR`, `triggersBock` (60 : 60), `nextBockGamesLeft` (Bockrunden, skat-rules §13) |
 | `botNames.ts` | `BOT_NAMES` (pool, first `Guguurz`), `botName` (first unused name, `Bot (n)` fallback) |
@@ -40,7 +41,7 @@ Read first: `docs/table.md` (state, commands, views), `docs/hidden-information.m
 | `index.ts` | public re-exports (also `BotView` type) |
 | `testing.ts` | `tableWith`, `ctxFor`, `randomStep`, `playUntilRecords`, `pickRandom` |
 | `fixtures.ts` | `finishedGame`, `GRAND_144`, `DIAMONDS_LOST`, `NULL_OUVERT_WON` |
-| `*.test.ts` | `table`, `leave`, `replace`, `seating`, `rotation`, `records` (incl. Bock doubling), `stats`, `view` (incl. Bock fields), `view.redaction`, `rules`, `ramsch` (records, stats, views of a Ramsch), `bock` (trigger, counter, table flow), `log` (game log), `bot`, `bot/*` (incl. `bot/ramsch`) |
+| `*.test.ts` | `table`, `leave`, `replace`, `seating`, `rotation`, `series` (game limit, series end, add rounds), `records` (incl. Bock doubling), `stats`, `view` (incl. Bock fields), `view.redaction`, `rules`, `ramsch` (records, stats, views of a Ramsch), `bock` (trigger, counter, table flow), `log` (game log), `bot`, `bot/*` (incl. `bot/ramsch`) |
 
 ## `view.ts` / `viewGame.ts` are the security boundary
 

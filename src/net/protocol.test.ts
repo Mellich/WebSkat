@@ -50,6 +50,13 @@ describe('client messages', () => {
     expect(TableCommandSchema.safeParse({ type: 'kick' }).success).toBe(false);
   });
 
+  it('accepts the game-limit commands and rejects bad limits', () => {
+    expect(TableCommandSchema.safeParse({ type: 'set-game-limit', limit: 12 }).success).toBe(true);
+    expect(TableCommandSchema.safeParse({ type: 'set-game-limit', limit: -1 }).success).toBe(false);
+    expect(TableCommandSchema.safeParse({ type: 'set-game-limit', limit: 1.5 }).success).toBe(false);
+    expect(TableCommandSchema.safeParse({ type: 'add-rounds' }).success).toBe(true);
+  });
+
   it('accepts the set-rules command and rejects a rule without a value', () => {
     expect(TableCommandSchema.safeParse({ type: 'set-rules', rules: { ramsch: true, bock: false, kontra: false } }).success).toBe(true);
     expect(TableCommandSchema.safeParse({ type: 'set-rules', rules: {} }).success).toBe(false);

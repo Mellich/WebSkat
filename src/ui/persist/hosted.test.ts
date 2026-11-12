@@ -114,6 +114,21 @@ describe('host snapshots in localStorage', () => {
     expect(loaded?.table.records[0]).toMatchObject({ bock: false, bockTriggered: false });
   });
 
+  it('upgrades a snapshot from before game limits to an unlimited table', () => {
+    const storage = memoryStorage();
+    const table = passedInTable();
+    saveHostSnapshot(storage, snapshotOf(table));
+    const key = storage.key(0);
+    if (key === null) throw new Error('nothing saved');
+    const old = JSON.parse(JSON.stringify(snapshotOf(table))) as { table: { gameLimit?: unknown; seriesOver?: unknown } };
+    delete old.table.gameLimit;
+    delete old.table.seriesOver;
+    storage.setItem(key, JSON.stringify(old));
+    const loaded = loadHostSnapshot(storage, 'TESTKEY');
+    expect(loaded?.table.gameLimit).toBe(0);
+    expect(loaded?.table.seriesOver).toBe(false);
+  });
+
   it('upgrades a snapshot from before Kontra and Re', () => {
     const storage = memoryStorage();
     const table = passedInTable();

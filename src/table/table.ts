@@ -15,6 +15,7 @@ import { appendLog } from './log';
 import { commandLog } from './logEvents';
 import { makeRecord } from './records';
 import { replacePlayer } from './replace';
+import { addRounds, seriesDone, setGameLimit } from './series';
 import { DEFAULT_RULES, setRules } from './rules';
 import { pickFirstDealer, roleOf, rolesForDealer } from './rotation';
 import {
@@ -75,6 +76,8 @@ export function createTable(args: {
     game: null,
     ready: [],
     rules: { ...DEFAULT_RULES },
+    gameLimit: 0,
+    seriesOver: false,
     bockGamesLeft: 0,
     records: [],
     seq: 0,
@@ -93,7 +96,7 @@ export function dealNext(state: TableState, ctx: Ctx): TableState {
   const s = removeLeavers(state);
   const seated = allPlayers(s);
   if (seated.length < MIN_SEATS) {
-    return touch({ ...s, players: seated, pending: [], game: null, status: 'lobby', ready: [] });
+    return touch({ ...s, players: seated, pending: [], game: null, status: 'lobby', ready: [], seriesOver: false });
   }
   const n = seated.length;
   const dealerIdx = s.nextDealerIdx % n;
@@ -117,6 +120,7 @@ export function dealNext(state: TableState, ctx: Ctx): TableState {
     gameCounter: s.gameCounter + 1,
     nextDealerIdx: (dealerIdx + 1) % n,
     status: 'in-game',
+    seriesOver: false,
     ready: seated.filter((p) => p.isBot).map((p) => p.id),
   });
 }
@@ -125,13 +129,16 @@ export function dealNext(state: TableState, ctx: Ctx): TableState {
 export function tryDeal(s: TableState, ctx: Ctx): TableState {
   if (s.game === null || s.game.engine.phase !== 'finished') return s;
   const allReady = s.players.every((p) => p.isBot || !p.connected || s.ready.includes(p.id));
-  return allReady ? dealNext(s, ctx) : s;
+  if (!allReady) return s;
+  // the last game of a limited series: show the final standings instead of dealing
+  if (seriesDone(s)) return s.seriesOver ? s : touch({ ...s, seriesOver: true });
+  return dealNext(s, ctx);
 }
 
 /** Back to the lobby when fewer than three players remain; pending players are seated. */
 function toLobbyIfTooFew(s: TableState): TableState {
   if (s.players.length >= MIN_SEATS) return s;
-  return touch({ ...s, players: allPlayers(s), pending: [], game: null, status: 'lobby', ready: [] });
+  return touch({ ...s, players: allPlayers(s), pending: [], game: null, status: 'lobby', ready: [], seriesOver: false });
 }
 
 function finishGame(s: TableState, game: ActiveGame, ctx: Ctx): CommandResult {
@@ -267,6 +274,14 @@ function reduce(
       return actor === s.hostId ? setBotLevel(s, c.playerId, c.level) : notHost();
     case 'leave':
       return leave(s, actor, ctx);
+    case 'set-game-limit': {
+      const set = setGameLimit(s, actor, c.limit);
+      return set.ok ? plain(set.value) : set;
+    }
+    case 'add-rounds': {
+      const added = addRounds(s, actor);
+      return added.ok ? plain(tryDeal(added.value, ctx)) : added;
+    }
     case 'set-rules': {
       const set = setRules(s, actor, c.rules);
       return set.ok ? plain(set.value) : set;

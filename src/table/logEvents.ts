@@ -100,6 +100,8 @@ function commandEvents(before: TableState, after: TableState, actor: PlayerId, c
     case 'ready':
     case 'set-bot-level':
     case 'set-rules':
+    case 'set-game-limit':
+    case 'add-rounds':
       return [];
     default:
       return assertNever(c);

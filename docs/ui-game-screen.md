@@ -138,6 +138,15 @@ A bottom sheet whose backdrop lets clicks through, so TopBar (Stats, Settings) s
 - **Continue** (`continue`) sends `ready`; then it is disabled and shows "Waiting for: A, B"
   (connected humans not yet ready).
 
+## 7a. Series end (`SeriesDialog.tsx`)
+
+With a game limit (lobby select `game-limit`), the ResultDialog of the last game says so, its button
+reads "Final standings", and the host gets `add-rounds` (one more game per seat). When everyone
+continued, `table.seriesOver` is true: ResultDialog is hidden and `SeriesDialog` (`series-dialog`)
+shows the podium of the best three (`podium`, `podium-1..3`), `series-stats` (total, declared, won,
+win rate, best, worst by the chosen scoring), CSS-only `Fireworks` (off for reduced motion) and, for
+the host, `add-rounds`. Closing it is local; a new round reopens it at the next end.
+
 ## 8. Accessibility notes
 
 Real buttons; `aria-pressed` on toggles and selected cards; illegal cards are disabled buttons

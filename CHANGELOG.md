@@ -12,9 +12,12 @@ Versions before 0.7.0 were reconstructed from the git history.
 ### Added
 
 - The game result dialog has a "Show all cards" button. After a game it shows every player's dealt cards and the Skat (protocol version 9).
+- Number of games: the host sets how many games the table plays in the lobby ("Unlimited" by default). After the last game the result dialog offers the host to play another round (one more game per player).
+- Final standings: after the last game, when the host adds no round, a dialog shows a podium of the best three players, table statistics and small fireworks.
 
 ### Changed
 
+- Protocol version 10: commands `set-game-limit` and `add-rounds`, view fields `gameLimit`, `gamesPlayed` and `seriesOver`. Old host snapshots are upgraded on load; clients of the previous version cannot join.
 - The changelog screen shows changes that are not released yet under "Unreleased".
 
 ## [0.12.0] - 2026-11-11

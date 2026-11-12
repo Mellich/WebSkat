@@ -19,6 +19,13 @@ const MIN_PLAYERS = 3;
 const LEVELS: readonly BotLevel[] = ['easy', 'normal', 'strong'];
 const LEVEL_KEYS = { easy: 'botLevel.easy', normal: 'botLevel.normal', strong: 'botLevel.strong' } as const;
 
+const LIMIT_PRESETS = [0, 6, 9, 12, 18, 24, 36, 48] as const;
+
+/** The presets, plus the current value when a round was added and it is not a preset. */
+function limitOptions(current: number): readonly number[] {
+  return LIMIT_PRESETS.includes(current as never) ? LIMIT_PRESETS : [...LIMIT_PRESETS, current].sort((a, b) => a - b);
+}
+
 /** Not available in insecure contexts, so the value may be undefined at runtime. */
 function clipboardOf(): Clipboard | undefined {
   return navigator.clipboard;
@@ -119,6 +126,21 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
         <h3 className={styles.label}>{t('lobby.rules')}</h3>
         {isHost ? (
           <div className={styles.rules}>
+            <label className={styles.limit}>
+              <span>{t('series.limit')}</span>
+              <select
+                data-testid="game-limit"
+                value={table.gameLimit}
+                disabled={gameRunning}
+                onChange={(e) => {
+                  connection.send({ type: 'set-game-limit', limit: Number(e.target.value) });
+                }}
+              >
+                {limitOptions(table.gameLimit).map((n) => (
+                  <option key={n} value={n}>{n === 0 ? t('series.unlimited') : String(n)}</option>
+                ))}
+              </select>
+            </label>
             <Switch
               testId="rule-ramsch"
               checked={table.rules.ramsch}
@@ -152,6 +174,9 @@ export function TableLobby({ view, connection, tableKey }: TableLobbyProps) {
           </div>
         ) : (
           <>
+            <p className={styles.hint} data-testid="game-limit-status">
+              {t('series.limit')}: {table.gameLimit === 0 ? t('series.unlimited') : String(table.gameLimit)}
+            </p>
             <p className={styles.hint}>
               {t('lobby.ruleRamsch')}: {table.rules.ramsch ? t('lobby.ruleOn') : t('lobby.ruleOff')}
             </p>

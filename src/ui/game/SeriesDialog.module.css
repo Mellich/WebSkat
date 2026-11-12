@@ -1,0 +1,104 @@
+.body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px 16px;
+}
+
+.body > :not(:first-child) {
+  position: relative;
+}
+
+.winner {
+  margin: 0;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.muted {
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+.podium {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+}
+
+.step {
+  flex: 1 1 0;
+  max-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.name {
+  font-weight: 700;
+}
+
+.points {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.block {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--wood-dark);
+  border-radius: 6px 6px 0 0;
+  background: #c9ccd1;
+  height: 64px;
+}
+
+.place1 .block {
+  height: 96px;
+  background: var(--accent);
+}
+
+.place3 .block {
+  height: 44px;
+  background: #c98a52;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+  padding: 4px 6px;
+  text-align: right;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  text-align: left;
+}
+
+.me {
+  font-weight: 700;
+}
+
+.body button {
+  align-self: center;
+}

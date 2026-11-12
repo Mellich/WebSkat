@@ -56,6 +56,7 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 | `appendLog(s, events, at)` | `log.ts` | Numbers the events (`n`, `at`) and keeps the last `LOG_LIMIT` (200). No events: same state |
 | `commandLog(before, after, actor, command, record)` | `logEvents.ts` | The log events of one successful command (§4a) |
 | `dealNext(s, ctx)` | `table.ts` | Removes leavers first (`removeLeavers`), seats pending players; < 3 seated → back to lobby. Dealer = `nextDealerIdx % N`, pointer moves one seat on, `newGame(ctx.seed, { ramschOnPassIn: rules.ramsch, kontra: rules.kontra })`, roles from the rotation, `ready` = bots |
+| `setGameLimit`, `addRounds`, `seriesDone` | `series.ts` | Game limit (`TableState.gameLimit`, 0 = unlimited, clamped 0..999): `setGameLimit` host only, not while a game runs. `addRounds` host only after the last game; adds one game per seated player and clears `seriesOver`. `seriesDone` = limit set and `records.length >= limit`. `tryDeal` sets `seriesOver` instead of dealing when the series is done and everyone is ready |
 | `setRules(s, actor, rules)` | `rules.ts` | Host only, not while a game runs (lobby or finished game); sets `ramsch`, `bock` and `kontra`. Turning `bock` off sets `bockGamesLeft = 0`. `DEFAULT_RULES = { ramsch: false, bock: false, kontra: false }` |
 | `triggersBock(result)` | `bock.ts` | True for a played suit or Grand game with `declarerPoints === 60` (60 : 60; Null and Ramsch never) |
 | `nextBockGamesLeft(left, wasBock, triggered)` | `bock.ts` | `max(0, left − (wasBock ? 1 : 0)) + (triggered ? 3 : 0)`; `BOCK_GAMES = 3`, `BOCK_FACTOR = 2` |
@@ -87,6 +88,8 @@ Constants (`seating.ts`): `MIN_SEATS = 3`, `MAX_SEATS = 6`, `MAX_NAME_LENGTH = 2
 | `replace-player {playerId, by}` | host | any time | `by = {kind:'pending', playerId}` (a waiting player) or `{kind:'bot', level}` (new bot `bot-<seq>`, named by `botName`, always ready). The target leaves the table; its seat, role and dealer slot go to the newcomer (`replacePlayer`). A finished game may now be fully ready → `tryDeal` | `NOT_HOST`, `CANNOT_KICK_HOST` (target is the host), `UNKNOWN_PLAYER` (no such seated target, or no such waiting player) |
 | `add-bot` | host | no game or finished | adds `bot-<seq>` named by `botName` (first unused of the pool, `Guguurz` first) at level `normal` | `NOT_HOST`, `GAME_RUNNING`, `TABLE_FULL` |
 | `set-bot-level {playerId, level}` | host | any time | sets that bot's level; used from its next action | `NOT_HOST`, `UNKNOWN_PLAYER`, `NOT_A_BOT` |
+| `set-game-limit {limit}` | host | no game or finished | `setGameLimit` | `NOT_HOST`, `GAME_RUNNING` |
+| `add-rounds` | host | finished game, series done | `addRounds`, then `tryDeal` (deals at once if everyone already continued) | `NOT_HOST`, `WRONG_STATUS` |
 | `set-rules {rules}` | host | no game or finished | `setRules`: replaces `ramsch`, `bock` and `kontra`; applies from the next deal | `NOT_HOST`, `GAME_RUNNING` |
 | `leave` | anyone | — | pending → removed. Seated + game running → `markLeaving` (seat kept, removed at the next deal). Seated otherwise → removed (< 3 → lobby) | `HOST_CANNOT_LEAVE`, `UNKNOWN_PLAYER` |
 
@@ -169,7 +172,7 @@ and the `ramsch` block: `points`, `tricks`, `loserIds`, `jungfrau`, `durchmarsch
 - `log`: the newest `LOG_VIEW_LIMIT` (100) entries of `TableState.log` (§4a); public, no cards.
 - `table`: `key`, `name`, `hostId`, `maxSeats`, `status`, `players` / `pending` as `PlayerPublic`
   (`id`, `name`, `connected`, `isBot`, `botLevel` (null for humans), `seat` (null while pending)),
-  `nextDealerId`, `readyIds`, `rules` (`TableRules`, shown in the lobby), `bockGamesLeft`.
+  `nextDealerId`, `readyIds`, `rules` (`TableRules`, shown in the lobby), `gameLimit`, `gamesPlayed` (records), `seriesOver`, `bockGamesLeft`.
 - `you`: `id`, `seat`, `role`: a `Role`, `'sitting-out'`, `'pending'` or `'lobby'` (also for
   unknown ids; never throws).
 - `game`: `GameView` or `null`.

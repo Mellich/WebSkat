@@ -29,6 +29,9 @@ const view: TableView = {
     nextDealerId: null,
     readyIds: [],
     rules: { ramsch: false, bock: false, kontra: false },
+    gameLimit: 0,
+    gamesPlayed: 0,
+    seriesOver: false,
     bockGamesLeft: 0,
   },
   you: { id: 'a', seat: 0, role: 'forehand' },
@@ -106,25 +109,25 @@ function scoreCells(): string[] {
 
 describe('ResultDialog score table', () => {
   it('shows the Seeger deltas and names the system when Seeger scoring is selected', () => {
-    render(<ResultDialog view={view} result={lost} record={record} scoring="seeger" onContinue={() => undefined} />);
+    render(<ResultDialog view={view} result={lost} record={record} scoring="seeger" onContinue={() => undefined} onAddRounds={() => undefined} />);
     expect(scoreCells()).toEqual(['−104', '+40', '+40']);
     expect(screen.getByText('Score change (Seeger–Fabian)')).toBeTruthy();
   });
 
   it('shows the standard deltas and names the system when standard scoring is selected', () => {
-    render(<ResultDialog view={view} result={lost} record={record} scoring="standard" onContinue={() => undefined} />);
+    render(<ResultDialog view={view} result={lost} record={record} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />);
     expect(scoreCells()).toEqual(['−54', '0', '0']);
     expect(screen.getByText('Score change (Standard)')).toBeTruthy();
   });
 
   it('shows a placeholder in every score cell while the record has not arrived', () => {
-    render(<ResultDialog view={view} result={lost} record={null} scoring="seeger" onContinue={() => undefined} />);
+    render(<ResultDialog view={view} result={lost} record={null} scoring="seeger" onContinue={() => undefined} onAddRounds={() => undefined} />);
     expect(scoreCells()).toEqual(['…', '…', '…']);
   });
 
   it('shows no score table when everybody passed', () => {
     render(
-      <ResultDialog view={view} result={{ kind: 'passed-in' }} record={null} scoring="seeger" onContinue={() => undefined} />,
+      <ResultDialog view={view} result={{ kind: 'passed-in' }} record={null} scoring="seeger" onContinue={() => undefined} onAddRounds={() => undefined} />,
     );
     expect(screen.getByText('Everybody passed: no game.')).toBeTruthy();
     expect(screen.queryByRole('table')).toBeNull();
@@ -159,7 +162,7 @@ describe('ResultDialog after a Ramsch', () => {
   };
 
   it('names the losers and shows each card point count and score change', () => {
-    render(<ResultDialog view={view} result={ramsch} record={ramschRecord} scoring="standard" onContinue={() => undefined} />);
+    render(<ResultDialog view={view} result={ramsch} record={ramschRecord} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />);
     expect(screen.getByText('Anna lost the Ramsch')).toBeTruthy();
     const rows = within(screen.getByRole('table'))
       .getAllByRole('row')
@@ -175,12 +178,12 @@ describe('ResultDialog after a Ramsch', () => {
   it('shows the Jungfrau note and the Durchmarsch headline', () => {
     const durchmarsch: ViewResult = { ...ramsch, kind: 'ramsch', durchmarschId: 'b', loserIds: [], jungfrau: false };
     const { unmount } = render(
-      <ResultDialog view={view} result={durchmarsch} record={null} scoring="standard" onContinue={() => undefined} />,
+      <ResultDialog view={view} result={durchmarsch} record={null} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />,
     );
     expect(screen.getByText('Ben took every trick: Durchmarsch!')).toBeTruthy();
     unmount();
     render(
-      <ResultDialog view={view} result={{ ...ramsch, jungfrau: true }} record={ramschRecord} scoring="standard" onContinue={() => undefined} />,
+      <ResultDialog view={view} result={{ ...ramsch, jungfrau: true }} record={ramschRecord} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />,
     );
     expect(screen.getByText('Jungfrau: a player took no trick, the loss counts double.')).toBeTruthy();
   });
@@ -189,19 +192,19 @@ describe('ResultDialog after a Ramsch', () => {
 
 describe('ResultDialog Bock notes (skat-rules §13)', () => {
   it('says the points are doubled in a Bock game', () => {
-    render(<ResultDialog view={view} result={lost} record={{ ...record, bock: true }} scoring="standard" onContinue={() => undefined} />);
+    render(<ResultDialog view={view} result={lost} record={{ ...record, bock: true }} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />);
     expect(screen.getByText('Bock game: points doubled.')).toBeTruthy();
     expect(screen.queryByText('60 : 60 — the next 3 games are Bock games.')).toBeNull();
   });
 
   it('says that 60 : 60 starts the next 3 Bock games', () => {
-    render(<ResultDialog view={view} result={lost} record={{ ...record, bockTriggered: true }} scoring="standard" onContinue={() => undefined} />);
+    render(<ResultDialog view={view} result={lost} record={{ ...record, bockTriggered: true }} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />);
     expect(screen.getByText('60 : 60 — the next 3 games are Bock games.')).toBeTruthy();
     expect(screen.queryByText('Bock game: points doubled.')).toBeNull();
   });
 
   it('shows no Bock note for an ordinary game', () => {
-    render(<ResultDialog view={view} result={lost} record={record} scoring="standard" onContinue={() => undefined} />);
+    render(<ResultDialog view={view} result={lost} record={record} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />);
     expect(screen.queryByText(/Bock/)).toBeNull();
   });
 });
@@ -209,7 +212,7 @@ describe('ResultDialog Bock notes (skat-rules §13)', () => {
 describe('ResultDialog show all cards', () => {
   it('offers the button only when the finished game carries the dealt hands', () => {
     const { unmount } = render(
-      <ResultDialog view={tableViewFixture(finishedGameFixture())} result={lost} record={record} scoring="standard" onContinue={() => undefined} />,
+      <ResultDialog view={tableViewFixture(finishedGameFixture())} result={lost} record={record} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />,
     );
     expect(screen.queryByTestId('show-all-cards')).toBeNull();
     unmount();
@@ -221,9 +224,30 @@ describe('ResultDialog show all cards', () => {
         record={record}
         scoring="standard"
         onContinue={() => undefined}
+        onAddRounds={() => undefined}
       />,
     );
     fireEvent.click(screen.getByTestId('show-all-cards'));
     expect(screen.getByTestId('all-cards').textContent).toContain('Cem');
+  });
+});
+
+describe('ResultDialog last game of a series', () => {
+  const last: TableView = { ...view, table: { ...view.table, gameLimit: 3, gamesPlayed: 3 } };
+
+  it('offers the host to add a round and sends it', () => {
+    let added = 0;
+    render(<ResultDialog view={last} result={lost} record={record} scoring="seeger" onContinue={() => undefined} onAddRounds={() => { added++; }} />);
+    fireEvent.click(screen.getByTestId('add-rounds'));
+    expect(added).toBe(1);
+  });
+
+  it('does not offer it to other players or before the last game', () => {
+    const guest: TableView = { ...last, you: { id: 'b', seat: 1, role: 'middlehand' } };
+    render(<ResultDialog view={guest} result={lost} record={record} scoring="seeger" onContinue={() => undefined} onAddRounds={() => undefined} />);
+    expect(screen.queryByTestId('add-rounds')).toBeNull();
+    cleanup();
+    render(<ResultDialog view={view} result={lost} record={record} scoring="seeger" onContinue={() => undefined} onAddRounds={() => undefined} />);
+    expect(screen.queryByTestId('add-rounds')).toBeNull();
   });
 });

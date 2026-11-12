@@ -152,6 +152,9 @@ export const TableViewSchema: z.ZodType<TableView> = z.object({
     nextDealerId: nullableId,
     readyIds: playerIds,
     rules: z.object({ ramsch: z.boolean(), bock: z.boolean(), kontra: z.boolean() }),
+    gameLimit: z.number().int().min(0).max(999),
+    gamesPlayed: z.number().int().min(0),
+    seriesOver: z.boolean(),
     bockGamesLeft: z.number().int().min(0),
   }),
   you: z.object({

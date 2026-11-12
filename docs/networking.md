@@ -14,7 +14,7 @@ Browser ──WebRTC data channels (P2P, encrypted)── Browser
 One Trystero room per table (`tableRoom(key)` = `webskat-t-<KEY>`), plus one shared lobby room
 (`webskat-lobby-v1`) for the public table list.
 
-`constants.ts`: `APP_ID = 'webskat-v1-7c2f9a'`, `PROTOCOL_VERSION = 9`, `LOBBY_ROOM`,
+`constants.ts`: `APP_ID = 'webskat-v1-7c2f9a'`, `PROTOCOL_VERSION = 10`, `LOBBY_ROOM`,
 `AD_INTERVAL_MS = 5000`, `AD_TTL_MS = 15000`, `JOIN_TIMEOUT_MS = 15000`, `LEAVE_CLOSE_DELAY_MS = 500`.
 
 **Bump `PROTOCOL_VERSION`** whenever a message, command or view changes shape so that old
@@ -24,6 +24,7 @@ browsers cannot talk to new ones. Version history: 1 initial, 2 table bot level 
 6 `bock` in table rules, `bockGamesLeft`, `bock`/`bockTriggered` in views and records (plan 09),
 7 `TableView.log` and the log entry kinds (game log, plan 10),
 8 Kontra and Re: actions `kontra`, `re`, `no-double`, phase `doubling`, `GameView.doubling`, `doubling` in results and records, log kind `doubled`. The `set-rules` command carries `kontra` (lobby toggle).
+9 game limit: commands `set-game-limit` and `add-rounds`, view fields `gameLimit`, `gamesPlayed`, `seriesOver`.
 
 ## 2. Transport (`transport.ts`, `trysteroTransport.ts`, `fake.ts`)
 

@@ -127,6 +127,16 @@ function migrateDoubling(parsed: unknown): void {
   }
 }
 
+/** Snapshots before game limits have no `gameLimit` (unlimited) and `seriesOver`. */
+function migrateGameLimit(parsed: unknown): void {
+  if (typeof parsed !== 'object' || parsed === null || !('table' in parsed)) return;
+  const t = parsed.table;
+  if (typeof t !== 'object' || t === null) return;
+  const table = t as Record<string, unknown>;
+  if (!('gameLimit' in table)) table.gameLimit = 0;
+  if (!('seriesOver' in table)) table.seriesOver = false;
+}
+
 /** Runs every migration step on a parsed snapshot. */
 export function migrateSnapshot(parsed: unknown): void {
   migrateBotLevel(parsed);
@@ -134,4 +144,5 @@ export function migrateSnapshot(parsed: unknown): void {
   migrateBockRule(parsed);
   migrateLog(parsed);
   migrateDoubling(parsed);
+  migrateGameLimit(parsed);
 }

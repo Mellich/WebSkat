@@ -56,6 +56,8 @@ export interface TableState {
   readonly game: ActiveGame | null;
   readonly ready: readonly PlayerId[]; // who pressed "continue" after the finished game
   readonly rules: TableRules;
+  readonly gameLimit: number; // games to play (finished ones count); 0 = unlimited (src/table/series.ts)
+  readonly seriesOver: boolean; // the limit is reached and every player continued: show the final standings
   readonly bockGamesLeft: number; // Bock games still to come, the running one included
   readonly records: readonly GameRecord[];
   readonly seq: number; // increments on every state change
@@ -77,6 +79,8 @@ export type TableCommand =
   | { readonly type: 'add-bot' }
   | { readonly type: 'set-bot-level'; readonly playerId: PlayerId; readonly level: BotLevel }
   | { readonly type: 'leave' }
+  | { readonly type: 'set-game-limit'; readonly limit: number }
+  | { readonly type: 'add-rounds' }
   | { readonly type: 'set-rules'; readonly rules: Pick<TableRules, 'ramsch' | 'bock' | 'kontra'> };
 
 /** Values supplied by the caller: wall clock (record timestamps) and the deal seed. */

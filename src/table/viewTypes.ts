@@ -116,6 +116,9 @@ export interface TableView {
     readonly nextDealerId: PlayerId | null;
     readonly readyIds: readonly PlayerId[];
     readonly rules: TableRules;
+    readonly gameLimit: number; // games to play, 0 = unlimited
+    readonly gamesPlayed: number; // finished games (records)
+    readonly seriesOver: boolean; // limit reached and everyone continued: final standings
     readonly bockGamesLeft: number; // Bock games still to come, the running one included
   };
   readonly you: {

@@ -19,6 +19,7 @@ import { cardName } from './labels';
 import { declarerSummary } from './declarerSummary';
 import { StatusArea } from './StatusArea';
 import { ResultDialog } from './ResultDialog';
+import { SeriesDialog } from './SeriesDialog';
 import { SkatDecision, DiscardPanel } from './SkatPanels';
 import { DoublingPanel } from './DoublingPanel';
 import { namesById, opponentsOf, type SeatedView } from './seats';
@@ -63,6 +64,9 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
   const cardBack = useSettings((s) => s.cardBack);
   const scoring = useSettings((s) => s.scoring);
   const records = useSession((s) => s.records);
+  // the final dialog is closed for this many played games; a further round reopens it at its end
+  const [seriesClosedAt, setSeriesClosedAt] = useState<number | null>(null);
+  const seriesClosed = seriesClosedAt === view.table.gamesPlayed;
   const names = namesById(view);
   const nameOf = (id: string): string => names.get(id) ?? '?';
   const viewer = view.you.id;
@@ -266,7 +270,19 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
         )}
       </div>
 
-      {game.phase === 'finished' && game.result !== null && !shown.holding ? (
+      {view.table.seriesOver && !seriesClosed ? (
+        <SeriesDialog
+          view={view}
+          records={records}
+          scoring={scoring}
+          connection={connection}
+          onClose={() => {
+            setSeriesClosedAt(view.table.gamesPlayed);
+          }}
+        />
+      ) : null}
+
+      {game.phase === 'finished' && game.result !== null && !shown.holding && !view.table.seriesOver ? (
         <ResultDialog
           view={view}
           result={game.result}
@@ -274,6 +290,9 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
           scoring={scoring}
           onContinue={() => {
             connection.send({ type: 'ready' });
+          }}
+          onAddRounds={() => {
+            connection.send({ type: 'add-rounds' });
           }}
         />
       ) : null}
