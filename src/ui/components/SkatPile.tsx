@@ -13,7 +13,7 @@ export interface SkatPileProps {
 export function SkatPile({ visible, back, label = 'Skat' }: SkatPileProps) {
   if (!visible) return null;
   return (
-    <div className={styles.pile} role="img" aria-label={`${label}: two cards face down`}>
+    <div className={styles.pile} role="img" aria-label={`${label}: two cards face down`} data-testid="skat-pile">
       <div className={styles.first}>
         <Card id="back" label="Card back" size="opponent" {...(back === undefined ? {} : { back })} />
       </div>

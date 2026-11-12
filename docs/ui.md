@@ -211,8 +211,8 @@ blocked) and the `persist/*` modules. Values are validated on read.
 | `VersionBadge` | `v<version>` link bottom left on every screen, opens `#/changelog` in a new tab (§1) |
 | `stats/*` | `statistics.md` §3 |
 
-Styling: `styles/tokens.css` (palette, fonts, textures, `--card-w` etc.), `styles/global.css`
-(oak background with grain, scratches, beer rings and smoke; buttons and text fields; includes a
+Styling: `styles/tokens.css` (palette, fonts, grain noise, `--card-w` etc.), `styles/global.css`
+(old oak background from `public/textures/oak-old.webp` (`docs/assets.md` §5) with a lamp glow, grain and smoke; buttons and text fields; includes a
 `prefers-reduced-motion` rule), one `X.module.css` per component. The theme is a westphalian
 Schänke (dark oak, worn baize table, brass accents); dark only. Headings use `--font-display`
 (Pirata One, bundled as `public/fonts/PirataOne-latin-400.woff2` with its OFL text, `@font-face`

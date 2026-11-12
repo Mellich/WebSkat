@@ -8,10 +8,16 @@
   min-width: 0;
 }
 
-/* The text owns the middle column so it stays centered; the buttons sit in the right column. */
+/* Under a phase panel: the space stays (the felt keeps its size), the content is not shown. */
+.covered {
+  visibility: hidden;
+}
+
+/* The text owns the middle column so it stays centered; the buttons sit in the right column.
+   The middle column may shrink, so a long text wraps instead of pushing out of the screen. */
 .statusRow {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr minmax(0, max-content) 1fr;
   align-items: center;
   column-gap: 10px;
   width: 100%;
@@ -23,6 +29,9 @@
 .statusText {
   grid-column: 2;
   justify-self: center;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .statusActions {
@@ -47,9 +56,9 @@
   color: var(--muted);
   font-size: 0.85rem;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Long lines (declarer, game, Skat, Kontra on a phone) wrap onto a second line. */
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 /* Phones held sideways: the same rows, a little smaller. */

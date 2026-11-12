@@ -86,11 +86,14 @@
   }
 }
 
-@media (orientation: landscape) and (max-height: 520px) {
+/* Side layout (docs/ui-game-screen.md §2): the seat boxes are tall columns, the content sits in the middle. */
+@media (orientation: landscape) and (max-height: 900px) {
   .seat {
     justify-content: center;
   }
+}
 
+@media (orientation: landscape) and (max-height: 520px) {
   .header {
     flex-direction: column;
     align-items: center;

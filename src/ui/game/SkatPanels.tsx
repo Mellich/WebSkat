@@ -6,15 +6,15 @@ import { useT } from '../i18n';
 export interface SkatDecisionProps {
   readonly legal: Legal;
   readonly isMine: boolean;
+  /** Shown to the others ("Waiting for X"); the panel's declarer line says who won the bidding and with what. */
   readonly declarerName: string;
-  readonly bid: number | null;
   readonly send: (action: GameAction) => void;
 }
 
-export function SkatDecision({ legal, isMine, declarerName, bid, send }: SkatDecisionProps) {
+export function SkatDecision({ legal, isMine, declarerName, send }: SkatDecisionProps) {
   const t = useT();
   if (!isMine) {
-    return <p>{t('skat.wonBy', { name: declarerName, bid: bid ?? 0 })}</p>;
+    return <p>{t('status.waitingFor', { name: declarerName })}</p>;
   }
   return (
     <div className="skat-actions">

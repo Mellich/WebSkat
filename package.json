@@ -19,6 +19,7 @@
     "test:watch": "vitest",
     "check": "npm run typecheck && npm run lint && npm run test",
     "assets": "node scripts/make-assets.mjs",
+    "textures": "node scripts/make-textures.mjs",
     "publish:pages": "node scripts/publish-gh-pages.mjs",
     "release": "node scripts/release.mjs",
     "relay": "node scripts/relay.mjs",

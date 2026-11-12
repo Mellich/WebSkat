@@ -20,19 +20,20 @@ body,
   margin: 0;
 }
 
-/* The tavern table: dark oak planks, a lamp glow from above, beer rings, and smoke at the edges. */
+/* The tavern table: an old, used oak top (generated texture, docs/assets.md) under a lamp glow,
+   with uneven darker shading towards the corners. */
 body {
   font-family: var(--font-body);
   color: var(--ink);
   background-color: var(--wood-dark);
   background-image:
-    radial-gradient(ellipse at 50% -10%, rgb(255 190 110 / 16%), transparent 60%),
-    radial-gradient(circle at 84% 78%, transparent 0 96px, rgb(130 74 30 / 34%) 97px 100px, rgb(130 74 30 / 10%) 101px 104px, transparent 106px),
-    radial-gradient(circle at 12% 88%, transparent 0 58px, rgb(130 74 30 / 30%) 59px 61px, transparent 63px),
-    radial-gradient(circle at 30% 12%, transparent 0 40px, rgb(130 74 30 / 22%) 41px 42px, transparent 44px),
-    var(--scratches),
-    repeating-linear-gradient(90deg, rgb(0 0 0 / 0%) 0 23px, rgb(0 0 0 / 22%) 24px, rgb(0 0 0 / 0%) 26px 61px, rgb(255 210 150 / 4%) 62px, rgb(0 0 0 / 0%) 64px 97px),
-    linear-gradient(180deg, var(--wood) 0%, var(--wood-dark) 100%);
+    radial-gradient(ellipse at 50% -10%, rgb(255 190 110 / 18%), transparent 60%),
+    radial-gradient(ellipse at 12% 105%, rgb(0 0 0 / 45%), transparent 55%),
+    radial-gradient(ellipse at 100% 25%, rgb(0 0 0 / 30%), transparent 45%),
+    radial-gradient(ellipse at 70% 80%, rgb(255 200 140 / 5%), transparent 35%),
+    url('/textures/oak-old.webp');
+  background-size: auto, auto, auto, auto, cover;
+  background-position: center;
   min-height: 100dvh;
   overflow-x: hidden;
   padding:
@@ -51,9 +52,9 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background-image:
-    radial-gradient(ellipse at center, transparent 55%, var(--smoke) 100%),
+    radial-gradient(ellipse at center, transparent 50%, var(--smoke) 100%),
     var(--grain);
-  opacity: 0.85;
+  opacity: 0.6;
 }
 
 h1,

@@ -19,7 +19,8 @@ test('the version label opens the changelog in a new tab', async ({ page, contex
   const [changelog] = await Promise.all([context.waitForEvent('page'), badge.click()]);
   await expect(changelog.getByTestId('changelog')).toBeVisible();
   const version = (await badge.textContent())?.slice(1) ?? '';
-  await expect(changelog.getByTestId('changelog-release').first()).toContainText(`Version ${version}`);
+  // an Unreleased section may come first (docs/dev/versioning.md), so look for the release itself
+  await expect(changelog.getByTestId('changelog-release').filter({ hasText: `Version ${version}` })).toHaveCount(1);
   await expect(changelog.getByTestId('app-version')).toHaveCount(0);
   await expect(page).toHaveURL(/#\/$/);
 });

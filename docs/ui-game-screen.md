@@ -8,9 +8,9 @@ under the `TopBar` and is re-mounted for each game number.
 | Area (CSS grid name) | Content | Test id |
 |---|---|---|
 | `oppL`, `oppR` | `OpponentSeat` of the two other **active** players: `oppL` = next player in clockwise seat order after the viewer, `oppR` = the one after (`seats.ts` `opponentsOf`). Role text, "· Dealer" if dealer, card count, backs or ouvert cards, glow on turn; bid bubble below the box (§9) | `opponent-seat`, `bid-bubble-left`, `bid-bubble-right` |
-| `table` | `TableCenter.tsx`: `SkatPile` (bidding, Skat decision, and the whole Ramsch: the Skat is public), `TrickArea` with three fixed positions (left = `oppL` player, right = `oppR` player, bottom = the viewer, or the third active player for sitting-out viewers; `game/trickPositions.ts`), each card's player name as a label on the card, the "last trick" bubble, the bid bubble of the bottom seat (§9) | `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `last-trick`, `bid-bubble-bottom` |
-| `status` | `StatusArea.tsx`: status line (`aria-live`), "Last trick" toggle button, declarer summary line ("Anna won the bidding at 23 · took the Skat", §9; in a Ramsch "Ramsch: everybody plays alone; fewest points win"), sitting-out line (4+ players: "Sitting out: X, Y · Dealer: Z") | `status-line`, `bid-summary`, `sitting-out` |
-| `phase` | phase panel (§3); not rendered during `playing`/`finished` | `phase-panel` |
+| `table` | `TableCenter.tsx` (felt: `TableCenter.module.css`, test id `felt`): the club logo stamped into the felt (`felt-stamp`, §2), `SkatPile` (`skat-pile`) (bidding, Skat decision, and the whole Ramsch: the Skat is public), `TrickArea` with three fixed positions (left = `oppL` player, right = `oppR` player, bottom = the viewer, or the third active player for sitting-out viewers; `game/trickPositions.ts`), each card's player name as a label on the card, the "last trick" bubble, the bid bubble of the bottom seat (§9) | `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `last-trick`, `bid-bubble-bottom` |
+| `status` | `StatusArea.tsx`: status line (`aria-live`; hidden with `visibility: hidden` + `aria-hidden` while a phase panel covers it, so its height stays), "Last trick" toggle button, declarer summary line ("Anna won the bidding at 23 · took the Skat", §9; in a Ramsch "Ramsch: everybody plays alone; fewest points win"), sitting-out line (4+ players: "Sitting out: X, Y · Dealer: Z") | `status-line`, `bid-summary`, `sitting-out` |
+| overlay over `table` + `status` | phase panel (§3, `PhasePanel.module.css`), stacked at the bottom of the felt and status rows; the bottom bid bubble sits on top of it. Not rendered during `playing`/`finished`. Its first block (`PanelInfo.tsx`) repeats what the covered status row says and the panel needs: the reconnect wait, the declarer line, the Bock line, the host's Abort button | `phase-panel`, `panel-info`, `panel-status`, `panel-summary`, `panel-bock` |
 | `hand` | the viewer's `Hand`; "You are sitting out this game … Dealer: X." for sitting-out viewers | `hand-card-<ID>`, `sitting-out-you` |
 | overlay | `ResultDialog` when finished (after the trick hold) | `result-dialog` |
 
@@ -27,16 +27,33 @@ desktops. `e2e/layout.spec.ts` checks 7 viewports (`dev/e2e.md` §5). Only dialo
 
 | Layout | Media query | Grid |
 |---|---|---|
-| Portrait / default (mobile first) | — | areas `"oppL oppR" "table table" "status status" "phase phase" "hand hand"`, rows `auto minmax(0,1fr) auto auto auto`, `max-width: 960px` |
-| Compact landscape (phones sideways) | `(orientation: landscape) and (max-height: 520px)` | areas `"oppL table oppR" "oppL status oppR" "hand hand hand"`, columns `minmax(96px,20%) 1fr minmax(96px,20%)`; the phase panel is placed **over** the table + status rows (`grid-area: 1 / 2 / 3 / 3`, near-opaque background); headings/legends in the panel hidden; trick cards `0.8 × --card-w` |
+| Portrait / default (mobile first) | — | areas `"oppL oppR" "table table" "status status" "hand hand"`, rows `auto minmax(0,1fr) auto auto`, `max-width: 960px`; the phase panel overlay spans rows 2–3 |
 | Large screens | `(min-width: 900px) and (min-height: 600px)` | portrait areas, `max-width: 1040px`, `max-height: 900px` |
+| Side layout (wide, not much height: phones sideways, laptops, tablets in landscape) | `(orientation: landscape) and (max-height: 900px)` | areas `"oppL table oppR" "oppL status oppR" "hand hand hand"`, columns `minmax(96px, min(20%, 240px)) 1fr …`, `max-width: 1400px`; the phase panel overlay covers the middle column (`grid-area: 1 / 2 / 3 / 3`) |
+| Compact extras (phones held sideways) | `(orientation: landscape) and (max-height: 520px)` | side layout, smaller gaps; headings/legends in the panel hidden; trick cards at most `0.8 × --card-w` |
+
+**The phase panel never resizes the felt:** it lies over the felt and the status row (z-index 2, near-opaque),
+anchored at their bottom, at most their height (it scrolls inside). The status area stays in the grid
+but hidden, so the felt keeps its size when a panel opens or closes.
+
+**Cards always on the felt** (`TableCenter.module.css`): the felt is a size container (`container-type: size`)
+with a rounded-rectangle shape (`--felt-radius: clamp(36px, 14vmin, 140px)`, rim `--felt-rim: 9px`).
+`--card-w-trick` is the smallest of `--card-w × --trick-scale` (0.95; 0.8 compact), the felt height
+divided by the trick triangle (1.55 card heights) plus the Skat while it lies there (`.withSkat`:
+0.47 card heights + 6 px gap), and half the felt width minus the rounded corners. The Skat backs are
+`0.44 × --card-w-trick`. `e2e/layout.spec.ts` checks that every Skat and trick card corner lies inside
+the rim (`dev/e2e.md` §5).
+
+**Stamp:** `.stamp` (inset 12 % / 14 %, under the cards, `aria-hidden`) masks a darker baize with
+`public/felt-stamp.webp` (`stampUrl()`, passed as `--felt-stamp`); a 1 px light drop shadow below and a
+dark one above make it look pressed in (`docs/assets.md` §5).
 
 Card size tokens (`tokens.css`):
 ```css
 --card-w: clamp(44px, min((100vw - 24px) / 5.2, 17dvh), 100px);   /* ≈ 61–70 px on phones, 100 px cap */
 --card-h: calc(var(--card-w) * 178 / 128);
 --card-w-opponent: calc(var(--card-w) * 0.42);
---card-w-trick: calc(var(--card-w) * 0.95);   /* 0.8 × in compact landscape, set on .table */
+--card-w-trick: calc(var(--card-w) * 0.95);   /* on the felt: fitted to the felt, see above */
 ```
 
 Hand overlap is pure CSS: `Hand` sets `--hand-n` (card count, min 2); each card after the first
@@ -46,14 +63,17 @@ edge. Hover raise only under `@media (hover: hover)`.
 
 Compact parts (`max-width: 600px` or compact landscape): TopBar icon-only buttons; opponent seats
 show at most 4 backs (the count badge shows the real number); ouvert cards wrap; the bidding
-bidding panel is two short lines; `DeclarationPicker` tiles are 3 × 2.
+panel is two short lines; `DeclarationPicker` tiles are 3 × 2.
+
+Status lines never cut text off: the status text, the declarer line and the Bock line wrap
+(`text-wrap: balance`); the status text column may shrink beside the buttons.
 
 ## 3. Phase panel by `game.phase`
 
 | Phase | Viewer on turn | Others |
 |---|---|---|
 | `bidding` | `BiddingPanel`: only the current bid ("Current bid: 20 (Anna)" or "No bid yet.", `bid-current`) and who bids to whom ("Anna bids, Ben answers", `bid-turn`), then buttons from `legal`: **Bid N** (`bid-submit`, N = the single `legal.bidValues` entry), **Hold at N** (`bid-hold`), **Play (18)** (`bid-claim`, claim stage), **Pass** (`bid-pass`). Every single bid is shown as a bubble at its player (§9) | the same panel without buttons |
-| `skat-decision` | `SkatDecision`: **Pick up Skat** (`pickup`), **Play Hand** (`play-hand`) | "X won the bidding with N" |
+| `skat-decision` | `SkatDecision`: **Pick up Skat** (`pickup`), **Play Hand** (`play-hand`) | "Waiting for X…" (the panel's declarer line says "X won the bidding at N") |
 | `discarding` | `DiscardPanel`: "n of 2 selected" + **Discard** (`discard-submit`, enabled with exactly 2). The hand shows 12 cards, the two Skat cards highlighted; tapping toggles selection (max 2) | "Waiting for X" |
 | `declaring` | `DeclarationPicker` (§4) | "Waiting for X to declare the game…" |
 | `doubling` | `DoublingPanel` (`DoublingPanel.tsx`): **Kontra** (`kontra`, defenders, once), **Re** (`re`, declarer after Kontra), **No Kontra** / **No Re** (`no-double`) | "Waiting for X" |
@@ -98,8 +118,9 @@ During bidding the hand is shown at full brightness but not clickable (`showAll`
 ## 6. Status line texts (priority order)
 
 In a Bock game (skat-rules §13) the status area shows one more line below the status row:
-`bock-info` ("Bock game: points ×2 · {count} Bock games left incl. this one"), with the same
-ellipsis as the declarer line.
+`bock-info` ("Bock game: points ×2 · {count} Bock games left incl. this one"); it wraps like the
+declarer line. While a phase panel covers the status area, the panel shows the declarer line, the Bock
+line and (only while the player on turn is disconnected) the status text instead (§1).
 
 1. Holding a trick → "{winner} takes the trick".
 2. Finished → empty.
@@ -108,7 +129,7 @@ ellipsis as the declarer line.
 5. Otherwise → "Waiting for {name}…".
 
 Host only: while the game runs and the player on turn is disconnected (`waitingFor`), the status row
-also shows an **Abort game** button (`data-testid="abort-game"`, `AbortGameButton.tsx`). A confirm
+(or, while a phase panel covers it, the panel's info block) also shows an **Abort game** button (`data-testid="abort-game"`, `AbortGameButton.tsx`). A confirm
 dialog comes first; the confirmed click sends `abort-game`, and the next game is dealt.
 
 ## 7. ResultDialog (`ResultDialog.tsx`)

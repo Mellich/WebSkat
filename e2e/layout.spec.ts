@@ -17,6 +17,11 @@ const TARGETS: readonly Target[] = [
   { name: 'tablet-portrait', width: 768, height: 1024 },
   { name: 'laptop', width: 1280, height: 720 },
   { name: 'desktop', width: 1920, height: 1080 },
+  { name: 'laptop-s', width: 1366, height: 768 },
+  { name: 'laptop-wide', width: 1280, height: 800 },
+  { name: 'tablet-landscape', width: 1024, height: 768 },
+  { name: 'desktop-s', width: 1440, height: 900 },
+  { name: 'window-s', width: 900, height: 600 },
 ];
 
 /**
@@ -52,7 +57,7 @@ async function checkLayout(page: Page, target: Target, phase: string): Promise<v
   expect(size.scrollHeight, `${phase}: page scrolls vertically`).toBeLessThanOrEqual(size.innerHeight + 1);
   expect(size.scrollWidth, `${phase}: page scrolls horizontally`).toBeLessThanOrEqual(size.innerWidth + 1);
 
-  const selectors = ['[data-testid^="hand-card-"]', '[data-testid="opponent-seat"]', '[data-testid="trick-area"]', '[data-testid="status-line"]', '[data-testid="phase-panel"]'];
+  const selectors = ['[data-testid^="hand-card-"]', '[data-testid="opponent-seat"]', '[data-testid="trick-area"]', '[data-testid="status-line"]', '[data-testid="bid-summary"]', '[data-testid="phase-panel"]'];
   for (const selector of selectors) {
     for (const element of await page.locator(selector).all()) {
       const box = await element.boundingBox();
@@ -65,10 +70,65 @@ async function checkLayout(page: Page, target: Target, phase: string): Promise<v
     }
   }
 
+  await checkOnFelt(page, phase);
+
+  // The phase panel lies over the felt and the status row, never over the hand.
+  const panels = await page.getByTestId('phase-panel').all();
+  const panel = panels[0] === undefined ? null : await panels[0].boundingBox();
+  const firstCard = await page.locator('[data-testid^="hand-card-"]').first().boundingBox();
+  if (panel !== null && firstCard !== null) {
+    expect(panel.y + panel.height, `${phase}: phase panel covers the hand`).toBeLessThanOrEqual(firstCard.y + 1);
+  }
+
   const card = await page.locator('[data-testid^="hand-card-"]').first().boundingBox();
   if (card !== null) {
     if (Math.min(target.width, target.height) <= 480) expect(card.width, `${phase}: hand card too small`).toBeGreaterThanOrEqual(60);
     expect(card.width, `${phase}: hand card too large`).toBeLessThanOrEqual(104);
+  }
+}
+
+interface Box {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+/** Is the point inside the rounded rectangle `box` with corner radius `r`? */
+function insideRounded(px: number, py: number, box: Box, r: number): boolean {
+  const tol = 1;
+  if (px < box.x - tol || px > box.x + box.width + tol || py < box.y - tol || py > box.y + box.height + tol) return false;
+  const cx = Math.min(Math.max(px, box.x + r), box.x + box.width - r);
+  const cy = Math.min(Math.max(py, box.y + r), box.y + box.height - r);
+  return Math.hypot(px - cx, py - cy) <= r + tol;
+}
+
+/** The Skat and the trick (cards and empty spots) lie completely on the felt, inside the oak rim. */
+async function checkOnFelt(page: Page, phase: string): Promise<void> {
+  const felt = await page.getByTestId('felt').evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const style = getComputedStyle(el);
+    return {
+      x: r.x,
+      y: r.y,
+      width: r.width,
+      height: r.height,
+      radius: parseFloat(style.borderTopLeftRadius),
+      rim: parseFloat(style.getPropertyValue('--felt-rim')),
+    };
+  });
+  const inner: Box = { x: felt.x + felt.rim, y: felt.y + felt.rim, width: felt.width - 2 * felt.rim, height: felt.height - 2 * felt.rim };
+  const radius = Math.max(0, Math.min(felt.radius, felt.width / 2, felt.height / 2) - felt.rim);
+  const parts = page.locator('[data-testid="skat-pile"] img, [data-testid^="trick-slot-"] > *');
+  for (const part of await parts.all()) {
+    const box = await part.boundingBox();
+    if (box === null) continue;
+    const corners: readonly (readonly [number, number])[] = [
+      [box.x, box.y], [box.x + box.width, box.y], [box.x, box.y + box.height], [box.x + box.width, box.y + box.height],
+    ];
+    for (const [px, py] of corners) {
+      expect(insideRounded(px, py, inner, radius), `${phase}: card at ${JSON.stringify(box)} leaves the felt ${JSON.stringify(felt)}`).toBe(true);
+    }
   }
 }
 

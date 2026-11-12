@@ -18,3 +18,19 @@ describe('StatusArea bock line', () => {
     expect(screen.queryByTestId('bock-info')).toBeNull();
   });
 });
+
+describe('StatusArea under a phase panel', () => {
+  it('keeps its content but hides it from screen readers and stops announcing', () => {
+    render(<StatusArea statusText="Your turn" summary="Anna won the bidding at 18" sittingOut={null} bockInfo={null} covered />);
+    const row = screen.getByTestId('status-line');
+    expect(row.getAttribute('aria-live')).toBeNull();
+    expect(row.parentElement?.getAttribute('aria-hidden')).toBe('true');
+    expect(screen.getByTestId('bid-summary').textContent).toBe('Anna won the bidding at 18');
+  });
+
+  it('announces the status while nothing covers it', () => {
+    render(<StatusArea statusText="Your turn" summary={null} sittingOut={null} bockInfo={null} />);
+    expect(screen.getByTestId('status-line').getAttribute('aria-live')).toBe('polite');
+    expect(screen.getByTestId('status-line').parentElement?.getAttribute('aria-hidden')).toBeNull();
+  });
+});

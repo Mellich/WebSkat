@@ -20,8 +20,10 @@ async function seatingNow(players: readonly Player[]): Promise<Seating> {
   for (const player of players) {
     const bar = player.page.getByTestId('sitting-out');
     if ((await bar.count()) > 0) {
-      const match = /Sitting out: (.+) · Dealer: (.+)$/.exec(await bar.innerText());
-      if (match === null) throw new Error(`unexpected sitting-out bar: ${await bar.innerText()}`);
+      // textContent: while a phase panel covers the status area, the bar is in the DOM but hidden
+      const text = (await bar.textContent()) ?? '';
+      const match = /Sitting out: (.+) · Dealer: (.+)$/.exec(text);
+      if (match === null) throw new Error(`unexpected sitting-out bar: ${text}`);
       for (const name of (match[1] ?? '').split(', ')) sittingOut.add(name);
       dealers.add((match[2] ?? '').trim());
     }

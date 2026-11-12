@@ -66,7 +66,6 @@ export const deGame: Record<keyof typeof enGame, string> = {
   'summary.playing': '{game} von {name} (gereizt bis {bid})',
   'skat.pickUp': 'Skat aufnehmen',
   'skat.playHand': 'Hand spielen',
-  'skat.wonBy': '{name} hat mit {bid} gereizt.',
   'skat.selected': '{count} von 2 gewählt',
   'skat.discardButton': 'Drücken',
   'doubling.askKontra': 'Kontra sagen (verdoppelt das Spiel) oder weiterspielen?',

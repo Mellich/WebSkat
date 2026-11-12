@@ -37,7 +37,7 @@ npx playwright test -g "fits phone"    # tests whose title matches
 | `game.spec.ts` (A) | Host + 2 players: create, join by key, start, robots play one game; all three see the same result and one history row | ~1.5 min |
 | `geberskat.spec.ts` (B) | Public table found in the list by a 4th player; 4 players; the dealer sits out; after Continue the next game has another dealer/sitter | ~3.5 min |
 | `reconnect.spec.ts` (C) | Client reload mid-game gets seat and hand back; start page goes back to the stored table; host reload resumes and clients reconnect to the same game; a client that leaves the lobby disappears from the host's seats | — |
-| `layout.spec.ts` (D) | Offline `#/dev/local?seed=6&bots=easy` at 7 viewports; checks every phase (§5) | — |
+| `layout.spec.ts` (D) | Offline `#/dev/local?seed=6&bots=easy` at 12 viewports; checks every phase (§5) | — |
 | `version.spec.ts` | The version label sits bottom left on Home and opens `#/changelog` in a new tab; the newest release is the shown version | ~5 s |
 | `replace.spec.ts` | Host replaces a player who is gone by a waiting player (Players dialog, `replace-with`); a disconnected player takes its seat back through the invite link from Players | ~40 s |
 
@@ -62,14 +62,17 @@ npx playwright test -g "fits phone"    # tests whose title matches
 
 ## 5. Layout test details (`layout.spec.ts`)
 
-Viewports: 360×640, 390×844, 844×390, 640×360, 768×1024, 1280×720, 1920×1080 (width ≤ 900 also
-gets `isMobile` + `hasTouch`). The test opens `#/dev/local?seed=6&bots=easy`, presses Start, wins
+Viewports: 360×640, 390×844, 844×390, 640×360, 768×1024, 1280×720, 1920×1080, 1366×768, 1280×800,
+1024×768, 1440×900, 900×600 (width ≤ 900 also gets `isMobile` + `hasTouch`). The test opens `#/dev/local?seed=6&bots=easy`, presses Start, wins
 the bidding (with seed 6 an easy bot always passes, because the fixed seed restarts the bot RNG on
 each bot turn), picks up, discards (12 cards), declares, and plays. In each phase it asserts:
 
 - no page scroll (`scrollHeight ≤ innerHeight + 1`, same for width);
-- every `hand-card-*`, `opponent-seat`, `trick-area`, `status-line`, `phase-panel` box is inside
-  the viewport;
+- every `hand-card-*`, `opponent-seat`, `trick-area`, `status-line`, `bid-summary`, `phase-panel` box is
+  inside the viewport;
+- every corner of the Skat cards (`skat-pile` images) and of the trick slots (cards or empty spots) lies
+  on the felt: inside the rounded rectangle of `felt` shrunk by its `--felt-rim` (1 px tolerance);
+- the `phase-panel` ends above the first hand card (it covers felt and status, never the hand);
 - hand card width ≥ 60 px when `min(width, height) ≤ 480`, and ≤ 104 px always;
 - saves `test-results/layout-<viewport>-<phase>.png` for review by eye.
 
@@ -87,7 +90,7 @@ viewer win the bidding.
 | Game log dialog | `log-dialog`, `log-list`, `log-entry` (one per entry, oldest first) |
 | Players dialog | `players-dialog`, `players-row-<i>`, `replace-<i>`, `replace-with`, `replace-level`, `replace-confirm`, `players-kick-<i>`, `reinvite-<i>`, `invite-code`, `invite-link`, `players-pending`, `players-abort-game` |
 | Lobby | `table-key`, `seat-<i>`, `bot-level-<i>`, `rule-ramsch`, `rule-bock`, `rule-kontra`, `game-limit`, `game-limit-status`, `add-bot`, `start-game` |
-| Game | `bock-info`, `opponent-seat`, `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `trick-dismiss`, `last-trick`, `status-line`, `bid-summary`, `bid-bubble-left`, `bid-bubble-right`, `bid-bubble-bottom`, `sitting-out`, `sitting-out-you`, `phase-panel`, `hand-card-<CardId>`, `abort-game` (host, player on turn disconnected) |
+| Game | `bock-info`, `opponent-seat`, `trick-area`, `trick-slot-left`, `trick-slot-right`, `trick-slot-bottom`, `trick-dismiss`, `last-trick`, `status-line`, `bid-summary`, `bid-bubble-left`, `bid-bubble-right`, `bid-bubble-bottom`, `sitting-out`, `sitting-out-you`, `felt`, `felt-stamp`, `skat-pile`, `phase-panel`, `panel-info`, `panel-status`, `panel-summary`, `panel-bock`, `hand-card-<CardId>`, `abort-game` (host, player on turn disconnected) |
 | Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass`, `bid-current`, `bid-turn` |
 | Skat / declare | `pickup`, `play-hand`, `discard-submit`, `declare-option-0..5` (♣ ♠ ♥ ♦ Grand Null), `declare-submit` |
 | Kontra / Re | `kontra`, `re`, `no-double` |

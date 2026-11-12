@@ -51,7 +51,7 @@ test.describe('reloading during a game', () => {
       await waitForHand(ben.page);
 
       const annaHand = await handCards(anna.page);
-      const statusBefore = await anna.page.getByTestId('status-line').innerText();
+      const statusBefore = await anna.page.getByTestId('status-line').textContent() ?? '';
 
       await anna.page.reload();
       await waitForHand(anna.page);
@@ -106,8 +106,8 @@ test.describe('reloading during a game', () => {
 
       const hostHand = await handCards(host.page);
       const annaHand = await handCards(anna.page);
-      const hostStatus = await host.page.getByTestId('status-line').innerText();
-      const annaStatus = await anna.page.getByTestId('status-line').innerText();
+      const hostStatus = await host.page.getByTestId('status-line').textContent() ?? '';
+      const annaStatus = await anna.page.getByTestId('status-line').textContent() ?? '';
 
       await host.page.reload();
       await waitForHand(host.page);

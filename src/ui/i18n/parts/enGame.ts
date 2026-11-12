@@ -64,7 +64,6 @@ export const enGame = {
   'summary.playing': '{game} by {name} (bid {bid})',
   'skat.pickUp': 'Pick up Skat',
   'skat.playHand': 'Play Hand',
-  'skat.wonBy': '{name} won the bidding with {bid}.',
   'skat.selected': '{count} of 2 selected',
   'skat.discardButton': 'Discard',
   'doubling.askKontra': 'Say Kontra (doubles the game) or play on?',

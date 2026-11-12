@@ -8,25 +8,25 @@ import type { GameView, TableView } from '../../table';
 import { Hand } from '../components/Hand';
 import { OpponentSeat } from '../components/OpponentSeat';
 import { SpeechBubble } from '../components/SpeechBubble';
+import { cls } from '../classNames';
 import { useT, type Translator } from '../i18n';
 import { useSettings } from '../store/settings';
 import { useSession } from '../store/session';
 import { AbortGameButton } from './AbortGameButton';
-import { BiddingPanel } from './BiddingPanel';
-import { DeclarationPicker } from './DeclarationPicker';
 import { bubbleText, type BidBubble } from './bidBubbles';
 import { cardName } from './labels';
 import { declarerSummary } from './declarerSummary';
+import { PanelInfo } from './PanelInfo';
+import { phasePanelContent } from './phasePanelContent';
 import { StatusArea } from './StatusArea';
 import { ResultDialog } from './ResultDialog';
 import { SeriesDialog } from './SeriesDialog';
-import { SkatDecision, DiscardPanel } from './SkatPanels';
-import { DoublingPanel } from './DoublingPanel';
 import { namesById, opponentsOf, type SeatedView } from './seats';
 import { useBidBubbles } from './useBidBubbles';
 import { useShownTrick } from './useShownTrick';
 import { TableCenter } from './TableCenter';
 import styles from './GameScreen.module.css';
+import panelStyles from './PhasePanel.module.css';
 
 /** Ramsch has no declaration; its hand is sorted in Grand order (only Jacks are trump). */
 const RAMSCH_ORDER: Declaration = { kind: 'grand', hand: false, announce: 'none', ouvert: false };
@@ -156,54 +156,27 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
     );
   };
 
-  const phaseContent = (() => {
-    switch (game.phase) {
-      case 'bidding':
-        return <BiddingPanel bidding={game.bidding} legal={game.legal} nameOf={nameOf} send={send} />;
-      case 'skat-decision':
-        return <SkatDecision legal={game.legal} isMine={myTurn} declarerName={declarer} bid={game.bid} send={send} />;
-      case 'discarding':
-        return isDiscarding ? (
-          <DiscardPanel
-            selected={discardPick.length}
-            onDiscard={() => {
-              const [a, b] = discardPick;
-              if (a !== undefined && b !== undefined) {
-                setDiscardPick([]);
-                send({ type: 'discard', cards: [a, b] });
-              }
-            }}
-          />
-        ) : <p>{t('status.waitingFor', { name: declarer })}</p>;
-      case 'declaring':
-        return myTurn && game.legal.declarations !== undefined ? (
-          <DeclarationPicker
-            options={game.legal.declarations}
-            spitzen={game.declarerSpitzen}
-            bid={game.bid}
-            onDeclare={(d: Declaration) => {
-              send({ type: 'declare', declaration: d });
-            }}
-          />
-        ) : <p>{t('declare.waiting', { name: declarer })}</p>;
-      case 'doubling':
-        return (
-          <DoublingPanel
-            legal={game.legal}
-            isMine={myTurn}
-            waitingFor={game.turnId === null ? '' : nameOf(game.turnId)}
-            send={send}
-          />
-        );
-      case 'playing':
-      case 'finished':
-        return null;
-      default: {
-        const unused: never = game.phase;
-        return unused;
-      }
-    }
-  })();
+  const phaseContent = phasePanelContent({
+    game,
+    myTurn,
+    isDiscarding,
+    discardPick,
+    onDiscard: (cards) => {
+      setDiscardPick([]);
+      send({ type: 'discard', cards });
+    },
+    declarer,
+    nameOf,
+    send,
+    t,
+  });
+
+  // The phase panel lies over the felt and the status row; what the panel needs from the covered row moves into it.
+  const covered = phaseContent !== null;
+  const abortButton = view.you.id === view.table.hostId && game.phase !== 'finished' && game.waitingFor !== null
+    ? <AbortGameButton onAbort={() => { connection.send({ type: 'abort-game' }); }} />
+    : null;
+  const bockInfo = game.bock ? t('bock.active', { count: view.table.bockGamesLeft }) : null;
 
   return (
     <div className={styles.screen}>
@@ -211,6 +184,7 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
       <div className={styles.oppR}>{seat(1)}{bubbleAt(rightId, 'below', 'bid-bubble-right', styles.bidBubble)}</div>
 
       <TableCenter
+        className={styles.table}
         view={view}
         game={game}
         shown={shown}
@@ -218,24 +192,23 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
         cardBack={cardBack}
         nameOf={nameOf}
         label={label}
-        bottomBubble={bubbleAt(bottomId, 'above', 'bid-bubble-bottom', styles.bidBubbleBottom)}
+        bottomBubble={covered ? null : bubbleAt(bottomId, 'above', 'bid-bubble-bottom', styles.bidBubbleBottom)}
       />
 
       <div className={styles.status}>
         <StatusArea
           statusText={statusLine}
-          actions={(
+          covered={covered}
+          actions={covered ? null : (
             <>
-              {view.you.id === view.table.hostId && game.phase !== 'finished' && game.waitingFor !== null ? (
-                <AbortGameButton onAbort={() => { connection.send({ type: 'abort-game' }); }} />
-              ) : null}
+              {abortButton}
               {game.lastTrick === null ? null : (
                 <button type="button" aria-pressed={showLast} onClick={() => { setShowLast((v) => !v); }}>{t('trick.last')}</button>
               )}
             </>
           )}
           summary={summary}
-          bockInfo={game.bock ? t('bock.active', { count: view.table.bockGamesLeft }) : null}
+          bockInfo={bockInfo}
           sittingOut={opponents.sittingOut.length === 0 ? null : (
             <p className={styles.sittingOut} aria-label={t('sitOut.bar')} data-testid="sitting-out">
               {t('sitOut.bar')}: {opponents.sittingOut.map((o) => o.player.name).join(', ')}
@@ -246,7 +219,18 @@ export function GameScreen({ view, game, connection }: GameScreenProps) {
       </div>
 
       {phaseContent === null ? null : (
-        <div className={styles.phase} data-testid="phase-panel">{phaseContent}</div>
+        <div className={cls(styles.overlay, panelStyles.overlay)}>
+          {bubbleAt(bottomId, 'above', 'bid-bubble-bottom', panelStyles.bubble)}
+          <div className={panelStyles.panel} data-testid="phase-panel">
+            <PanelInfo
+              status={game.waitingFor === null ? null : statusLine}
+              summary={summary}
+              bockInfo={bockInfo}
+              actions={abortButton}
+            />
+            {phaseContent}
+          </div>
+        </div>
       )}
 
       <div className={styles.hand}>

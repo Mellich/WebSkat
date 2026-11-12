@@ -79,6 +79,7 @@ npm run e2e                          Playwright (starts relay + dev server; see 
 npx playwright test e2e/game.spec.ts one e2e spec
 npm run build / npm run preview      production build into dist/ / serve it
 npm run assets                       regenerate public/cards and public/backs
+npm run textures                     regenerate the felt stamp and the oak texture (committed)
 npm run relay                        local signaling relay (port 8787)
 npm run release -- X.Y.Z             release (only on request): version, commit, tag vX.Y.Z, publish + push gh-pages
 npm run publish:pages                build and prepare the gh-pages commit (no push)

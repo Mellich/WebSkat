@@ -1,0 +1,172 @@
+/* The phase panel (docs/ui-game-screen.md §3) lies over the felt and the status row, so the felt never
+   changes size when a panel opens. GameScreen places the overlay in the grid; this file styles it. */
+
+/* Bubble and panel, stacked at the bottom of the covered area; clicks pass through the empty part. */
+.overlay {
+  z-index: 2;
+  min-height: 0;
+  max-height: 100%;
+  align-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+/* The bid bubble of the bottom seat sits on top of the panel instead of under it. */
+.bubble {
+  flex: none;
+}
+
+/* What the covered status row said and the panel needs: declarer line, Bock line, reconnect wait, Abort. */
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.info p {
+  margin: 0;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.infoLines {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+
+.infoStatus {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.info button {
+  min-height: 36px;
+  font-size: 0.9rem;
+  padding: 0 10px;
+}
+
+.panel {
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background-color: var(--panel-solid);
+  background-image: var(--grain);
+  border: 1px solid var(--panel-edge);
+  box-shadow: inset 0 1px 0 rgb(255 230 180 / 12%), 0 6px 14px rgb(0 0 0 / 40%);
+  min-height: 0;
+  overflow: auto;
+  width: 100%;
+  max-width: 640px;
+  pointer-events: auto;
+}
+
+.panel :global(section) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.panel :global(fieldset) {
+  margin: 0;
+  padding: 4px 6px 6px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.panel :global(legend) {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.panel :global(.bidding-actions),
+.panel :global(.skat-actions),
+.panel :global(.discard-panel) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.panel :global(.bidding) > p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.panel :global(.declare-games) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+
+.panel :global(.declare-games) button {
+  padding: 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
+}
+
+/* The game currently chosen in the declare picker is lit like the chosen segment of a segmented control. */
+.panel :global(.declare-games) button[aria-pressed='true'],
+.panel :global(.declare-games) button[aria-pressed='true']:hover {
+  color: #1a1a1a;
+  font-weight: 700;
+  background: linear-gradient(180deg, #f3c96a, var(--accent));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 40%), inset 0 1px 0 rgb(255 255 255 / 40%);
+}
+
+.panel :global(h3) {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.panel :global(p) {
+  margin: 0;
+}
+
+/* Phones held sideways: tighter, without headings and legends. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .panel {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .panel :global(.declare-games) button,
+  .panel :global(.declare) > button {
+    min-height: 36px;
+  }
+
+  .panel :global(h3),
+  .panel :global(legend) {
+    display: none;
+  }
+
+  .panel :global(fieldset) {
+    padding: 4px;
+  }
+
+  .info {
+    padding-bottom: 4px;
+  }
+}

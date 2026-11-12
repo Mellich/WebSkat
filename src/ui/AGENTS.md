@@ -35,16 +35,18 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `version.ts` | `APP_VERSION` (from `package.json` via Vite `define __APP_VERSION__`; `docs/dev/versioning.md`) |
 | `changelog/` | `changelogText.ts` (`CHANGELOG.md?raw`), `parseChangelog.ts` (`parseChangelog`, `splitInlineCode`, `parseSemver`); `changelog.test.ts` checks the changelog against `APP_VERSION` |
 | `screens/ChangelogScreen.tsx` | `#/changelog`: releases from `CHANGELOG.md`, translated headings |
-| `assets.ts` | `cardUrl`, `backUrl`, `logoUrl`, `BackIndex`, `DEFAULT_BACK` |
+| `assets.ts` | `cardUrl`, `backUrl`, `logoUrl`, `stampUrl` (felt stamp), `BackIndex`, `DEFAULT_BACK` |
 | `preload.ts` | `cardImageUrls(back)`, `preloadImages(urls)`: loads card faces and back once per page |
 | `cardNames.ts` | `cardLabel` (English fallback card name, default prop of components) |
 | `classNames.ts` | `cls(...)` joins class names |
 | `screens/Home.tsx` | start page: name, rejoin/resume, create, join by key, public list, About |
 | `screens/TableScreen.tsx` | `#/t/KEY`: name form, `openTable(key, name, invite)`, TopBar, connection banner (Retry for `TIMEOUT`), lobby or game |
 | `screens/TableLobby.tsx` | key + copy, seats, bot strength selects, Add bot, Start, Kick |
-| `game/GameScreen.tsx` | in-game layout, bid bubbles, phase panel switch, hand, result |
+| `game/GameScreen.tsx` (+ `.module.css`) | in-game grid (portrait, side layout, compact extras), bid bubbles, phase panel overlay, hand, result |
+| `game/phasePanelContent.tsx` | `phasePanelContent(...)`: the panel content per phase (bidding, Skat, discard, declare, Kontra/Re) or null |
+| `game/PanelInfo.tsx` (+ `PhasePanel.module.css`) | the panel's info block: what the covered status row says and the panel needs (declarer, Bock, reconnect wait, Abort) |
 | `game/StatusArea.tsx` (+ `.module.css`) | status line row, declarer summary (`bid-summary`), Bock line (`bock-info`), sitting-out line |
-| `game/TableCenter.tsx` | the table area: Skat pile, bottom bid bubble, trick at fixed positions, last-trick bubble |
+| `game/TableCenter.tsx` (+ `.module.css`) | the felt: stamped logo, Skat pile, bottom bid bubble, trick at fixed positions, last-trick bubble; trick/Skat card size fitted to the felt |
 | `game/AbortGameButton.tsx` | host's "Abort game" button in the status row, with a confirm dialog |
 | `game/BiddingPanel.tsx` | current bid, whose turn, Bid N / Hold / Play (18) / Pass |
 | `game/bidBubbles.ts` | `latestPerPlayer`, `bubbleText` (pure) for the bid bubbles |
@@ -97,5 +99,6 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
   add i18n keys, write a jsdom test that checks enabled/disabled and the sent command.
 - **New setting:** `persist/settings.ts` (schema with `.default()`, `defaultSettings`) →
   `SettingsDialog.tsx` → i18n → `persist.test.ts` → `docs/ui.md` §6.
-- **Layout change in the game screen:** edit `GameScreen.module.css` (three layouts) and check
+- **Layout change in the game screen:** edit `GameScreen.module.css` (grid layouts), `TableCenter.module.css`
+  (felt, card fit) or `PhasePanel.module.css` (panel overlay) and check
   with `npx playwright test e2e/layout.spec.ts` plus a look at the screenshots in `test-results/`.

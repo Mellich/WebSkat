@@ -43,6 +43,7 @@ i18n or test-assertion library such as jest-dom) unless the user agrees. Record 
 | `npm run test:watch` | Vitest watch mode |
 | `npm run check` | typecheck + lint + test. **Must be green before you finish** |
 | `npm run assets` | Regenerates `public/cards/*.webp` and `public/backs/*.webp` from `assets/` |
+| `npm run textures` | Regenerates the committed table textures `public/felt-stamp.webp` and `public/textures/oak-old.webp` (`docs/assets.md` §5) |
 | `npm run relay` | Local signaling relay on port 8787 (`PORT` overrides) |
 | `npm run e2e` | Playwright tests (starts relay + dev server itself; `dev/e2e.md`) |
 | `npm run publish:pages` | Check, build and prepare a `gh-pages` commit (`deployment.md`) |

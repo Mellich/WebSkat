@@ -8,6 +8,7 @@
 | `assets/Card Backs 128x178.png` | 512 × 178: 4 backs side by side |
 | `assets/Das Skatastische Logo.PNG` | raster logo; its unchanged copy is `public/skatastisches-logo.png` (Home header + favicon) |
 | `assets/Skatastischer Hirsch.svg` | vector logo, kept unchanged (copy in `public/skatastischer-hirsch.svg`, not used by the app) |
+| `assets/skatastisches-logo-monochrome.svg` | monochrome club logo (Inkscape, 2 MB; source for editing); its export is `public/skatastisches-logo-monochrome.png` (800 × 566, transparent), the input of the felt stamp (§5) |
 
 Card art licensing is the user's responsibility (supplied by the user).
 
@@ -33,4 +34,17 @@ Backs: index 0 dark-blue ornate, 1 light red/white, 2 dark red (default), 3 navy
 
 `cardUrl(id)`, `backUrl(index)`, `logoUrl()` build URLs from `import.meta.env.BASE_URL`, so a
 deployment under a sub-path works. Never hard-code `/cards/...`. Suit symbols in text are Unicode
-♣ ♠ ♥ ♦ (♥ ♦ red, `--suit-red`). No sounds and no table texture exist.
+♣ ♠ ♥ ♦ (♥ ♦ red, `--suit-red`). No sounds exist. `stampUrl()` gives the felt stamp (§5); CSS
+files may reference public files by root path (`url('/textures/oak-old.webp')`, like the fonts):
+Vite rewrites those for the relative `base`.
+
+## 5. Table textures (`public/felt-stamp.webp`, `public/textures/oak-old.webp`; committed)
+
+`scripts/make-textures.mjs` (`npm run textures`, via `sharp`) renders both from SVG filters with fixed
+seeds, so a run gives the same files. They are committed (not part of `predev`/`prebuild`); rerun the
+script after changing it. One run takes about a minute.
+
+| File | Content | Used by |
+|---|---|---|
+| `public/felt-stamp.webp` | the monochrome logo as a white + alpha mask, worn like a used stamp: soft patches of less pressure, a few small holes, slightly wobbly edges (≈ 90 kB) | `TableCenter` (`.stamp`, a CSS `mask` over a darker baize with a light lip and a shadow: the logo looks pressed into the felt) |
+| `public/textures/oak-old.webp` | 1600 × 1000 old oak table top: planks of uneven width and tone, dark seams, butt joints, wavy grain, knots, whitish water marks and dark beer rings, spills, cigarette burns, dents, fine scratches and deep gouges, worn and greasy patches (≈ 170 kB) | `body` background in `global.css` (`cover`, under a lamp glow and darker corners) |

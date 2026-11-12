@@ -1,16 +1,18 @@
-// The middle of the game screen: the Skat pile, the trick at fixed positions, the bottom bid bubble and the last-trick list.
+// The felt in the middle of the game screen: the stamped logo, the Skat pile, the trick at fixed positions,
+// the bottom bid bubble and the last-trick list. Styles: TableCenter.module.css.
 
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { CardId } from '../../engine';
 import type { GameView, TableView } from '../../table';
 import { SkatPile } from '../components/SkatPile';
 import { CardChip } from '../components/CardChip';
 import { TrickArea, type TrickSlot } from '../components/TrickArea';
-import type { BackIndex } from '../assets';
+import { stampUrl, type BackIndex } from '../assets';
+import { cls } from '../classNames';
 import { useT } from '../i18n';
 import type { ShownTrick } from './useShownTrick';
 import { placeTrick, trickSeats } from './trickPositions';
-import styles from './GameScreen.module.css';
+import styles from './TableCenter.module.css';
 
 export interface TableCenterProps {
   readonly view: TableView;
@@ -20,11 +22,16 @@ export interface TableCenterProps {
   readonly cardBack: BackIndex;
   readonly nameOf: (id: string) => string;
   readonly label: (card: CardId) => string;
-  /** The bid bubble of the bottom seat; it sits in the table area. */
+  /** The bid bubble of the bottom seat while no phase panel covers the felt (null otherwise). */
   readonly bottomBubble: ReactNode;
+  /** Grid placement from GameScreen. */
+  readonly className?: string | undefined;
 }
 
-export function TableCenter({ view, game, shown, showLast, cardBack, nameOf, label, bottomBubble }: TableCenterProps) {
+/** The stamp mask; the URL comes from assets.ts so a sub-path deployment works. */
+const STAMP_STYLE = { '--felt-stamp': `url("${stampUrl()}")` } as CSSProperties & Record<'--felt-stamp', string>;
+
+export function TableCenter({ view, game, shown, showLast, cardBack, nameOf, label, bottomBubble, className }: TableCenterProps) {
   const t = useT();
   const placed = placeTrick(shown.plays, trickSeats(view));
   const toSlot = (p: { readonly playerId: string; readonly card: CardId; readonly winner: boolean } | null): TrickSlot | null =>
@@ -34,7 +41,8 @@ export function TableCenter({ view, game, shown, showLast, cardBack, nameOf, lab
   const showSkat = game.phase === 'bidding' || game.phase === 'skat-decision' || game.ramsch;
 
   return (
-    <div className={styles.table}>
+    <div className={cls(className, styles.felt, showSkat && styles.withSkat)} data-testid="felt">
+      <div className={styles.stamp} style={STAMP_STYLE} aria-hidden="true" data-testid="felt-stamp" />
       <SkatPile visible={showSkat} back={cardBack} label={t('skat.onTable')} />
       {bottomBubble}
       <TrickArea slots={slots} labelOf={label} {...(shown.holding ? { onDismiss: shown.dismiss, dismissLabel: t('trick.continue') } : {})} />
