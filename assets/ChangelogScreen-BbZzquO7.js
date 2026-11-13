@@ -1,4 +1,4 @@
-import{c as e,d as t,l as n}from"./index-cuOHY72_.js";var r=`# Changelog
+import{c as e,d as t,l as n}from"./index-0YEo7zsl.js";var r=`# Changelog
 
 All notable changes to WebSkat are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
@@ -6,6 +6,12 @@ All notable changes to WebSkat are listed here. The format follows
 next version: \`docs/dev/versioning.md\`.
 
 Versions before 0.7.0 were reconstructed from the git history.
+
+## [0.15.1] - 2026-11-13
+
+### Fixed
+
+- The felt stamp (club logo) was missing in the released build: its URL was relative and resolved against the CSS file (\`/assets/\`) instead of the page, so it returned 404.
 
 ## [0.15.0] - 2026-11-12
 
