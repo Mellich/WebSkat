@@ -1,7 +1,7 @@
 {
   "name": "webskat",
   "private": true,
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "Browser-only, peer-to-peer multiplayer Skat (3 players, Geberskat for 4-6).",
   "type": "module",
   "engines": {
