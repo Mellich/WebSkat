@@ -7,6 +7,12 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [Unreleased]
+
+### Fixed
+
+- The felt stamp (club logo) was missing in the released build: its URL was relative and resolved against the CSS file (`/assets/`) instead of the page, so it returned 404.
+
 ## [0.15.0] - 2026-11-12
 
 ### Added

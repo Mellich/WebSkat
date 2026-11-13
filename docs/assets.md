@@ -34,7 +34,7 @@ Backs: index 0 dark-blue ornate, 1 light red/white, 2 dark red (default), 3 navy
 
 `cardUrl(id)`, `backUrl(index)`, `logoUrl()` build URLs from `import.meta.env.BASE_URL`, so a
 deployment under a sub-path works. Never hard-code `/cards/...`. Suit symbols in text are Unicode
-♣ ♠ ♥ ♦ (♥ ♦ red, `--suit-red`). No sounds exist. `stampUrl()` gives the felt stamp (§5); CSS
+♣ ♠ ♥ ♦ (♥ ♦ red, `--suit-red`). No sounds exist. `stampUrl()` gives the felt stamp (§5, an absolute URL: a `url()` in a stylesheet resolves against the CSS file); CSS
 files may reference public files by root path (`url('/textures/oak-old.webp')`, like the fonts):
 Vite rewrites those for the relative `base`.
 
