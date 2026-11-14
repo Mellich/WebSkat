@@ -142,6 +142,9 @@ export function gameViewFor(s: TableState, game: ActiveGame, viewer: PlayerId): 
     lastTrick: lastTrick === undefined
       ? null
       : { ...trickView(lastTrick.plays, lastTrick.leader), winnerId: idOf(lastTrick.winner) },
+    tricks: e.phase === 'finished'
+      ? e.tricks.map((t) => ({ ...trickView(t.plays, t.leader), winnerId: idOf(t.winner) }))
+      : null,
     tricksWon: Object.fromEntries(
       ROLES.map((r) => [idOf(r), e.tricks.filter((t) => t.winner === r).length]),
     ),

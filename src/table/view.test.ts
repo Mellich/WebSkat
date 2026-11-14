@@ -231,3 +231,63 @@ describe('Bockrunden in views (skat-rules §13)', () => {
     expect(viewFor({ ...s, game: { ...game, bock: true } }, 'p1').game?.bock).toBe(true);
   });
 });
+
+describe('tricks', () => {
+  const PLAYERS: PlayerId[] = ['p0', 'p1', 'p2', 'stranger'];
+
+  /** Declarer p2 (Hearts, not hand) with the Skat picked up; discards and declaration done. */
+  function declared(): TableState {
+    let s = declarerPickedUp();
+    const [a, b] = game(s).engine.hands.middlehand;
+    s = step(s, 'p2', { type: 'game', action: { type: 'discard', cards: [a ?? 'C7', b ?? 'C8'] } });
+    return step(s, 'p2', { type: 'game', action: { type: 'declare', declaration: { kind: 'suit', trump: 'H', hand: false, announce: 'none', ouvert: false } } });
+  }
+
+  it('is null for every viewer while the game runs', () => {
+    let s = declared();
+    const rand = mulberry32(5);
+    for (let i = 0; i < 3; i++) {
+      const next = randomStep(s, CTX, rand);
+      if (next === null) break;
+      s = next;
+    }
+    expect(game(s).engine.phase).toBe('playing');
+    for (const viewer of PLAYERS) {
+      expect(viewFor(s, viewer).game?.tricks).toBeNull();
+    }
+  });
+
+  it('lists every completed trick of a finished played game, the same for everybody', () => {
+    const rand = mulberry32(3);
+    let s = declared();
+    for (let i = 0; i < 500 && game(s).engine.phase !== 'finished'; i++) {
+      const next = randomStep(s, CTX, rand);
+      if (next === null) break;
+      s = next;
+    }
+    const e = game(s).engine;
+    expect(e.phase).toBe('finished');
+    const tricks = viewFor(s, 'stranger').game?.tricks;
+    expect(tricks).toHaveLength(e.tricks.length);
+    expect(tricks).toHaveLength(10);
+    for (const viewer of PLAYERS) {
+      expect(viewFor(s, viewer).game?.tricks).toEqual(tricks);
+    }
+    const first = e.tricks[0];
+    if (first === undefined) throw new Error('no trick');
+    expect(tricks?.[0]).toEqual({
+      leaderId: idOf(s, first.leader),
+      plays: first.plays.map((p) => ({ playerId: idOf(s, p.role), card: p.card })),
+      winnerId: idOf(s, first.winner),
+    });
+    expect(viewFor(s, 'stranger').game?.lastTrick).toEqual(tricks?.at(-1));
+  });
+
+  it('is an empty list for a passed-in game', () => {
+    let s = started(3);
+    for (const id of ['p2', 'p0', 'p1']) {
+      s = step(s, id, { type: 'game', action: { type: 'pass' } });
+    }
+    expect(viewFor(s, 'stranger').game?.tricks).toEqual([]);
+  });
+});

@@ -123,6 +123,27 @@ input[type='text']:focus-visible {
   outline-offset: 1px;
 }
 
+select {
+  font: inherit;
+  color: var(--ink);
+  color-scheme: dark;
+  min-height: var(--tap);
+  padding: 0 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--oak-edge);
+  background-color: var(--panel-solid);
+}
+
+select option {
+  color: var(--ink);
+  background-color: var(--panel-solid);
+}
+
+select:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+}
+
 a {
   color: var(--accent);
 }

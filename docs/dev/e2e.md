@@ -34,7 +34,7 @@ npx playwright test -g "fits phone"    # tests whose title matches
 
 | Spec | Scenario | Duration |
 |---|---|---|
-| `game.spec.ts` (A) | Host + 2 players: create, join by key, start, robots play one game; all three see the same result and one history row | ~1.5 min |
+| `game.spec.ts` (A) | Host + 2 players: create, join by key, start, robots play one game; all three see the same result and one history row; the host's "Analyze game" opens the analysis in a new tab (deal shown, replay steps, scores appear unless passed in) | ~1.5 min |
 | `geberskat.spec.ts` (B) | Public table found in the list by a 4th player; 4 players; the dealer sits out; after Continue the next game has another dealer/sitter | ~3.5 min |
 | `reconnect.spec.ts` (C) | Client reload mid-game gets seat and hand back; start page goes back to the stored table; host reload resumes and clients reconnect to the same game; a client that leaves the lobby disappears from the host's seats | — |
 | `layout.spec.ts` (D) | Offline `#/dev/local?seed=6&bots=easy` at 12 viewports; checks every phase (§5) | — |
@@ -85,6 +85,7 @@ viewer win the bidding.
 |---|---|
 | Every screen | `app-version` (version link, opens `#/changelog` in a new tab) |
 | Changelog | `changelog`, `changelog-release` |
+| Analysis | `analysis-screen`, `analysis-invalid`, `analysis-deal`, `analysis-board`, `analysis-seat-<role>` (`aria-current` on the player to move), `analysis-card-<CardId>` (playable cards only), `analysis-trick`, `analysis-start`, `analysis-back`, `analysis-forward`, `analysis-end`, `analysis-play-best`, `analysis-reset`, `analysis-real-hands`, `analysis-epsilon`, `analysis-pause`, `analysis-status`, `analysis-variant`, `analysis-scores`, `analysis-score-<CardId>`, `analysis-tricks`, `analysis-trick-<n>`, `analysis-result` |
 | Home | `create-table`, `join-key-input`, `join-invite-input`, `join-submit`, `public-table`, `public-join` |
 | Table screen / TopBar | `connection-banner`, `connection-status`, `open-stats`, `open-log`, `open-players`, `open-settings`, `leave-table`, `retry-join` |
 | Game log dialog | `log-dialog`, `log-list`, `log-entry` (one per entry, oldest first) |
@@ -94,7 +95,7 @@ viewer win the bidding.
 | Bidding | `bid-submit`, `bid-hold`, `bid-claim`, `bid-pass`, `bid-current`, `bid-turn` |
 | Skat / declare | `pickup`, `play-hand`, `discard-submit`, `declare-option-0..5` (♣ ♠ ♥ ♦ Grand Null), `declare-submit` |
 | Kontra / Re | `kontra`, `re`, `no-double` |
-| Result | `result-dialog`, `continue`, `show-all-cards`, `all-cards` |
+| Result | `result-dialog`, `continue`, `open-analysis` (opens `#/analysis` in a new tab) |
 | Stats / settings | `stats-dialog`, `stats-tab-standings`, `stats-tab-history`, `stats-tab-charts`, `stats-scoring`, `history-row`, `stats-export-csv`, `settings-dialog`, `settings-tab-display`, `settings-tab-play`, `setting-language`, `setting-confirm`, `setting-scoring`, `setting-trick-display`, `setting-bid-bubble` |
 | Dialogs | `dialog-close` (the × of every `Dialog`), `log-dialog`, `players-dialog`, `about-dialog` |
 

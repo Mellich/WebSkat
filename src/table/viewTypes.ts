@@ -96,6 +96,7 @@ export interface GameView {
   readonly discarded: readonly CardId[] | null; // everybody when finished
   readonly trick: ViewTrick;
   readonly lastTrick: ViewLastTrick | null;
+  readonly tricks: readonly ViewLastTrick[] | null; // every completed trick, everybody when finished, else null
   readonly tricksWon: Readonly<Record<PlayerId, number>>;
   readonly legal: Legal;
   readonly result: ViewResult | null;

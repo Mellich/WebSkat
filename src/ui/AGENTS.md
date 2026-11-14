@@ -17,6 +17,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
   (`connection.send(command)`). Network setup lives in `net/actions.ts` only.
 - All user-visible text through `useT()` / `t('key', params)`; add keys to **both**
   `i18n/parts/enApp|enGame|enPanels.ts` and the matching `de*.ts` part (`en.ts`/`de.ts` only merge). Error toasts use `error.<CODE>`.
+- **Match the dark theme for every new element.** Use the tokens (`--ink`, `--panel-solid`, `--accent`); native controls (`select` + `option`, inputs, scrollbars) are themed in `styles/global.css` with `color-scheme: dark`. Never leave browser-default light controls; add a global rule for a new element type (`docs/ui.md` §10).
 - Image URLs only via `assets.ts` (`import.meta.env.BASE_URL`).
 - `localStorage` only through `persist/storage.ts` and `persist/*`; zod-validate on read; wrap in
   try/catch.
@@ -31,10 +32,30 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 
 | Path | Contents |
 |---|---|
-| `router.ts` | `Route` (table route carries `invite`), `parseRoute`, `useRoute`, `navigate`, `tableHash(key, invite?)` |
+| `router.ts` | `Route` (table route carries `invite`; `analysis` carries the raw `g` data), `parseRoute`, `useRoute`, `navigate`, `tableHash(key, invite?)` |
 | `version.ts` | `APP_VERSION` (from `package.json` via Vite `define __APP_VERSION__`; `docs/dev/versioning.md`) |
 | `changelog/` | `changelogText.ts` (`CHANGELOG.md?raw`), `parseChangelog.ts` (`parseChangelog`, `splitInlineCode`, `parseSemver`); `changelog.test.ts` checks the changelog against `APP_VERSION` |
 | `screens/ChangelogScreen.tsx` | `#/changelog`: releases from `CHANGELOG.md`, translated headings |
+| `analysis/link.ts` (+ test) | `encodeAnalysis`, `decodeAnalysis` (zod + `validateInput`, never throws), `analysisHash`, `analysisUrl`, `openAnalysis` (new tab) |
+| `analysis/inputSchema.ts` | `AnalysisInputSchema` (zod) for the link data |
+| `analysis/AnalysisScreen.tsx` (+ css, test) | `#/analysis`: decodes the link once, summary line, `DealOverview`, `AnalysisReplay` (not for passed-in games); optional `workerFactory` prop for tests |
+| `analysis/AnalysisReplay.tsx` (+ css) | owns the line, real-hands switch, pause and `useCardScores` (hook call only here); layout, keyboard (ArrowLeft/Right, Home/End) |
+| `analysis/DealOverview.tsx` (+ css, test) | starting cards per role (`sortHand`), declarer `*`, Skat, discarded after a pickup |
+| `analysis/ReplayBoard.tsx` (+ css, test) | the board: three `SeatHand`s and the current trick; `analysis-board` |
+| `analysis/SeatHand.tsx` (+ css) | one seat: name, points, tricks, hand; the mover's playable cards are buttons with a win-rate badge |
+| `analysis/ReplayControls.tsx` (+ css) | step buttons, status line, variant badge and reset, real-hands switch, play best, pause, samples |
+| `analysis/ScoreList.tsx` (+ css) | score rows per playable card (`rankStats`), notice for Ramsch and errors |
+| `analysis/TrickHistory.tsx` (+ css) | every trick of the line, click jumps to its end; variant marks |
+| `analysis/AnalysisResult.tsx` (+ css) | result of a finished line: played (won/lost, points, value) and Ramsch (losers, Durchmarsch, per-player) |
+| `analysis/analysisSummary.ts` (+ test) | `summaryText(input, t)`: the one-line game summary |
+| `analysis/scoreFormat.ts` (+ test) | `percent`, `points`, `rankStats`, `winTone` (score text, order and badge colour) |
+| `analysis/lineNav.ts` (+ test) | pure cursor moves (`moveTo`, back, forward, `jumpToTrick`, `resetToActual`) |
+| `analysis/roleKey.ts` | seat role to translation key (exhaustive) |
+| `analysis/analysisFixtures.ts` | test-only: played, Ramsch and passed-in inputs, `fakeWorker` (the real runner with a step queue); not used by the app |
+| `analysis/workerProtocol.ts` | `WorkerRequest` (`analyze` with an id, `stop`), `WorkerResponse` (`scores`, `error`); typed only, never leaves the tab |
+| `analysis/runner.ts` (+ test) | `createRunner({post, schedule, seed})`: the sampling loop (batches via `scoreBatch`, stale ids dropped, cap `MAX_SAMPLES_PER_CARD`); no worker, no DOM |
+| `analysis/analysis.worker.ts` | the module worker: `createRunner` on `postMessage`; `setTimeout` as scheduler |
+| `analysis/useCardScores.ts` (+ test) | `useCardScores(input, plays, useRealHands, paused)`: one worker per screen, restarts on a new position, pause/resume keeps the stats; `defaultWorkerFactory` (the real `Worker`) |
 | `assets.ts` | `cardUrl`, `backUrl`, `logoUrl`, `stampUrl` (felt stamp), `BackIndex`, `DEFAULT_BACK` |
 | `preload.ts` | `cardImageUrls(back)`, `preloadImages(urls)`: loads card faces and back once per page |
 | `cardNames.ts` | `cardLabel` (English fallback card name, default prop of components) |
@@ -55,9 +76,7 @@ screen, `docs/ui-game-screen.md`. Stats UI: `docs/statistics.md` §3. Test ids: 
 | `game/SkatPanels.tsx` | `SkatDecision` (pick up / Hand), `DiscardPanel` |
 | `game/DoublingPanel.tsx` | `DoublingPanel`: Kontra / Re / no-double buttons (`kontra`, `re`, `no-double` test ids) |
 | `game/DeclarationPicker.tsx` | game tiles, extras, floor-value hint, Declare |
-| `game/ResultDialog.tsx` | result sheet, score table of the selected scoring system, Continue / ready state |
-| `game/AllCards.tsx` | "Show all cards" button and the list of every dealt hand and the Skat (toggle, local state) |
-| `game/revealedHands.ts` | `revealedHands(view)`: the dealt hands in seat-role order and the Skat, or null while the game runs (pure) |
+| `game/ResultDialog.tsx` | result sheet, score table of the selected scoring system, "Analyze game" (`open-analysis`, `analysisInputFromView` + `openAnalysis`), Continue / ready state |
 | `game/viewFixtures.ts` | test helper: `finishedGameFixture`, `tableViewFixture` (not used by the app) |
 | `game/RamschResult.tsx` | the Ramsch part of the result sheet: headline (losers or Durchmarsch), Jungfrau line, card points and score change per player, Skat |
 | `game/useShownTrick.ts` | holds a finished trick for `trickDisplayMs` |

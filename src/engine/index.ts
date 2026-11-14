@@ -12,3 +12,4 @@ export * from './scoring';
 export * from './play';
 export * from './ramsch';
 export * from './game';
+export * from './playingState';

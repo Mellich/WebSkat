@@ -183,13 +183,45 @@ and the `ramsch` block: `points`, `tricks`, `loserIds`, `jungfrau`, `durchmarsch
 `waitingFor` (= `turnId` if that player is disconnected), `bidding` (`stage`, `callerId`,
 `listenerId`, `currentBid`, `history` with player ids), `declarerId`, `bid`, `pickedUpSkat`,
 `declaration`, `myHand`, `openHands`, `initialHands` (every dealt hand, by player id, once the game is finished; null before), `handCounts`, `skat`, `discarded`, `trick`
-(`leaderId`, `plays[{playerId, card}]`), `lastTrick` (+ `winnerId`), `tricksWon`, `legal` (the
+(`leaderId`, `plays[{playerId, card}]`), `lastTrick` (+ `winnerId`), `tricks` (every completed trick in order, same shape plus `winnerId`, once the game is finished; `null` while it runs; passed-in games `[]`; decision I181), `tricksWon`, `legal` (the
 engine's `Legal` for the viewer, `{}` if not their turn), `result` (`ViewResult`: the
 `GameResult` with `declarerId` instead of the role; a Ramsch result maps its per-role fields to ids: `points`, `tricks`, `skatToId`, `loserIds`, `jungfrau`, `durchmarschId`, `scores`), `declarerSpitzen` (declarer only, while
 declaring: spitzen for Grand and each suit, for the floor-value hint).
 
 Which card fields each viewer gets: `hidden-information.md` §2. After a finished Ramsch the Skat is
 visible to everybody (`skat` and `discarded` as after a played game). Once any game is finished (played, passed in or Ramsch), `initialHands` shows the three dealt hands to everybody (decision I175); a running game sends `null`.
+
+## 6a. Game analysis (`src/table/analysis/`, plan `docs/plans/analysis/`)
+
+Pure helpers for the analysis screen. The host never uses them; they run in the browser on data
+from a finished game's view (no network, no storage).
+
+- `AnalysisInput` (`types.ts`): one finished game as JSON: `kind` (`played`, `ramsch`,
+  `passed-in`), `names` and `hands` by role (as dealt), `skat`, `declarer`, `declaration`, `bid`,
+  `pickedUpSkat`, `discarded`, `doubling`, `bidding` and `plays` (the card play in order).
+- `analysisInputFromView(view)` (`fromView.ts`): the input of the finished game in a view, `null`
+  while no finished game is shown. Passed-in games take the Skat as the two cards missing from the hands.
+- Replay (`replay.ts`): `analysisStart(input)` gives the `GameState` at the first card (engine
+  `playingStateFrom`; `null` for passed-in games). `positionAt(start, cards)` applies the cards with the
+  normal reducer and returns a `Position` (hands, current and completed tricks, points and tricks per
+  role, `mover`, `playable` = the legal cards of the mover, `result`). `validateInput` checks that the
+  input starts and its plays replay.
+- Lines: an `AnalysisLine` is the card list plus a `cursor`. `actualLine(input)` starts the real game,
+  `chooseCard(line, card)` follows it while the card matches the next one and otherwise cuts the rest
+  and starts a variant, `divergenceAt(actual, line)` gives the first card where a variant leaves the game.
+- Replay scope: only the card play is replayed; bidding, Skat, discard, declaration and doubling are
+  static information (decision I182). Variants change played cards only.
+- Card scores (`scores.ts`, `rollout.ts`, `tuning.ts`; decision I183): `canScore(position)` is true
+  for a played game with a player to move (not Ramsch, not finished). `scoreBatch(position, stats,
+  options, rand)` plays every playable card in the same sampled worlds and adds the results to the
+  `CardStat`s (`samples`, `wins`, `points`, `histogram` of the team's card points 0..120); `winRate`,
+  `averagePoints`, `medianPoints`, `maxPoints`, `minPoints`, `minSamples`, `compareStats` and
+  `bestCard(stats, criterion)` (`ScoreCriterion`: win, average, median, max, min) read them. Every `CardStat` also keeps `worlds`, one packed result per sampled world (`world.ts`; the same index is the same deal for every card). `pairedDifference(a, b, measure)` (`compare.ts`) gives the mean and standard error of the per-world difference of two cards, and `bestCards(stats, criterion)` returns the best card followed by every card that is not clearly worse (difference below `CONFIDENCE_Z` standard errors): one card is a clear decision, several are "about equal". `activeCards(stats, usePoints)` (`adaptive.ts`) says which cards the next batch samples (`scoreBatch` option `cards`): only cards at the front (most samples), minus cards clearly behind the leader (`ELIMINATION_Z` standard errors, from `MIN_SAMPLES_TO_ELIMINATE` samples, by win rate and, unless Null, by average points); empty when one card is left or `MAX_SAMPLES_PER_CARD` is reached. The default mode samples hidden cards with `sampleDeal` from what the mover knows; the
+  real-hands mode uses the real hands (the Skat that counts for the declarer is `discarded` after a
+  pickup, else `skat`). Play-outs use `analysisPolicy`: the Normal heuristic, with probability
+  `ROLLOUT_EPSILON` a random legal card (`scoreBatch` option `epsilon`, default `ROLLOUT_EPSILON`; the screen offers `ROLLOUT_EPSILONS`). `teamWon` decides the mover's team's win (suit: 61 points,
+  90 with Schneider, no defender trick with Schwarz or ouvert; Null: declarer takes no trick;
+  overbidding ignored). Constants: `analysis/tuning.ts`.
 
 ## 7. Bots on the table (`bot.ts`)
 

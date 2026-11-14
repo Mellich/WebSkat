@@ -27,6 +27,7 @@ A `TableView` for player P may contain card identities only for:
 | Skat and discarded cards when a **played** game is finished | everyone | `game.skat`, `game.discarded` |
 | Skat of a **Ramsch** (during and after the game; nobody picks it up) | everyone | `game.skat` |
 | Cards of the current trick and of the last completed trick | everyone | `game.trick`, `game.lastTrick` |
+| Every completed trick of a **finished** game (played, passed in, Ramsch; the order of play) | everyone | `game.tricks` (null while the game runs) |
 | Other players' hands | **nobody**; only the count | `game.handCounts` |
 | All dealt hands (`initialHands`) of a **finished** game (played, passed in, Ramsch) | everyone | `game.initialHands` (null while the game runs) |
 | Shuffle seed | nobody (never in a view, record or message) | — |

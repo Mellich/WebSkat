@@ -30,7 +30,7 @@ const TrickSchema = z.object({
   plays: z.array(z.object({ playerId: id, card: CardIdSchema })),
 });
 
-const DoubleLevelSchema = z.union([z.literal(1), z.literal(2), z.literal(4)]);
+export const DoubleLevelSchema = z.union([z.literal(1), z.literal(2), z.literal(4)]);
 
 const LegalSchema = z.object({
   bidValues: z.array(z.number().int()).optional(),
@@ -127,6 +127,7 @@ const GameViewSchema: z.ZodType<GameView> = z.object({
   discarded: cards.nullable(),
   trick: TrickSchema,
   lastTrick: TrickSchema.extend({ winnerId: id }).nullable(),
+  tricks: z.array(TrickSchema.extend({ winnerId: id })).nullable(),
   tricksWon: countsById,
   legal: LegalSchema,
   result: ViewResultSchema.nullable(),

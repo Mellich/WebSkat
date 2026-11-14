@@ -27,6 +27,22 @@ test('three players play one game and everybody sees the result and the statisti
     const results = await Promise.all(pages.map((page) => page.getByTestId('result-dialog').innerText()));
     expect(new Set(results).size).toBe(1);
 
+    // The analysis (docs/ui.md §11) opens in a new tab and replays the game.
+    const [analysis] = await Promise.all([
+      host.page.context().waitForEvent('page'),
+      host.page.getByTestId('open-analysis').click(),
+    ]);
+    await analysis.waitForLoadState();
+    await expect(analysis.getByTestId('analysis-screen')).toBeVisible();
+    await expect(analysis.getByTestId('analysis-deal')).toContainText('Anna');
+    // a passed-in game has no replay board; the robot game may end passed in
+    if (await analysis.getByTestId('analysis-board').count() > 0) {
+      await analysis.getByTestId('analysis-forward').click();
+      await expect(analysis.getByTestId('analysis-trick')).not.toBeEmpty();
+      await expect(analysis.locator('[data-testid^="analysis-score-"]').first()).toBeVisible({ timeout: 15_000 });
+    }
+    await analysis.close();
+
     for (const page of pages) {
       await page.getByTestId('open-stats').click();
       await page.getByTestId('stats-tab-history').click();

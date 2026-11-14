@@ -6,6 +6,7 @@ import { en } from './en';
 import { enApp } from './parts/enApp';
 import { enGame } from './parts/enGame';
 import { enPanels } from './parts/enPanels';
+import { enAnalysis } from './parts/enAnalysis';
 import { enLog } from './parts/enLog';
 import { translate } from './index';
 
@@ -54,7 +55,7 @@ describe('translate', () => {
 
 describe('dictionaries', () => {
   it('has no key in two parts', () => {
-    expect(Object.keys(enApp).length + Object.keys(enGame).length + Object.keys(enPanels).length + Object.keys(enLog).length).toBe(Object.keys(en).length);
+    expect(Object.keys(enApp).length + Object.keys(enGame).length + Object.keys(enPanels).length + Object.keys(enLog).length + Object.keys(enAnalysis).length).toBe(Object.keys(en).length);
   });
 
   it('have the same keys and no empty strings', () => {

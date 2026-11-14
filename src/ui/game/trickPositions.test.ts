@@ -37,6 +37,7 @@ function gameWith(roles: GameView['roles'], sittingOut: readonly string[]): Game
     discarded: null,
     trick: { leaderId: roles.forehand, plays: [] },
     lastTrick: null,
+    tricks: null,
     tricksWon: {},
     legal: {},
     result: null,

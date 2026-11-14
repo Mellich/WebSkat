@@ -34,6 +34,7 @@ export function finishedGameFixture(overrides: Partial<GameView> = {}): GameView
     discarded: null,
     trick: { leaderId: 'a', plays: [] },
     lastTrick: null,
+    tricks: null,
     tricksWon: { a: 0, b: 0, c: 0 },
     legal: {},
     result: null,

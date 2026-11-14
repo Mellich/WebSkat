@@ -9,3 +9,5 @@ export * from './directory';
 export * from './signalingConfig';
 export * from './trysteroTransport';
 export * from './random';
+export { CardIdSchema, DeclarationSchema } from './schemaGame';
+export { DoubleLevelSchema } from './schemaView';

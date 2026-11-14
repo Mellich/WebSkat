@@ -11,6 +11,12 @@ const ChangelogScreen = lazy(async () => {
   return { default: module.ChangelogScreen };
 });
 
+// The analysis screen is loaded only when its route opens (docs/plans/analysis/05).
+const AnalysisScreen = lazy(async () => {
+  const module = await import('./ui/analysis/AnalysisScreen');
+  return { default: module.AnalysisScreen };
+});
+
 // Development-only screens. The conditions are constants in production builds, so the lazy
 // imports are removed from the bundle.
 const DevGallery = import.meta.env.DEV
@@ -39,6 +45,8 @@ export function App() {
         return DevLocal === null ? <Home /> : <DevLocal seed={route.seed} players={route.players} bots={route.bots} />;
       case 'changelog':
         return <ChangelogScreen />;
+      case 'analysis':
+        return <AnalysisScreen data={route.data} />;
       case 'home':
         return <Home />;
       default: {

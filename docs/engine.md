@@ -69,6 +69,17 @@ cards), `declarations` (`declarationOptions(!pickedUpSkat)`: 7 or 22 entries), `
 The view passes `Legal` unchanged to the viewer (`table.md` §6), and the UI enables exactly these
 options.
 
+### Playing state from known cards (`playingState.ts`)
+
+`playingStateFrom(setup: PlaySetup): Result<GameState, GameErrorCode>` builds the state at the
+first card of a played game or a Ramsch from the dealt hands, the Skat, the declarer, declaration,
+bid, discard and doubling level. It replays no seed and no bidding: phase `playing`, the declarer
+holds the Skat minus the discard, `initialHands` are the dealt hands. Every card is then played
+with the normal reducer (`applyAction` with `{type:'play'}`), so legal cards, trick winners and the
+result come out exactly as in a real game. It validates the cards (`UNKNOWN_CARD`), the
+declaration and Ramsch consistency and the discard (`INVALID_DECLARATION`, `INVALID_DISCARD`). It
+is meant for the game analysis (plan in `docs/plans/analysis/`), not for the table.
+
 ## 4. Bidding (`bidding.ts`)
 
 ```ts

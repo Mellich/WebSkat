@@ -1,0 +1,79 @@
+.seat {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid transparent;
+}
+
+.active {
+  border-color: var(--accent);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.info {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.turn {
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cell {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.badge {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--panel-solid);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.good {
+  background: var(--analysis-good);
+}
+
+.bad {
+  background: var(--analysis-bad);
+}
+
+.neutral {
+  background: var(--panel-solid);
+}
+
+.marker {
+  font-size: 0.7rem;
+  color: var(--muted);
+}

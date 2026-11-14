@@ -1,0 +1,36 @@
+.screen {
+  display: grid;
+  gap: 16px;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-wrap: anywhere;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.head h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+.head a {
+  min-height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+}
+
+.summary {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}

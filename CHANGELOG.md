@@ -7,6 +7,21 @@ next version: `docs/dev/versioning.md`.
 
 Versions before 0.7.0 were reconstructed from the git history.
 
+## [Unreleased]
+
+### Added
+
+- Game analysis: "Analyze game" in the result dialog opens a new tab with every player's starting cards and the Skat. Replay the card play step by step and see, for each playable card, how often it wins: the scores come from sampled play-outs that keep improving while the analysis is open (pauses and resumes keep the samples). A switch uses the real cards of the other players instead. Choosing another card starts a variant from there. The scores also show the median, maximum and minimum card points, and a selector chooses which value decides the best card (win rate, average, median, max or min).
+
+### Changed
+
+- Dropdown menus (for example in the game analysis) now use the dark theme, including the open list, instead of the browser's light default.
+- The game analysis no longer calls a card "best" when the difference to another card is just sampling noise. Cards are compared on the same sampled deals; if the gap is within the noise, all cards that are about equal are marked "best (tied)". The score table is unchanged otherwise.
+- The game analysis samples adaptively: cards that are clearly behind stop getting samples, so the close contenders get more of them, and the analysis finishes early once one card is clearly the best. The sample count now reads "up to N samples per card".
+- The game analysis can set the share of random moves in the simulated play-outs (0, 5, 10, 20 or 30 %; default 10 %). Changing it restarts the sampling.
+- The game analysis score table no longer shows the sample count of each card (the move control above already shows it).
+- "Show all cards" in the result dialog is replaced by the game analysis. A finished game sends every completed trick to every player (protocol version 11), which the replay needs.
+
 ## [0.15.1] - 2026-11-13
 
 ### Fixed

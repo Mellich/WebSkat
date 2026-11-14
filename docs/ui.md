@@ -19,6 +19,7 @@ No router library. `useRoute()` reads `location.hash` (`useSyncExternalStore`);
 | `#/dev/local?seed=N&players=3..6&bots=easy\|normal\|strong` | `dev-local` | `dev/DevLocal.tsx` (DEV builds only, else Home) |
 | `#/dev/gallery` | `dev-gallery` | `dev/Gallery.tsx` (DEV builds only, else Home) |
 | `#/changelog` | `changelog` | `screens/ChangelogScreen.tsx` (all builds) |
+| `#/analysis?g=<base64url>` | `analysis` (`data` = the raw `g` value or null) | `analysis/AnalysisScreen.tsx`, lazy (all builds). The link carries the whole finished game (`analysis/link.ts`, validated by `analysis/inputSchema.ts`); no storage or network. Step 05 stub, the screen is filled in step 07 (`docs/plans/analysis/`) |
 
 `App` also renders `<Toasts />` (toasts vanish after 4.5 s or on click) and, on every route except
 `changelog`, `<VersionBadge />`: `v<version>` fixed in the bottom left corner (`app-version`, small,
@@ -221,3 +222,78 @@ in `global.css`; serif fallbacks), text uses `--font-body`
 Buttons are ≥ 44 px tap targets. Image URLs come from `assets.ts` (`cardUrl`, `backUrl`,
 `logoUrl`, based on `import.meta.env.BASE_URL`). Card images are preloaded once per page when a
 table opens (`preload.ts`), so tricks and open hands show without delay.
+
+**Theme every new element.** The app is dark only: `:root` sets `color-scheme: dark`, and
+`global.css` styles the native controls `button`, `input[type='text']` and `select` (including
+`option`, which draws the popup list) with `--ink` on `--panel-solid`. A new control must use
+these tokens and never rely on browser defaults (white popups, light scrollbars). When you add a
+new kind of native element (`textarea`, `input[type=range]`, `details`, …), add a rule to
+`global.css` first, then check it in the browser. Overrides in a module (e.g. `.field select` in
+`SettingsDialog.module.css`) must keep `color` and `background` from the tokens.
+
+## 11. Analysis screen (`analysis/`, plan `docs/plans/analysis/`)
+
+Entry point: the "Analyze game" button (`open-analysis`) of the result dialog (`ui-game-screen.md` §7),
+which opens the link in a new tab.
+
+The card scores are sampled in a **module Web Worker** so the page never freezes. The worker
+(`analysis/analysis.worker.ts`) runs `createRunner` (`analysis/runner.ts`, plain TypeScript and
+unit-tested without a worker): on `analyze` it builds the position at the cursor with the engine
+(`analysisStart`, `positionAt`), then runs one batch of `SAMPLES_PER_BATCH` (8) worlds per playable
+card still in play (`scoreBatch` with `activeCards`: cards clearly behind stop, I189) per step. After
+every batch it posts the summed stats (`scores`); the loop stops when one card is clearly the best or
+the leading cards reach `MAX_SAMPLES_PER_CARD` (3000), or at once for Ramsch, passed-in games and the end
+of the line (`scores` with `[]`, `done`). Steps are scheduled with `setTimeout(f, 0)`, so a stop or
+a new request takes effect after at most one batch (~30–60 ms). Every request has an `id`; a step
+of an older id posts nothing and a response of an older id is dropped by the hook.
+
+`analysis/useCardScores.ts` owns the worker: one worker per mounted screen (created in an effect,
+`terminate()` on unmount). A change of the position key (`plays`, real-hands switch and rollout epsilon) restarts the
+sampling from zero; a pause sends `stop` and keeps the shown stats; resuming continues from them
+(`initial`), so no sample is counted twice. The messages (`workerProtocol.ts`) never leave the
+tab, so they are typed but not zod-validated; the input was validated by the link (decision I185).
+The `input` argument must be a stable object (memoize it), otherwise the sampling restarts on
+every render.
+
+### The analysis screen (`analysis/AnalysisScreen.tsx`, plan step 07)
+
+`#/analysis?g=…` is a page of its own (new tab, no session store). It shows, top to bottom:
+a summary line (`summaryText`: "Anna plays Grand Hand · bid 48", "Ramsch", "Everybody passed"),
+`DealOverview` (the starting cards of every player, the Skat, the discarded cards after a pickup,
+the declarer marked `*`), and for played and Ramsch games `AnalysisReplay`. A passed-in game
+stops after the deal overview: no replay, no worker. The link is decoded once (`decodeAnalysis`);
+invalid data shows `analysis.invalid`.
+
+- **Replay board** (`ReplayBoard`, `SeatHand`): one seat per role, all cards face up. The player
+  to move is highlighted (`aria-current`), their playable cards are buttons (`analysis-card-<id>`)
+  with a win-rate badge; the others are drawn disabled. The current trick sits in the middle.
+  Clicking a playable card plays it (`chooseCard`).
+- **State** (`AnalysisReplay.tsx`): one `AnalysisLine` (`plays`, `cursor`). Navigation is pure
+  (`lineNav.ts`): start, back, forward, end, jump to trick n (cursor = 3n), reset. A card that
+  differs from the actual next card starts a variant: the line is cut there (`chooseCard`).
+  Forward is off at the end of a line; a variant continues only by choosing a card.
+  The keys ArrowLeft / ArrowRight / Home / End move the cursor; they are ignored while focus is in
+  a form field. The handler sits on the replay wrapper, so the keys work while focus is on the board.
+- **Controls** (`ReplayControls`): the four step buttons, the status line (`analysis-status`,
+  "Trick 3 · card 2", or "End of the game"), the variant badge with "Back to the actual game" (only
+  while the line differs from the actual game), and for played games: the real-hands switch
+  (`analysis-real-hands`), the share of random moves in the play-outs (`analysis-epsilon`, 0/5/10/20/30 %,
+  default 10 %, I190; a change restarts the sampling), "Play best" (the best card by the chosen criterion), and pause/resume.
+  The switch is off by default; the hint says what it means.
+- **Scores** (`ScoreList`): one row per playable card, best first (`rankStats`): card, win rate,
+  Ø / median / max / min points (hidden for Null), and the marks "played" (the actual game's next card)
+  and "best". A selector (`analysis-criterion`, not for Null) chooses the value that ranks the
+  cards and decides "best" and "Play best": win rate (default), average, median, max or min; the
+  other values break ties. Before the first batch the rows show zeros and "Calculating…". A row is a button that
+  plays the card. Ramsch shows "No scores for Ramsch games." and no sampling. Win-rate colours:
+  `--analysis-good` from 60 %, `--analysis-bad` up to 40 % (`winTone`).
+- **Result** (`AnalysisResult`): replaces the score list when the line reached the end of the game
+  (won/lost with the game, points, tricks, value; for Ramsch the losers or Durchmarsch, Jungfrau and
+  per-player points and score change).
+- **Tricks** (`TrickHistory`): every completed trick of the whole line, one button per trick
+  (`analysis-trick-<n>`, 1-based) that jumps to its end. Tricks from the variant start on carry a
+  variant tag on the first one and a left accent on the others.
+
+Layout: mobile first, one column. From 900 px the board is left and the controls, scores or result
+are right (`AnalysisReplay.module.css`). Every card button has an `aria-label` with the card name and
+its win rate; tap targets are at least 44 px. The worker and its hook are described above.

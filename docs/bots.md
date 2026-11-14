@@ -218,6 +218,10 @@ team view:
   if the other side takes no trick (Schwarz).
 - Null: `100` if the bot's team wins the Null game in the play-out, else `0`.
 
+`playOut(start, pick = heuristicCard)` takes the card policy of the simulated players as an optional
+`RolloutPolicy`. The Strong bot keeps the default; the game analysis passes its own policy
+(`src/table/analysis/rollout.ts`, decision I183).
+
 Pick the card with the highest mean. Ties go to the Normal heuristic's choice. Budget: one decision
 may take up to 500 ms (slowest decision) on an idle mid-range laptop; measured on an 8-core machine:
 median ≈ 110 ms, slowest ≈ 400 ms. If the perf test fails, lower `ROLLOUT_BUDGET` in `tuning.ts`.

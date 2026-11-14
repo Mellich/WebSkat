@@ -137,6 +137,16 @@ describe('real views and records from the table layer', () => {
     }
   });
 
+  it('parses a view that lists the completed tricks and rejects a bad card in one', () => {
+    const view = viewFor(playedPassIn(), 'h');
+    if (view.game === null) throw new Error('no game');
+    const trick = { leaderId: 'h', plays: [{ playerId: 'h', card: 'C7' }], winnerId: 'h' };
+    expect(TableViewSchema.safeParse({ ...view, game: { ...view.game, tricks: [trick] } }).success).toBe(true);
+    expect(TableViewSchema.safeParse({ ...view, game: { ...view.game, tricks: null } }).success).toBe(true);
+    const bad = { ...trick, plays: [{ playerId: 'h', card: 'XX' }] };
+    expect(TableViewSchema.safeParse({ ...view, game: { ...view.game, tricks: [bad] } }).success).toBe(false);
+  });
+
   it('parses the game records', () => {
     const s = playedPassIn();
     expect(s.records).toHaveLength(1);

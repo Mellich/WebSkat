@@ -85,15 +85,18 @@ function turnOf(sim: SimState): Role {
   return last === undefined ? sim.trick.leader : nextRole(last.role);
 }
 
+/** Chooses the card of a simulated player (the Normal heuristics unless another policy is given). */
+export type RolloutPolicy = (view: PlayView) => CardId;
+
 /** Plays the deal to the end (Null stops once the declarer has taken a trick). */
-export function playOut(start: SimState): SimOutcome {
+export function playOut(start: SimState, pick: RolloutPolicy = heuristicCard): SimOutcome {
   let sim = start;
   const isNull = sim.declaration.kind === 'null';
   for (let guard = 0; guard < 40; guard++) {
     const role = turnOf(sim);
     if (sim.hands[role].length === 0) break;
     if (isNull && sim.tricks.some((t) => t.winner === sim.declarer)) break;
-    sim = simPlay(sim, role, heuristicCard(viewIn(sim, role)));
+    sim = simPlay(sim, role, pick(viewIn(sim, role)));
   }
   const won = sim.tricks.filter((t) => t.winner === sim.declarer);
   const trickPts = won.reduce((n, t) => n + t.plays.reduce((m, p) => m + cardPoints(p.card), 0), 0);

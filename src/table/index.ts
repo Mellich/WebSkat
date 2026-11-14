@@ -9,3 +9,4 @@ export * from './viewTypes';
 export * from './view';
 export * from './bot';
 export type { BotView } from './bot/knowledge';
+export * from './analysis';

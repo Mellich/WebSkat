@@ -1,6 +1,7 @@
 /* Design tokens (docs/ui.md §5). A westphalian Schänke: dark oak, worn baize, brass and beer.
    Dark theme only in v1. Keep text contrast ≥ 4.5:1 on every panel. */
 :root {
+  color-scheme: dark; /* native controls (select popups, scrollbars) follow the dark theme */
   /* Wood and tavern */
   --wood-dark: #1f130a;
   --wood: #3a2415;
@@ -25,6 +26,8 @@
   --danger: #e5484d;
   --suit-red: #c8322a;
   --suit-black: #17110c;
+  --analysis-good: #3f7a3a; /* score badges: win rate from 60 % (analysis, docs/ui.md §11) */
+  --analysis-bad: #8a2a24; /* win rate up to 40 % */
 
   /* Type: headings in Pirata One (blackletter-style, bundled in public/fonts), text stays a readable sans. */
   --font-display: 'Pirata One', 'Old English Text MT', 'Times New Roman', serif;

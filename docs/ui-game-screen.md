@@ -153,10 +153,11 @@ A bottom sheet whose backdrop lets clicks through, so TopBar (Stats, Settings) s
   (`records`, matched by `record.number === game.number`). Cells show `…` until the record has
   arrived. The caption names the system ("Score change (Standard)" / "Score change (Seeger–Fabian)").
   The dialog computes no scores itself.
-- **Show all cards** (`show-all-cards`, `AllCards.tsx`): toggles a list (`all-cards`) of every player's
-  dealt cards (forehand, middlehand, hindhand; names from the seats, sorted by `sortHand`) and the Skat.
-  Shown only when the view carries `game.initialHands` (a finished game, any outcome, `revealedHands.ts`).
-  Local UI state only; it is not sent anywhere.
+- **Analyze game** (`open-analysis`): opens the finished game in a new tab at `#/analysis?g=…`
+  (`openAnalysis`, `window.open(…, '_blank', 'noopener')`). `analysisInputFromView(view)` builds the
+  link data; the button is shown only when the view is a finished game that carries
+  `game.initialHands` (any outcome). The analysis shows every dealt hand and the Skat, a replay and
+  the card scores (`docs/ui.md` §11). Nothing is stored or sent; the link carries the game.
 - **Continue** (`continue`) sends `ready`; then it is disabled and shows "Waiting for: A, B"
   (connected humans not yet ready).
 

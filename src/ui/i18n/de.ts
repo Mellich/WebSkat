@@ -3,7 +3,8 @@
 import { deApp } from './parts/deApp';
 import { deGame } from './parts/deGame';
 import { dePanels } from './parts/dePanels';
+import { deAnalysis } from './parts/deAnalysis';
 import { deLog } from './parts/deLog';
 import type { Dict } from './en';
 
-export const de: Dict = { ...deApp, ...deGame, ...dePanels, ...deLog };
+export const de: Dict = { ...deApp, ...deGame, ...dePanels, ...deLog, ...deAnalysis };

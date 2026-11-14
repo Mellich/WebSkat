@@ -1,7 +1,9 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
-import type { GameRecord, TableView, ViewResult } from '../../table';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { viewFor, type GameRecord, type TableView, type ViewResult } from '../../table';
+import { finishedTable } from '../../table/analysis/testing';
+import { decodeAnalysis } from '../analysis/link';
 import { ResultDialog } from './ResultDialog';
 import { finishedGameFixture, tableViewFixture } from './viewFixtures';
 
@@ -209,26 +211,39 @@ describe('ResultDialog Bock notes (skat-rules §13)', () => {
   });
 });
 
-describe('ResultDialog show all cards', () => {
-  it('offers the button only when the finished game carries the dealt hands', () => {
-    const { unmount } = render(
+describe('ResultDialog game analysis', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('offers no analysis while the view carries no dealt hands', () => {
+    render(
       <ResultDialog view={tableViewFixture(finishedGameFixture())} result={lost} record={record} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />,
     );
-    expect(screen.queryByTestId('show-all-cards')).toBeNull();
-    unmount();
+    expect(screen.queryByTestId('open-analysis')).toBeNull();
+  });
 
-    render(
-      <ResultDialog
-        view={tableViewFixture(finishedGameFixture({ initialHands: { a: ['C7'], b: ['H9'], c: ['D10'] }, skat: ['CA', 'SK'] }))}
-        result={lost}
-        record={record}
-        scoring="standard"
-        onContinue={() => undefined}
-        onAddRounds={() => undefined}
-      />,
-    );
-    fireEvent.click(screen.getByTestId('show-all-cards'));
-    expect(screen.getByTestId('all-cards').textContent).toContain('Cem');
+  it('opens the finished game in a new tab, encoded in the link', () => {
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    const finished = viewFor(finishedTable('played'), 'p0');
+    const result = finished.game?.result;
+    if (result === undefined || result === null) throw new Error('expected a finished game');
+
+    render(<ResultDialog view={finished} result={result} record={null} scoring="standard" onContinue={() => undefined} onAddRounds={() => undefined} />);
+    fireEvent.click(screen.getByTestId('open-analysis'));
+
+    expect(open).toHaveBeenCalledTimes(1);
+    const call = open.mock.calls[0];
+    if (call === undefined) throw new Error('expected a call to window.open');
+    const [url, target, features] = call;
+    expect(String(url)).toContain('#/analysis?g=');
+    expect(target).toBe('_blank');
+    expect(features).toBe('noopener');
+
+    const g = new URLSearchParams(String(url).split('?')[1]).get('g');
+    const decoded = decodeAnalysis(g ?? '');
+    expect(decoded).not.toBeNull();
+    expect(Object.values(decoded?.names ?? {}).sort()).toEqual(finished.table.players.map((p) => p.name).sort());
   });
 });
 

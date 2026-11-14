@@ -39,9 +39,10 @@ API). Tests: `docs/dev/testing.md`.
 | `legal.ts` | `Legal`, `getLegal`, `enumerateActions` (re-exported by `game.ts`; not in `index.ts`) |
 | `doubling.ts` | `openDoubling`, `applyDoubling`, `defendersOf`: the Kontra/Re window after the declaration (skat-rules §14) |
 | `game.ts` | `newGame(seed, options)`, `applyAction` (the reducer), `isFinished` |
+| `playingState.ts` | `PlaySetup`, `playingStateFrom(setup)`: the state at the first card from known cards (analysis; no seed, no bidding) |
 | `index.ts` | public re-exports |
 | `testing.ts` | test helpers (`hand`, `stateWith`, `apply`, `run`, `afterBidding`, …) |
-| `*.test.ts` | one test file per module; `game.fuzz.test.ts` (2000 random games), `ramsch.fuzz.test.ts` (500 Ramsch games), `ramsch.test.ts` (R1–R5 vectors, Ramsch flow), `game.scripted.test.ts` (a full game as living documentation), `game.legal.test.ts` |
+| `*.test.ts` | one test file per module (`playingState.test.ts`: round trip of 300 finished games, Hand/Ramsch starts, validation errors); `game.fuzz.test.ts` (2000 random games), `ramsch.fuzz.test.ts` (500 Ramsch games), `ramsch.test.ts` (R1–R5 vectors, Ramsch flow), `game.scripted.test.ts` (a full game as living documentation), `game.legal.test.ts` |
 
 ## Recipes
 

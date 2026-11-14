@@ -21,7 +21,7 @@ Read first: `docs/dev/e2e.md` (setup, specs, robot, layout test, test ids).
 |---|---|
 | `helpers.ts` | `newPlayer`, `createTable`, `joinTable`, `startGame`, `handCards`, `waitForHand`, `storageKey`, `hasHostSnapshot`, `closeAll` |
 | `robot.ts` | `robotStep`, `playUntilResult`, `continueAfterResult` |
-| `game.spec.ts` | A: three players play one game; result and history row everywhere |
+| `game.spec.ts` | A: three players play one game; result and history row everywhere; the host's analysis opens in a new tab and replays |
 | `geberskat.spec.ts` | B: public table, four players, dealer sits out, rotation after one game |
 | `reconnect.spec.ts` | C: client reload, start-page rejoin, host reload + resume |
 | `layout.spec.ts` | D: `#/dev/local?seed=6&bots=easy` at 7 viewports, every phase fits without scrolling |

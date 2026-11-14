@@ -47,6 +47,7 @@ All implementation phases 0–14 of the original plan are done (archive: `histor
 | F14 | Table rule "Bockrunden" (host sets it in the lobby): a 60 : 60 game makes the next 3 games Bock games with doubled points | `skat-rules.md` §13, `table.md` §2, §4, §5 |
 | F15 | Game log (📜): joins, disconnects, bids, declared games, Ramsch and Bock events, results; the same for everybody | `table.md` §4a, `ui.md` §10 |
 | F16 | Version label bottom left on every screen; opens the changelog (`#/changelog`, from `CHANGELOG.md`) in a new tab | `ui.md` §1, `dev/versioning.md` |
+| F17 | Game analysis from the result dialog ("Analyze game", new tab): starting cards and Skat, replay of the card play, win-rate score per playable card from sampled play-outs (optional real hands), variants from any card | `ui.md` §11, `table.md` §6a, `ui-game-screen.md` §7 |
 
 ## 4. Out of scope
 

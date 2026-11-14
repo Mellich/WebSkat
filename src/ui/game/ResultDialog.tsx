@@ -2,15 +2,14 @@
 
 import type { ReactNode } from 'react';
 
-import type { GameRecord, TableView, ViewResult } from '../../table';
+import { analysisInputFromView, type GameRecord, type TableView, type ViewResult } from '../../table';
 import { CardChips } from '../components/CardChip';
 import { useT, type Translator } from '../i18n';
 import { signed } from '../stats/gameLabel';
-import { AllCards } from './AllCards';
+import { openAnalysis } from '../analysis/link';
 import { declarationLabel } from './labels';
 import { RamschResult } from './RamschResult';
 import { namesById } from './seats';
-import { revealedHands } from './revealedHands';
 import styles from './ResultDialog.module.css';
 
 export interface ResultDialogProps {
@@ -30,11 +29,15 @@ export function ResultDialog({ view, result, record, scoring, onContinue, onAddR
   const names = namesById(view);
   const readyIds = new Set(view.table.readyIds);
   const waiting = view.table.players.filter((p) => !p.isBot && p.connected && !readyIds.has(p.id));
-  const dealt = revealedHands(view);
+  const analysis = analysisInputFromView(view);
   const shell = {
     t,
     onContinue,
-    allCards: dealt === null ? null : <AllCards hands={dealt} />,
+    analysis: analysis === null ? null : (
+      <button type="button" onClick={() => { openAnalysis(analysis); }} data-testid="open-analysis">
+        {t('result.analyze')}
+      </button>
+    ),
     onAddRounds: view.you.id === view.table.hostId ? onAddRounds : null,
     lastGame: view.table.gameLimit > 0 && view.table.gamesPlayed >= view.table.gameLimit,
     seats: view.table.players.length,
@@ -109,12 +112,12 @@ interface ShellProps {
   readonly iAmReady: boolean;
   readonly waiting: readonly string[];
   readonly record: GameRecord | null;
-  /** The "show all cards" button, or null while the game is not finished. */
-  readonly allCards: ReactNode;
+  /** The 'Analyze game' button, or null while the game is not finished. */
+  readonly analysis: ReactNode;
   readonly children: ReactNode;
 }
 
-function Shell({ t, onContinue, onAddRounds, lastGame, seats, iAmReady, waiting, record, allCards, children }: ShellProps) {
+function Shell({ t, onContinue, onAddRounds, lastGame, seats, iAmReady, waiting, record, analysis, children }: ShellProps) {
   const status = waiting.length > 0
     ? t('result.waitingFor', { names: waiting.join(', ') })
     : t('result.waitingOthers');
@@ -125,7 +128,7 @@ function Shell({ t, onContinue, onAddRounds, lastGame, seats, iAmReady, waiting,
         {children}
         {record?.bock ? <p>{t('result.bock')}</p> : null}
         {record?.bockTriggered ? <p>{t('result.bockTriggered')}</p> : null}
-        {allCards}
+        {analysis}
         {lastGame ? <p>{t('series.lastGame')}</p> : null}
         {iAmReady ? <p className={styles.waiting}>{status}</p> : null}
         {lastGame && onAddRounds !== null ? (

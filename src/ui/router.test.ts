@@ -22,6 +22,8 @@ describe('parseRoute', () => {
     ['#/dev/local?bots=hard', { kind: 'dev-local', seed: null, players: 3, bots: 'normal' }],
     ['#/dev/gallery', { kind: 'dev-gallery' }],
     ['#/changelog', { kind: 'changelog' }],
+    ['#/analysis?g=abc', { kind: 'analysis', data: 'abc' }],
+    ['#/analysis', { kind: 'analysis', data: null }],
   ] as const)('%j → %j', (hash, route) => {
     expect(parseRoute(hash)).toEqual(route);
   });
